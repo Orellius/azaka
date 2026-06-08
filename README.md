@@ -113,21 +113,26 @@ bun scripts/build-areas.mjs    # -> public/data/areas.geojson
 
 ```
 src/
-  App.tsx                  dashboard shell + grouped event feed
+  App.tsx                  history-API router (map / historical / about / privacy / terms / contact)
+  MapDashboard.tsx         dashboard shell: map + RTL command panel, grouped feed, FIRMS panel, legend
   alerts/
-    useAlertFeed.ts        WebSocket client, alert state, fail-safe backstop
-    categories.ts          authoritative category + title classifier (single source of truth)
+    useAlertFeed.ts        WebSocket client; rolling 24h feed seeded from /history, stacking, backstop
+    categories.ts          authoritative title classifier (single source of truth)
+    AlertIcon.tsx          per-threat-type category icon
   map/
-    AlertMap.tsx           MapLibre map, tiers, threat-zone, React-portal overlays
-    majorCities.ts         curated city labels
-    mapStyle.ts            basemap config
-  threat-zone/
-    convexHull.ts          monotone-chain hull (no deps)
-    computeThreatZone.ts   active areas -> threat polygon
+    AlertMap.tsx           MapLibre map: tiers, threat-zone, history-snapshot layer, portal overlays
+    majorCities.ts / mapStyle.ts
+  firms/                   NASA FIRMS thermal-anomaly overlay (useFirms, anomaly grouping/labels)
+    map/FireLayer.tsx      fire-icon markers + popup (lives under src/map)
+  historical/              /historical stats page (server-aggregated)
+  pages/InfoPage.tsx       about / privacy / terms / contact
+  consent/                 cookie consent banner + store
+  threat-zone/             convexHull + computeThreatZone (no deps)
 relay/
-  server.ts                Bun relay: poll official feed, classify, fan out, persist
-scripts/
-  build-areas.mjs          build areas.geojson from upstream sources
+  server.ts                poll official feed, classify, fan out, persist, HTTP routes
+  history.ts               year-partitioned history log + computeStats
+  firms.ts                 NASA FIRMS poller + local-midnight daily rollover
+scripts/build-areas.mjs    build areas.geojson from upstream sources
 ```
 
 ## Data sources and credits
@@ -143,9 +148,15 @@ These feeds are unofficial and carry no SLA. Treat them accordingly.
 ## Status
 
 Early but real. The relay has caught real live alerts end to end from the official feed and classifies
-them correctly. The full UI builds and typechecks clean. See the project notes for the current roadmap
-(production Israeli egress, a distinct visual for terror and nonconventional threats, and a predictive
-"next likely areas" model from the persisting history).
+them correctly. The full UI builds and typechecks clean. Beyond the core map it now has a rolling 24h
+grouped feed (seeded from history, survives refresh), per-event history snapshots (click a card to
+replay its areas on the map), a NASA FIRMS thermal-anomaly overlay (opt-in), a historical stats page,
+and the legal/consent scaffolding for launch.
+
+Roadmap: production Israeli egress; "full event extent" historical snapshots (union every wave of an
+ended event); FIRMS counts surfaced on the historical page; an honest alert-correlation tag (anomaly
+inside a recently-alerted polygon vs. random fire); a predictive "next likely areas" model from the
+persisting history. Legal pages and the contact email still need real content before launch.
 
 ## License
 
