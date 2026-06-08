@@ -45,6 +45,18 @@ itself cannot answer.
 - **Hebrew city labels and click-to-inspect.** Major cities light up by tier. Click any sub-area to see
   its name and shelter-entry time.
 - **Auto-zoom to fresh alerts**, with guards so it never hijacks the view while you are panning.
+- **Sound + browser notifications** on a genuinely-new live alert (distinct for active vs early), with a
+  mute toggle. Permission is requested only on an explicit opt-in, never on page load.
+- **"My Area" personal alert.** Pick your city once; when it is alerted, a full-width banner shows with a
+  live ticking countdown built from the official migun seconds, framed honestly as time-to-reach-shelter,
+  not time-to-impact.
+- **"Where to take shelter."** The official Home Front Command protected-space hierarchy (mamad/mamak/
+  miklat, then interior stairwell, then interior room, then outdoors/driving). Israel publishes no
+  reliable open public-shelter dataset, so Azaka shows always-correct guidance rather than a pin that
+  could send you to a locked or demolished shelter.
+- **Multilingual (he / en / ar / ru)** with language chips and full RTL/LTR switching. oref's verbatim
+  text is always kept; translations sit beside it as an aid.
+- **Mobile-first.** The command panel is a collapsible bottom sheet on phones, a floating card on desktop.
 
 ## Architecture
 
@@ -60,7 +72,9 @@ Cloudflare Worker) cannot read it directly. Azaka runs its own thin relay from a
 
 - **Frontend** (`src/`): Vite + React 19 + TypeScript + MapLibre GL + Tailwind v4, RTL Hebrew. The
   GL layer (polygons, colors, threat-zone hull) is imperative; the HTML overlays (city pills, popup)
-  are React via `createPortal`.
+  are React via `createPortal`. Vertical-slice folders: `notify/` (alarm + notifications), `myarea/`
+  (personal alert + shelter countdown), `i18n/` (language store + dictionary), `shelter/` (where-to-
+  shelter guidance).
 - **Relay** (`relay/server.ts`): a Bun WebSocket server that polls the official `Alerts.json`, dedups
   by alert id, classifies each alert, fans it out to every connected browser, and appends it to a
   history log. No third party in the data path.
@@ -77,6 +91,11 @@ This is a life-safety surface, so a few rules are non-negotiable in the code:
    threats. An area is held until an explicit all-clear, with a long fail-safe backstop only to avoid
    a stuck state.
 3. **Filter non-attacks.** Memorial-day sirens and drills are never shown as real alerts.
+4. **No fabricated shelter pins.** Israel publishes no reliable, openly-licensed national public-shelter
+   dataset (the complete layer is proprietary; open data is a few cities; a Jan-2026 State Comptroller
+   audit found >11% of public shelters unfit). Location is not live availability, so Azaka shows the
+   official "where to take shelter" guidance rather than directing you to a specific shelter that may be
+   locked or gone. The personal countdown is the official time-to-reach-shelter, never a time-to-impact.
 
 ## Getting started
 
@@ -114,11 +133,15 @@ bun scripts/build-areas.mjs    # -> public/data/areas.geojson
 ```
 src/
   App.tsx                  history-API router (map / historical / about / privacy / terms / contact)
-  MapDashboard.tsx         dashboard shell: map + RTL command panel, grouped feed, FIRMS panel, legend
+  MapDashboard.tsx         dashboard shell: map + command panel, grouped feed, FIRMS panel, legend
   alerts/
     useAlertFeed.ts        WebSocket client; rolling 24h feed seeded from /history, stacking, backstop
     categories.ts          authoritative title classifier (single source of truth)
     AlertIcon.tsx          per-threat-type category icon
+  notify/                  audible alarm (Web Audio) + browser notifications + mute toggle
+  myarea/                  "My Area" pick, persistence, personal alert + live shelter countdown banner
+  shelter/                 "Where to take shelter" official guidance (no fabricated pins)
+  i18n/                    language store + dictionary + chips (he / en / ar / ru, RTL/LTR)
   map/
     AlertMap.tsx           MapLibre map: tiers, threat-zone, history-snapshot layer, portal overlays
     majorCities.ts / mapStyle.ts
@@ -150,13 +173,19 @@ These feeds are unofficial and carry no SLA. Treat them accordingly.
 Early but real. The relay has caught real live alerts end to end from the official feed and classifies
 them correctly. The full UI builds and typechecks clean. Beyond the core map it now has a rolling 24h
 grouped feed (seeded from history, survives refresh), per-event history snapshots (click a card to
-replay its areas on the map), a NASA FIRMS thermal-anomaly overlay (opt-in), a historical stats page,
-and the legal/consent scaffolding for launch.
+replay its areas on the map), audible alarm + browser notifications, a personal "My Area" alert with a
+live shelter countdown, "where to take shelter" guidance, a multilingual UI (he/en/ar/ru), a mobile
+bottom-sheet layout, a NASA FIRMS thermal-anomaly overlay (opt-in), a historical stats page, and the
+legal/consent scaffolding.
 
-Roadmap: production Israeli egress; "full event extent" historical snapshots (union every wave of an
-ended event); FIRMS counts surfaced on the historical page; an honest alert-correlation tag (anomaly
-inside a recently-alerted polygon vs. random fire); a predictive "next likely areas" model from the
-persisting history. Legal pages and the contact email still need real content before launch.
+Before launch: gate the dev-only `/test/alert` endpoint and serve the relay over `wss://` (an HTTPS page
+cannot connect to `ws://`); production Israeli egress under process supervision; legal pages + a real
+contact email need real content; the Arabic and Russian strings need a native/professional review.
+
+Roadmap: an optional real public-shelter layer for the 2-3 cities with good open data (Jerusalem ODbL +
+Be'er Sheva), with explicit coverage labels and a "may be locked, verify" disclaimer; "full event
+extent" historical snapshots (union every wave of an ended event); FIRMS counts on the historical page;
+an honest alert-correlation tag (anomaly inside a recently-alerted polygon vs. random fire).
 
 ## License
 
