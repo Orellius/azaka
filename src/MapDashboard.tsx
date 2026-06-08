@@ -18,11 +18,18 @@ const STATUS_LABEL: Record<string, { text: string; dot: string }> = {
   connecting: { text: 'מתחבר…', dot: 'bg-amber-400' },
   error: { text: 'שגיאת חיבור', dot: 'bg-rose-500' },
 }
-const SEV: Record<FeedEvent['severity'], { bar: string; txt: string }> = {
-  active: { bar: 'bg-rose-500', txt: 'text-rose-200' },
-  special: { bar: 'bg-rose-500', txt: 'text-rose-200' },
-  early: { bar: 'bg-amber-500', txt: 'text-amber-200' },
-  cleared: { bar: 'bg-emerald-500', txt: 'text-emerald-200' },
+const SEV: Record<FeedEvent['severity'], { bar: string; txt: string; border: string }> = {
+  active: { bar: 'bg-rose-500', txt: 'text-rose-200', border: 'border-rose-500/50' },
+  special: { bar: 'bg-rose-500', txt: 'text-rose-200', border: 'border-rose-500/50' },
+  early: { bar: 'bg-amber-500', txt: 'text-amber-200', border: 'border-amber-500/50' },
+  cleared: { bar: 'bg-emerald-500', txt: 'text-emerald-200', border: 'border-emerald-500/50' },
+}
+// hex equivalents for the MapLibre snapshot highlight (paint props need hex, not Tailwind classes)
+const SEV_HEX: Record<FeedEvent['severity'], string> = {
+  active: '#ff2532',
+  special: '#ff2532',
+  early: '#f59e0b',
+  cleared: '#10b981',
 }
 
 function relTime(ts: number): string {
@@ -66,28 +73,11 @@ export function MapDashboard() {
         clearedAreas={clearedAreas}
         fires={firmsOn ? firms.detections : []}
         snapshot={snapshot ? snapshot.cities : null}
+        snapshotColor={snapshot ? SEV_HEX[snapshot.severity] : undefined}
       />
 
       <div className="pointer-events-none absolute inset-0 p-4">
-        {snapshot && (
-          <div className="pointer-events-auto absolute start-1/2 top-4 z-10 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl border border-cyan-400/40 bg-slate-950/90 px-3 py-2 shadow-2xl backdrop-blur-md">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-400" />
-            <div className="min-w-0 text-[12px] text-slate-200">
-              <span className="font-semibold text-cyan-200">תצוגת היסטוריה</span>
-              {' · '}
-              {snapshot.title || 'התרעה'} · {snapshot.cities.length} אזורים ·{' '}
-              {new Date(snapshot.ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
-            </div>
-            <button
-              type="button"
-              onClick={() => setSnapshot(null)}
-              aria-label="סגור תצוגת היסטוריה"
-              className="shrink-0 text-slate-400 transition hover:text-white"
-            >
-              ✕
-            </button>
-          </div>
-        )}
+        {snapshot && <SnapshotBanner event={snapshot} onClose={() => setSnapshot(null)} />}
         <div className="feed-scroll pointer-events-auto me-auto flex max-h-[calc(100vh-2rem)] w-80 max-w-[88vw] flex-col gap-3 overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/85 p-4 shadow-2xl backdrop-blur-md">
           <header className="flex items-center gap-3">
             <span className="relative flex h-3.5 w-3.5">
@@ -124,9 +114,9 @@ export function MapDashboard() {
               אין התרעות פעילות
             </div>
           ) : (
-            <div className="feed-scroll flex max-h-[44vh] min-h-0 flex-col gap-2.5 overflow-y-auto pe-1">
-              {events.map((ev, i) => (
-                <EventCard key={`${ev.id}-${i}`} ev={ev} active={snapshot?.id === ev.id} onSelect={() => setSnapshot(ev)} />
+            <div className="feed-scroll flex max-h-[28rem] min-h-0 flex-col gap-2.5 overflow-y-auto pe-1">
+              {events.map((ev) => (
+                <EventCard key={ev.id} ev={ev} active={snapshot?.id === ev.id} onSelect={() => setSnapshot(ev)} />
               ))}
             </div>
           )}
@@ -142,14 +132,57 @@ export function MapDashboard() {
   )
 }
 
+function SnapshotBanner({ event, onClose }: { event: FeedEvent; onClose: () => void }) {
+  const sev = SEV[event.severity]
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true)) // fade in on mount
+    return () => cancelAnimationFrame(id)
+  }, [])
+  const close = () => {
+    setVisible(false)
+    window.setTimeout(onClose, 200) // let the fade-out finish before unmount
+  }
+  return (
+    <div
+      className={`pointer-events-auto absolute left-1/2 top-4 z-10 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl border bg-slate-950/90 px-3 py-2 shadow-2xl backdrop-blur-md transition-opacity duration-200 ${sev.border} ${visible ? 'opacity-100' : 'opacity-0'}`}
+    >
+      <span className={`h-2 w-2 shrink-0 rounded-full ${sev.bar}`} />
+      <div className="min-w-0 text-[12px] text-slate-200">
+        <span className={`font-semibold ${sev.txt}`}>תצוגת היסטוריה</span>
+        {' · '}
+        {event.title || 'התרעה'} · {event.cities.length} אזורים ·{' '}
+        {new Date(event.ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+      </div>
+      <button
+        type="button"
+        onClick={close}
+        aria-label="סגור תצוגת היסטוריה"
+        className="shrink-0 text-slate-400 transition hover:text-white"
+      >
+        ✕
+      </button>
+    </div>
+  )
+}
+
 function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; onSelect: () => void }) {
   const c = SEV[ev.severity]
+  const [expanded, setExpanded] = useState(false)
   const time = new Date(ev.ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
+  const long = ev.cities.length > 12 // collapse long lists; the card stays clickable for the map snapshot
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onSelect}
-      className={`flex w-full overflow-hidden rounded-xl border bg-white/5 text-start transition hover:bg-white/10 ${active ? 'border-cyan-400/70 ring-1 ring-cyan-400/40' : 'border-white/10'}`}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onSelect()
+        }
+      }}
+      className={`flex w-full shrink-0 cursor-pointer overflow-hidden rounded-xl border bg-white/5 text-start transition hover:bg-white/10 ${active ? 'border-cyan-400/70 ring-1 ring-cyan-400/40' : 'border-white/10'}`}
     >
       <div className={`w-1.5 shrink-0 ${c.bar}`} />
       <div className="min-w-0 flex-1 px-3 py-2.5">
@@ -157,9 +190,25 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
         <div className="mt-1 text-[10px] text-slate-500">
           {relTime(ev.ts)} · {time} · {ev.cities.length} אזורים
         </div>
-        <div className="mt-1.5 break-words text-[11px] leading-relaxed text-slate-300">{ev.cities.join(', ')}</div>
+        <div
+          className={`mt-1.5 break-words text-[11px] leading-relaxed text-slate-300 ${long && !expanded ? 'line-clamp-3' : ''}`}
+        >
+          {ev.cities.join(', ')}
+        </div>
+        {long && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setExpanded((v) => !v)
+            }}
+            className="mt-1.5 text-[10px] font-medium text-cyan-400/90 transition hover:text-cyan-300"
+          >
+            {expanded ? 'הצג פחות ▲' : `הצג את כל ${ev.cities.length} האזורים ▼`}
+          </button>
+        )}
       </div>
-    </button>
+    </div>
   )
 }
 

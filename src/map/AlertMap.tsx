@@ -54,12 +54,14 @@ export function AlertMap({
   clearedAreas,
   fires = [],
   snapshot = null,
+  snapshotColor = SELECT,
 }: {
   activeAreas: Set<string>
   earlyAreas: Set<string>
   clearedAreas: Set<string>
   fires?: FireDetection[]
   snapshot?: string[] | null // a past event's areas to highlight + fit (history snapshot view)
+  snapshotColor?: string // highlight colour, matching the event's severity (red / amber / green)
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
@@ -211,6 +213,8 @@ export function AlertMap({
       src.setData(EMPTY)
       return
     }
+    if (m.getLayer('snapshot-fill')) m.setPaintProperty('snapshot-fill', 'fill-color', snapshotColor)
+    if (m.getLayer('snapshot-line')) m.setPaintProperty('snapshot-line', 'line-color', snapshotColor)
     const features: Feature<Polygon>[] = []
     const pts: Point[] = []
     for (const name of snapshot) {
@@ -238,7 +242,7 @@ export function AlertMap({
       ],
       { padding: 80, maxZoom: 11, duration: 1000 },
     )
-  }, [map, snapshot])
+  }, [map, snapshot, snapshotColor])
 
   return (
     <div ref={containerRef} className="h-full w-full">

@@ -95,7 +95,12 @@ export function useAlertFeed() {
           .map(toFeedEvent)
           .filter((e): e is FeedEvent => e !== null && e.ts >= cutoff)
           .sort((a, b) => a.ts - b.ts) // oldest first so stacking accumulates forward
-        setEvents((prev) => hist.reduce((acc, e) => mergeEvent(acc, e), prev))
+        // a live websocket event may already be in the feed with MORE (newer) areas than the history
+        // snapshot captured; never let the staler history copy of the same id replace it
+        setEvents((prev) => {
+          const liveIds = new Set(prev.map((e) => e.id))
+          return hist.filter((e) => !liveIds.has(e.id)).reduce((acc, e) => mergeEvent(acc, e), prev)
+        })
       })
       .catch(() => {
         // relay history unavailable: live websocket events still populate the feed

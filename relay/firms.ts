@@ -52,7 +52,8 @@ function accumulate(list: FireDetection[]) {
 // the rolling live feed effectively resets for the new day. Exported so the dev endpoint can trigger it
 // without waiting for midnight. Uses server-local time (the relay runs on Israeli egress, so = Israel).
 export function rolloverDaily(refTs = Date.now()): { date: string; count: number; maxFrp: number } {
-  const endedDay = dayStr(refTs - 60 * 60_000) // ~1h before the post-midnight firing time = yesterday
+  const ref = new Date(refTs)
+  const endedDay = dayStr(new Date(ref.getFullYear(), ref.getMonth(), ref.getDate() - 1).getTime()) // calendar yesterday
   const b = dailyBuckets.get(endedDay)
   const count = b ? b.keys.size : 0
   const maxFrp = b ? Math.round(b.maxFrp * 10) / 10 : 0
@@ -71,7 +72,7 @@ function scheduleMidnight() {
   const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5)
   setTimeout(() => {
     rolloverDaily()
-    setInterval(rolloverDaily, 24 * 60 * 60_000)
+    scheduleMidnight() // re-arm for the next local midnight (DST-safe; avoids fixed-interval drift)
   }, next.getTime() - now.getTime())
 }
 
