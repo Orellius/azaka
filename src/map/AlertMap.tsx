@@ -71,6 +71,7 @@ export function AlertMap({
   const lastZoomRef = useRef(0)
   const userMovedRef = useRef(0)
   const zoomArmedRef = useRef(false)
+  const hadSnapshotRef = useRef(false)
   const [map, setMap] = useState<maplibregl.Map | null>(null)
   const [cities, setCities] = useState<CityLabel[]>([])
   const [selected, setSelected] = useState<Selected | null>(null)
@@ -211,8 +212,14 @@ export function AlertMap({
     if (!src) return
     if (!snapshot || snapshot.length === 0) {
       src.setData(EMPTY)
+      if (hadSnapshotRef.current) {
+        // left a history snapshot: zoom back out to the default country view
+        m.flyTo({ center: ISRAEL_CENTER, zoom: ISRAEL_ZOOM, duration: 900 })
+        hadSnapshotRef.current = false
+      }
       return
     }
+    hadSnapshotRef.current = true
     if (m.getLayer('snapshot-fill')) m.setPaintProperty('snapshot-fill', 'fill-color', snapshotColor)
     if (m.getLayer('snapshot-line')) m.setPaintProperty('snapshot-line', 'line-color', snapshotColor)
     const features: Feature<Polygon>[] = []
