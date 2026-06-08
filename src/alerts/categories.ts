@@ -84,7 +84,10 @@ export function classifyAlert(title: string, desc = ''): Classification {
   if (has('יום הזיכרון')) return { severity: 'info', key: 'memorialday', he: 'צפירת יום הזיכרון', remain: 'none', isThreat: false }
   if (t.includes('התקרבו')) return { severity: 'early', key: 'flash', he: 'התקרבו למרחב מוגן', remain: 'tenmin', isThreat: true }
   if (has('רקטות') || has('טילים')) return { severity: 'active', key: 'missilealert', he: 'ירי רקטות וטילים', remain: 'tenmin', isThreat: true }
-  if (has('כלי טיס') || has('מל"ט') || has('כטב"ם') || has('כלי טיס עוין'))
+  // oref's LIVE feed spells it "כלי טייס" (double yod); its history API normalizes to "כלי טיס" (single
+  // yod). Match BOTH (plus the מל"ט / כטב"ם abbreviations), or a real UAV alert lands as 'unknown' (bell
+  // icon + wrong remain). This is the verbatim-title classification the safety rule depends on.
+  if (has('כלי טייס') || has('כלי טיס') || has('מל"ט') || has('כטב"ם'))
     return { severity: 'active', key: 'uav', he: 'חדירת כלי טיס עוין', remain: 'tenmin', isThreat: true }
   if (has('מחבלים')) return { severity: 'special', key: 'terrorattack', he: 'חדירת מחבלים', remain: 'release', isThreat: true }
   if (has('חומרים מסוכנים') || has('בלתי שגרתי') || has('בלתי קונבנציונלי'))
