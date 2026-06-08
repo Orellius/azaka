@@ -97,15 +97,15 @@ export function FirePopup({ map, fire, onClose }: { map: maplibregl.Map; fire: P
       <div className="flex items-start gap-2">
         <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-orange-400" />
         <div className="min-w-0 flex-1">
-          <div className="text-[13px] font-bold leading-tight text-orange-200">
+          <div className="text-[0.8125rem] font-bold leading-tight text-orange-200">
             {t('firms_anomaly')}
             {near ? ` · ${t('firms_near')} ${near}` : ''}
           </div>
-          <div className="text-[10px] text-slate-400">{tAgo(fire.ts)} · {time}</div>
+          <div className="text-[0.625rem] text-slate-400">{tAgo(fire.ts)} · {time}</div>
         </div>
       </div>
-      <div className="mt-2 text-[11px] leading-relaxed text-slate-300">{t('firms_disclaimer')}</div>
-      <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 rounded-lg bg-white/5 px-2.5 py-1.5 text-[10px]">
+      <div className="mt-2 text-[0.6875rem] leading-relaxed text-slate-300">{t('firms_disclaimer')}</div>
+      <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 rounded-lg bg-white/5 px-2.5 py-1.5 text-[0.625rem]">
         <span className="text-slate-400">{t('firms_confidence')}</span>
         <span className="text-end font-medium text-white">{tConf(fire.confidence)}</span>
         <span className="text-slate-400">{t('firms_intensity')}</span>
@@ -113,7 +113,7 @@ export function FirePopup({ map, fire, onClose }: { map: maplibregl.Map; fire: P
         <span className="text-slate-400">{t('firms_satellite')}</span>
         <span className="text-end font-medium text-white">{fire.satellite || '—'}</span>
       </div>
-      <div className="mt-1.5 text-[9px] text-slate-500">{FIRMS_CREDIT}</div>
+      <div className="mt-1.5 text-[0.5625rem] text-slate-500">{FIRMS_CREDIT}</div>
     </div>,
     el,
   )

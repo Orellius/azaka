@@ -76,7 +76,7 @@ export function AreaPicker({ onPick, onClose }: { onPick: (area: MyArea) => void
         <div className="flex items-center gap-2 border-b border-white/10 p-3">
           <div className="min-w-0 flex-1">
             <div className="text-sm font-bold text-white">{t('picker_title')}</div>
-            <div className="text-[11px] text-slate-400">{t('picker_sub')}</div>
+            <div className="text-[0.6875rem] text-slate-400">{t('picker_sub')}</div>
           </div>
           <button
             type="button"
@@ -96,19 +96,19 @@ export function AreaPicker({ onPick, onClose }: { onPick: (area: MyArea) => void
             type="search"
             inputMode="search"
             placeholder={t('picker_search')}
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[15px] text-white placeholder:text-slate-500 focus:border-sky-400/50 focus:outline-none"
+            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[0.9375rem] text-white placeholder:text-slate-500 focus:border-sky-400/50 focus:outline-none"
           />
         </div>
 
         <div className="feed-scroll min-h-0 flex-1 overflow-y-auto px-3 pb-3">
           {error ? (
-            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-center text-[13px] text-rose-200">
+            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-center text-[0.8125rem] text-rose-200">
               {t('picker_failed')}
             </div>
           ) : !all ? (
-            <div className="p-4 text-center text-[13px] text-slate-400">{t('picker_loading')}</div>
+            <div className="p-4 text-center text-[0.8125rem] text-slate-400">{t('picker_loading')}</div>
           ) : results.length === 0 ? (
-            <div className="p-4 text-center text-[13px] text-slate-400">{t('picker_none')}</div>
+            <div className="p-4 text-center text-[0.8125rem] text-slate-400">{t('picker_none')}</div>
           ) : (
             <ul className="flex flex-col gap-1">
               {results.map((a) => (
@@ -119,11 +119,11 @@ export function AreaPicker({ onPick, onClose }: { onPick: (area: MyArea) => void
                     className="flex w-full items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-3 py-2.5 text-start transition hover:border-sky-400/40 hover:bg-sky-400/10"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[14px] font-semibold text-white">{localizeArea(a.name)}</div>
-                      {lang === 'he' && a.en && <div className="truncate text-[11px] text-slate-400">{a.en}</div>}
+                      <div className="truncate text-[0.875rem] font-semibold text-white">{localizeArea(a.name)}</div>
+                      {lang === 'he' && a.en && <div className="truncate text-[0.6875rem] text-slate-400">{a.en}</div>}
                     </div>
                     {a.countdown != null && (
-                      <span className="shrink-0 whitespace-nowrap rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
+                      <span className="shrink-0 whitespace-nowrap rounded-md bg-white/5 px-2 py-0.5 text-[0.625rem] text-slate-300">
                         {a.countdown === 0 ? t('immediate') : t('shelter_secs', { n: a.countdown })}
                       </span>
                     )}

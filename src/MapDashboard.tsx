@@ -49,7 +49,7 @@ function LiveClock() {
     return () => clearInterval(id)
   }, [])
   return (
-    <span className="text-[13px] font-medium tabular-nums text-slate-300">
+    <span className="text-[0.8125rem] font-medium tabular-nums text-slate-300">
       {now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
     </span>
   )
@@ -119,7 +119,7 @@ export function MapDashboard() {
             </span>
             <div className="leading-tight">
               <div className="text-lg font-bold tracking-tight text-white">{t('brand')}</div>
-              <div className="text-[11px] text-slate-400">{t('brand_sub')}</div>
+              <div className="text-[0.6875rem] text-slate-400">{t('brand_sub')}</div>
             </div>
             <div className="ms-auto flex items-center gap-2">
               <LiveClock />
@@ -144,13 +144,13 @@ export function MapDashboard() {
             <button
               type="button"
               onClick={() => void notifier.requestPermission()}
-              className="rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-1.5 text-start text-[11px] font-medium text-sky-200 transition hover:bg-sky-400/20"
+              className="rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-1.5 text-start text-[0.6875rem] font-medium text-sky-200 transition hover:bg-sky-400/20"
             >
               {t('notif_enable')}
             </button>
           )}
           {notifier.enabled && notifier.perm === 'denied' && (
-            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] text-slate-400">
+            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[0.625rem] text-slate-400">
               {t('notif_denied')}
             </div>
           )}
@@ -161,17 +161,17 @@ export function MapDashboard() {
 
           {(alerting || warning) && instruction && (instruction.title || instruction.desc) && (
             <div className="rounded-xl border border-rose-500/50 bg-rose-500/15 px-3 py-2.5">
-              {instruction.title && <div className="text-[15px] font-bold text-rose-100">{instruction.title}</div>}
+              {instruction.title && <div className="text-[0.9375rem] font-bold text-rose-100">{instruction.title}</div>}
               {lang !== 'he' && tThreat(instruction.key) && (
-                <div className="text-[12px] font-semibold text-rose-200/90">{tThreat(instruction.key)}</div>
+                <div className="text-[0.75rem] font-semibold text-rose-200/90">{tThreat(instruction.key)}</div>
               )}
-              {instruction.desc && <div className="mt-0.5 text-[12px] text-rose-100/90">{instruction.desc}</div>}
+              {instruction.desc && <div className="mt-0.5 text-[0.75rem] text-rose-100/90">{instruction.desc}</div>}
               {activeRegions.length > 0 && (
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {activeRegions.map((r) => (
                     <span
                       key={r.id}
-                      className="rounded-md border border-rose-200/30 bg-rose-500/25 px-1.5 py-0.5 text-[10px] font-semibold text-rose-50"
+                      className="rounded-md border border-rose-200/30 bg-rose-500/25 px-1.5 py-0.5 text-[0.625rem] font-semibold text-rose-50"
                     >
                       {r.name}
                       {r.count > 1 ? ` · ${r.count}` : ''}
@@ -180,11 +180,11 @@ export function MapDashboard() {
                 </div>
               )}
               {instruction.remain === 'tenmin' && (
-                <div className="mt-1 text-[12px] text-rose-100/80">{tGuide('tenmin')}</div>
+                <div className="mt-1 text-[0.75rem] text-rose-100/80">{tGuide('tenmin')}</div>
               )}
-              <div className="mt-1 text-[11px] text-rose-200/80">{t('areas_active', { n: activeAreas.size })}</div>
+              <div className="mt-1 text-[0.6875rem] text-rose-200/80">{t('areas_active', { n: activeAreas.size })}</div>
               {instruction.remain === 'release' && (
-                <div className="mt-1.5 text-[11px] font-semibold text-amber-200">{t('wait_release')}</div>
+                <div className="mt-1.5 text-[0.6875rem] font-semibold text-amber-200">{t('wait_release')}</div>
               )}
             </div>
           )}
@@ -230,7 +230,7 @@ function SnapshotBanner({ event, onClose, lowered = false }: { event: FeedEvent;
       className={`pointer-events-auto absolute left-1/2 z-10 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl border bg-slate-950/90 px-3 py-2 shadow-2xl backdrop-blur-md transition-opacity duration-200 ${lowered ? 'top-24' : 'top-4'} ${sev.border} ${visible ? 'opacity-100' : 'opacity-0'}`}
     >
       <span className={`h-2 w-2 shrink-0 rounded-full ${sev.bar}`} />
-      <div className="min-w-0 text-[12px] text-slate-200">
+      <div className="min-w-0 text-[0.75rem] text-slate-200">
         <span className={`font-semibold ${sev.txt}`}>{t('snap_label')}</span>
         {' · '}
         {event.severity === 'cleared' ? t('status_cleared') : event.title || t('alert_generic')} · {t('areas_n', { n: event.cities.length })} ·{' '}
@@ -276,11 +276,11 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
       <div className="flex items-center gap-2">
         <AlertIcon ev={ev} className={`size-4 shrink-0 ${c.txt}`} />
         <div className="min-w-0 flex-1">
-          <div className={`text-[13px] font-semibold leading-tight ${c.txt}`}>
+          <div className={`text-[0.8125rem] font-semibold leading-tight ${c.txt}`}>
             {ev.severity === 'cleared' ? t('status_cleared') : ev.title || t('alert_generic')}
           </div>
           {lang !== 'he' && ev.severity !== 'cleared' && threat && threat !== ev.title && (
-            <div className="text-[10px] font-medium text-slate-400">{threat}</div>
+            <div className="text-[0.625rem] font-medium text-slate-400">{threat}</div>
           )}
         </div>
       </div>
@@ -289,7 +289,7 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
           {regions.map((r) => (
             <span
               key={r.id}
-              className="rounded-md border border-white/15 bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-slate-200"
+              className="rounded-md border border-white/15 bg-white/5 px-1.5 py-0.5 text-[0.625rem] font-medium text-slate-200"
             >
               {r.name}
               {r.count > 1 ? ` · ${r.count}` : ''}
@@ -297,11 +297,11 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
           ))}
         </div>
       )}
-      <div className="mt-1 text-[10px] text-slate-500">
+      <div className="mt-1 text-[0.625rem] text-slate-500">
         {tAgo(ev.ts)} · {time} · {t('areas_n', { n: ev.cities.length })}
       </div>
         <div
-          className={`mt-1.5 break-words text-[11px] leading-relaxed text-slate-300 ${long && !expanded ? 'line-clamp-3' : ''}`}
+          className={`mt-1.5 break-words text-[0.6875rem] leading-relaxed text-slate-300 ${long && !expanded ? 'line-clamp-3' : ''}`}
         >
           {ev.cities.map(localizeArea).join(', ')}
         </div>
@@ -312,7 +312,7 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
               e.stopPropagation()
               setExpanded((v) => !v)
             }}
-            className="mt-1.5 text-[10px] font-medium text-cyan-400/90 transition hover:text-cyan-300"
+            className="mt-1.5 text-[0.625rem] font-medium text-cyan-400/90 transition hover:text-cyan-300"
           >
             {expanded ? t('show_less') : t('show_all', { n: ev.cities.length })}
           </button>
@@ -343,8 +343,8 @@ function FirmsPanel({ detections, on, onToggle }: { detections: FireDetection[];
         <span className="text-orange-500">
           <FlameIcon className="size-3.5 drop-shadow" />
         </span>
-        <h2 className="whitespace-nowrap text-[11px] font-semibold tracking-wide text-orange-200">{t('firms_title')}</h2>
-        <span className="ms-auto whitespace-nowrap text-[10px] text-slate-500">{detections.length} · {t('firms_24h')}</span>
+        <h2 className="whitespace-nowrap text-[0.6875rem] font-semibold tracking-wide text-orange-200">{t('firms_title')}</h2>
+        <span className="ms-auto whitespace-nowrap text-[0.625rem] text-slate-500">{detections.length} · {t('firms_24h')}</span>
         <button
           type="button"
           role="switch"
@@ -365,16 +365,16 @@ function FirmsPanel({ detections, on, onToggle }: { detections: FireDetection[];
             ))}
           </div>
         ) : (
-          <div className="rounded-lg bg-white/5 px-2.5 py-2 text-center text-[11px] text-slate-400">
+          <div className="rounded-lg bg-white/5 px-2.5 py-2 text-center text-[0.6875rem] text-slate-400">
             {t('firms_none')}
           </div>
         )
       ) : (
-        <div className="text-[10px] text-slate-500">{t('firms_off')}</div>
+        <div className="text-[0.625rem] text-slate-500">{t('firms_off')}</div>
       )}
 
       {on && (
-        <p className="text-[9px] leading-relaxed text-slate-500">
+        <p className="text-[0.5625rem] leading-relaxed text-slate-500">
           {t('firms_disclaimer')} · {FIRMS_CREDIT}
         </p>
       )}
@@ -389,12 +389,12 @@ function AnomalyGroupCard({ g }: { g: AnomalyGroup }) {
       <div className="w-1 shrink-0 bg-orange-400/80" />
       <div className="min-w-0 flex-1 px-2.5 py-1.5">
         <div className="flex items-center gap-1.5">
-          <span className="min-w-0 break-words text-[12px] font-semibold text-orange-100">
+          <span className="min-w-0 break-words text-[0.75rem] font-semibold text-orange-100">
             {t('firms_anomaly')}{g.label ? ` · ${g.label}` : ''}
           </span>
-          <span className="ms-auto shrink-0 whitespace-nowrap text-[10px] text-slate-500">{tAgo(g.latestTs)}</span>
+          <span className="ms-auto shrink-0 whitespace-nowrap text-[0.625rem] text-slate-500">{tAgo(g.latestTs)}</span>
         </div>
-        <div className="mt-0.5 text-[10px] text-slate-400">
+        <div className="mt-0.5 text-[0.625rem] text-slate-400">
           {g.count > 1 ? `${t('firms_detections', { n: g.count })} · ` : ''}
           {t('firms_confidence')} {tConf(g.topConf)}
           {g.maxFrp ? ` · ${g.maxFrp} MW` : ''}
@@ -414,7 +414,7 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
           e.preventDefault()
           navigate('/historical')
         }}
-        className="text-[11px] font-medium text-sky-400 transition hover:text-sky-300"
+        className="text-[0.6875rem] font-medium text-sky-400 transition hover:text-sky-300"
       >
         {t('hist_stats')}
       </a>
@@ -424,24 +424,24 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
           {LEGEND.map((l) => (
             <div key={l.key} className="flex items-center gap-2">
               <span className={`h-2.5 w-6 shrink-0 rounded-full ${l.color}`} />
-              <span className="text-[10px] text-slate-300">{t(l.key)}</span>
+              <span className="text-[0.625rem] text-slate-300">{t(l.key)}</span>
             </div>
           ))}
           <div className="flex items-center gap-2">
             <span className="flex w-6 shrink-0 justify-center text-orange-500">
               <FlameIcon className="size-3.5 drop-shadow" />
             </span>
-            <span className="text-[10px] text-slate-300">{t('legend_firms')}</span>
+            <span className="text-[0.625rem] text-slate-300">{t('legend_firms')}</span>
           </div>
         </div>
       </div>
 
-      <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-2.5 py-2 text-[10px] leading-relaxed text-amber-100/90">
+      <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-2.5 py-2 text-[0.625rem] leading-relaxed text-amber-100/90">
         <span className="font-bold text-amber-200">{t('disclaimer_bold')}</span> {t('disclaimer_text')}
         <span className="mt-1 block text-amber-100/60">{t('disclaimer_source')}</span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-slate-500">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.625rem] text-slate-500">
         {FOOTER_LINKS.map((link, i) => (
           <Fragment key={link.path}>
             {i > 0 && <span aria-hidden>·</span>}
@@ -456,7 +456,7 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
         </button>
       </div>
 
-      <div className="flex items-center justify-between gap-2 text-[10px] text-slate-600">
+      <div className="flex items-center justify-between gap-2 text-[0.625rem] text-slate-600">
         <span>
           {t('rights')}
           {lastAt ? ` · ${t('updated', { time: new Date(lastAt).toLocaleTimeString('he-IL') })}` : ''}

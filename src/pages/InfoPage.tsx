@@ -223,19 +223,19 @@ export function InfoPage({ slug }: { slug: InfoSlug }) {
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="mb-6 text-[13px] font-medium text-sky-400 transition hover:text-sky-300"
+          className="mb-6 text-[0.8125rem] font-medium text-sky-400 transition hover:text-sky-300"
         >
           {t('info_back')}
         </button>
         <h1 className="text-2xl font-bold tracking-tight text-white">{page.title}</h1>
-        <p className="mt-2 text-[14px] leading-relaxed text-slate-300">{page.intro}</p>
+        <p className="mt-2 text-[0.875rem] leading-relaxed text-slate-300">{page.intro}</p>
 
         <div className="mt-7 flex flex-col gap-6">
           {page.sections.map((s) => (
             <section key={s.h}>
-              <h2 className="text-[15px] font-semibold text-white">{s.h}</h2>
+              <h2 className="text-[0.9375rem] font-semibold text-white">{s.h}</h2>
               {s.p.map((para, i) => (
-                <p key={i} className="mt-1.5 text-[13px] leading-relaxed text-slate-400">
+                <p key={i} className="mt-1.5 text-[0.8125rem] leading-relaxed text-slate-400">
                   {para}
                 </p>
               ))}
@@ -245,14 +245,14 @@ export function InfoPage({ slug }: { slug: InfoSlug }) {
           {slug === 'contact' && (
             <a
               href="mailto:contact@example.com"
-              className="w-fit rounded-lg bg-sky-600 px-4 py-2 text-[13px] font-semibold text-white transition hover:bg-sky-500"
+              className="w-fit rounded-lg bg-sky-600 px-4 py-2 text-[0.8125rem] font-semibold text-white transition hover:bg-sky-500"
             >
               contact@example.com
             </a>
           )}
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/10 pt-5 text-[11px] text-slate-500">
+        <div className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/10 pt-5 text-[0.6875rem] text-slate-500">
           <button type="button" onClick={() => navigate('/about')} className="transition hover:text-slate-300">
             {t('nav_about')}
           </button>
@@ -273,7 +273,7 @@ export function InfoPage({ slug }: { slug: InfoSlug }) {
             {t('nav_cookies')}
           </button>
         </div>
-        <div className="mt-3 text-[11px] text-slate-600">
+        <div className="mt-3 text-[0.6875rem] text-slate-600">
           {t('info_updated')} · {t('rights')}
         </div>
       </div>

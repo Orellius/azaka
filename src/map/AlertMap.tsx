@@ -378,15 +378,15 @@ function AreaPopup({
       <div className="flex items-start gap-2">
         <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${status.dot}`} />
         <div className="min-w-0 flex-1">
-          <div className="text-[14px] font-bold leading-tight text-white">{localizeArea(selected.name)}</div>
-          {lang === 'he' && selected.en && <div className="truncate text-[10px] text-slate-400">{selected.en}</div>}
-          <div className={`mt-0.5 text-[11px] font-medium ${status.txt}`}>{t(status.key)}</div>
+          <div className="text-[0.875rem] font-bold leading-tight text-white">{localizeArea(selected.name)}</div>
+          {lang === 'he' && selected.en && <div className="truncate text-[0.625rem] text-slate-400">{selected.en}</div>}
+          <div className={`mt-0.5 text-[0.6875rem] font-medium ${status.txt}`}>{t(status.key)}</div>
         </div>
       </div>
       {sec != null && (
         <div className="mt-2.5 flex items-center justify-between gap-2 rounded-lg bg-white/5 px-2.5 py-1.5">
-          <span className="text-[10px] text-slate-400">{t('map_shelter_time')}</span>
-          <span className="whitespace-nowrap text-[13px] font-bold text-white">
+          <span className="text-[0.625rem] text-slate-400">{t('map_shelter_time')}</span>
+          <span className="whitespace-nowrap text-[0.8125rem] font-bold text-white">
             {sec === 0 ? t('immediate') : `${sec} ${t('unit_sec')}`}
           </span>
         </div>

@@ -33,7 +33,7 @@ export function WhereToShelter({ alerting }: { alerting: boolean }) {
         className="flex w-full items-center gap-2 px-3 py-2 text-start transition hover:bg-white/5"
       >
         <ShieldIcon className="size-4 shrink-0 text-sky-300" />
-        <span className="flex-1 text-[13px] font-semibold text-sky-100">{t('shelter_where_title')}</span>
+        <span className="flex-1 text-[0.8125rem] font-semibold text-sky-100">{t('shelter_where_title')}</span>
         <svg
           className={`size-4 shrink-0 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}
           viewBox="0 0 24 24"
@@ -52,15 +52,15 @@ export function WhereToShelter({ alerting }: { alerting: boolean }) {
         <div className="px-3 pb-3">
           <ol className="flex flex-col gap-1.5">
             {STEPS.map((key, i) => (
-              <li key={key} className="flex gap-2 text-[12px] leading-relaxed text-slate-200">
-                <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-sky-400/15 text-[10px] font-bold text-sky-300">
+              <li key={key} className="flex gap-2 text-[0.75rem] leading-relaxed text-slate-200">
+                <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-sky-400/15 text-[0.625rem] font-bold text-sky-300">
                   {i + 1}
                 </span>
                 <span className="min-w-0">{t(key)}</span>
               </li>
             ))}
           </ol>
-          <p className="mt-2.5 border-t border-white/10 pt-2 text-[10px] leading-relaxed text-slate-500">{t('shelter_note')}</p>
+          <p className="mt-2.5 border-t border-white/10 pt-2 text-[0.625rem] leading-relaxed text-slate-500">{t('shelter_note')}</p>
         </div>
       )}
     </section>

@@ -50,13 +50,13 @@ export function HistoricalView() {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[13px] text-slate-200 transition hover:bg-white/10"
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[0.8125rem] text-slate-200 transition hover:bg-white/10"
           >
             {t('hist_live_map')}
           </button>
           <div className="leading-tight">
             <h1 className="text-xl font-bold text-white">{t('hist_stats')}</h1>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[0.6875rem] text-slate-400">
               {t('hist_subtitle')} · {fmtRange(stats?.range.from ?? null, stats?.range.to ?? null, t)}
             </p>
           </div>
@@ -114,7 +114,7 @@ export function HistoricalView() {
               </div>
             </Panel>
 
-            <p className="mt-6 text-center text-[10px] text-slate-600">{t('hist_source')}</p>
+            <p className="mt-6 text-center text-[0.625rem] text-slate-600">{t('hist_source')}</p>
           </>
         )}
       </div>
@@ -126,7 +126,7 @@ function Card({ value, label, small }: { value: string; label: string; small?: b
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
       <div className={`font-bold tabular-nums text-white ${small ? 'text-base' : 'text-2xl'}`}>{value}</div>
-      <div className="mt-0.5 text-[11px] text-slate-400">{label}</div>
+      <div className="mt-0.5 text-[0.6875rem] text-slate-400">{label}</div>
     </div>
   )
 }
@@ -134,7 +134,7 @@ function Card({ value, label, small }: { value: string; label: string; small?: b
 function Panel({ title, children, className }: { title: string; children: ReactNode; className?: string }) {
   return (
     <section className={`rounded-2xl border border-white/10 bg-white/[0.03] p-4 ${className ?? ''}`}>
-      <h2 className="mb-3 text-[13px] font-semibold text-slate-200">{title}</h2>
+      <h2 className="mb-3 text-[0.8125rem] font-semibold text-slate-200">{title}</h2>
       {children}
     </section>
   )
@@ -145,7 +145,7 @@ function YearChip({ active, onClick, children }: { active: boolean; onClick: () 
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-lg px-2.5 py-1 text-[12px] font-medium transition ${
+      className={`rounded-lg px-2.5 py-1 text-[0.75rem] font-medium transition ${
         active ? 'bg-rose-600 text-white' : 'border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
       }`}
     >
@@ -166,12 +166,12 @@ function EventRow({ e }: { e: HistoryEvent }) {
       <div className={`w-1.5 shrink-0 ${bar}`} />
       <div className="min-w-0 flex-1 px-2.5 py-2">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="truncate text-[13px] font-semibold text-slate-100">{title}</span>
-          <span className="shrink-0 text-[10px] text-slate-500">
+          <span className="truncate text-[0.8125rem] font-semibold text-slate-100">{title}</span>
+          <span className="shrink-0 text-[0.625rem] text-slate-500">
             {time} · {t('hist_localities_n', { n: cities.length })}
           </span>
         </div>
-        <div className="mt-0.5 line-clamp-2 text-[11px] text-slate-400">{cities.map(localizeArea).join(', ')}</div>
+        <div className="mt-0.5 line-clamp-2 text-[0.6875rem] text-slate-400">{cities.map(localizeArea).join(', ')}</div>
       </div>
     </div>
   )
@@ -179,5 +179,5 @@ function EventRow({ e }: { e: HistoryEvent }) {
 
 function Empty() {
   const { t } = useLang()
-  return <div className="py-6 text-center text-[12px] text-slate-600">{t('hist_no_data')}</div>
+  return <div className="py-6 text-center text-[0.75rem] text-slate-600">{t('hist_no_data')}</div>
 }

@@ -4,6 +4,15 @@
   color-scheme: dark;
 }
 
+/* Responsive root font-size: the whole UI is rem-based, so scaling this scales every panel, text, and
+   spacing together. Deliberately GENTLE — stays 16px on phones/laptops and only nudges up on large
+   displays (~17px at 1080p, ~18px at 1440p, ~22px cap at 4K) so a command-post screen reads a touch
+   larger without the UI ballooning. The MapLibre canvas is sized in viewport units, not rem, so the
+   map keeps its native resolution. Tune the slope/cap here. */
+html {
+  font-size: clamp(16px, 0.25vw + 12px, 22px);
+}
+
 html,
 body,
 #root {

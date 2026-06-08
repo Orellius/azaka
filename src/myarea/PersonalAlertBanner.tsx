@@ -69,24 +69,24 @@ export function PersonalAlertBanner({ area, personal }: { area: MyArea; personal
 
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-2">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-white/80">{t(LABEL_KEY[personal.tier])}</span>
+          <span className="text-[0.6875rem] font-semibold uppercase tracking-wide text-white/80">{t(LABEL_KEY[personal.tier])}</span>
         </div>
         <div className="truncate text-xl font-extrabold leading-tight text-white">{localizeArea(area.name)}</div>
         {personal.tier === 'cleared' ? (
-          <div className={`mt-0.5 text-[12px] ${skin.accent}`}>{t('pb_cleared_msg')}</div>
+          <div className={`mt-0.5 text-[0.75rem] ${skin.accent}`}>{t('pb_cleared_msg')}</div>
         ) : left == null ? (
-          <div className={`mt-0.5 text-[13px] font-semibold ${skin.accent}`}>{t('pb_enter_now')}</div>
+          <div className={`mt-0.5 text-[0.8125rem] font-semibold ${skin.accent}`}>{t('pb_enter_now')}</div>
         ) : reached ? (
-          <div className={`mt-0.5 text-[12px] font-semibold ${skin.accent}`}>{t('pb_reached')}</div>
+          <div className={`mt-0.5 text-[0.75rem] font-semibold ${skin.accent}`}>{t('pb_reached')}</div>
         ) : (
-          <div className={`mt-0.5 text-[11px] ${skin.accent}`}>{t('pb_countdown')}</div>
+          <div className={`mt-0.5 text-[0.6875rem] ${skin.accent}`}>{t('pb_countdown')}</div>
         )}
       </div>
 
       {personal.tier !== 'cleared' && left != null && !reached && (
         <div className={`flex shrink-0 flex-col items-center rounded-xl px-3 py-1.5 ${skin.pill}`}>
           <span className="text-2xl font-black tabular-nums leading-none text-white">{fmt(left)}</span>
-          <span className="mt-0.5 text-[9px] font-medium text-white/70">{left >= 60 ? t('unit_min') : t('unit_sec')}</span>
+          <span className="mt-0.5 text-[0.5625rem] font-medium text-white/70">{left >= 60 ? t('unit_min') : t('unit_sec')}</span>
         </div>
       )}
     </div>

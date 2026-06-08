@@ -17,7 +17,7 @@ export function LangChips() {
             lang={l.code}
             aria-pressed={active}
             onClick={() => setLang(l.code)}
-            className={`rounded-md border px-3 py-1.5 text-[12px] font-medium shadow-sm shadow-black/30 transition ${
+            className={`rounded-md border px-3 py-1.5 text-[0.75rem] font-medium shadow-sm shadow-black/30 transition ${
               active
                 ? 'border-cyan-400/60 bg-cyan-400/15 text-cyan-200'
                 : 'border-white/10 bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'

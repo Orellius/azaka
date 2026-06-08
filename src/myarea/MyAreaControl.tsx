@@ -45,15 +45,15 @@ export function MyAreaControl({
           <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${status ? status.dot : 'bg-slate-500'}`} />
           <PinIcon className="size-4 shrink-0 text-sky-300/80" />
           <div className="min-w-0 flex-1 leading-tight">
-            <div className="truncate text-[13px] font-semibold text-white">{localizeArea(myArea.name)}</div>
-            <div className={`text-[10px] ${status ? status.txt : 'text-slate-400'}`}>
+            <div className="truncate text-[0.8125rem] font-semibold text-white">{localizeArea(myArea.name)}</div>
+            <div className={`text-[0.625rem] ${status ? status.txt : 'text-slate-400'}`}>
               {status ? t(status.key) : t('myarea_mine_no_alert')}
             </div>
           </div>
           <button
             type="button"
             onClick={() => setPicking(true)}
-            className="shrink-0 rounded-lg px-2 py-1 text-[11px] font-medium text-sky-300 transition hover:bg-white/10"
+            className="shrink-0 rounded-lg px-2 py-1 text-[0.6875rem] font-medium text-sky-300 transition hover:bg-white/10"
           >
             {t('myarea_change')}
           </button>
@@ -74,8 +74,8 @@ export function MyAreaControl({
         >
           <PinIcon className="size-4 shrink-0 text-sky-300" />
           <div className="leading-tight">
-            <div className="text-[13px] font-semibold text-sky-100">{t('myarea_set_title')}</div>
-            <div className="text-[10px] text-sky-200/70">{t('myarea_set_sub')}</div>
+            <div className="text-[0.8125rem] font-semibold text-sky-100">{t('myarea_set_title')}</div>
+            <div className="text-[0.625rem] text-sky-200/70">{t('myarea_set_sub')}</div>
           </div>
         </button>
       )}
