@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import maplibregl from 'maplibre-gl'
 import type { ExpressionSpecification, GeoJSONSource } from 'maplibre-gl'
-import type { FeatureCollection, Polygon } from 'geojson'
+import type { Feature, FeatureCollection, Polygon } from 'geojson'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle, ISRAEL_CENTER, ISRAEL_ZOOM } from './mapStyle'
 import { computeThreatZone } from '../threat-zone/computeThreatZone'
@@ -53,11 +53,13 @@ export function AlertMap({
   earlyAreas,
   clearedAreas,
   fires = [],
+  snapshot = null,
 }: {
   activeAreas: Set<string>
   earlyAreas: Set<string>
   clearedAreas: Set<string>
   fires?: FireDetection[]
+  snapshot?: string[] | null // a past event's areas to highlight + fit (history snapshot view)
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
@@ -129,6 +131,11 @@ export function AlertMap({
       m.addLayer({ id: 'threat-early-line', type: 'line', source: 'threat-early', paint: { 'line-color': AMBER, 'line-width': 1.5, 'line-dasharray': [2, 2], 'line-opacity': 0.7 } })
       m.addLayer({ id: 'threat-line', type: 'line', source: 'threat-zone', paint: { 'line-color': RED, 'line-width': 2, 'line-dasharray': [2, 1.5], 'line-opacity': 0.85 } })
 
+      // history-snapshot highlight (cyan), painted on top when a past feed card is opened
+      m.addSource('snapshot', { type: 'geojson', data: EMPTY })
+      m.addLayer({ id: 'snapshot-fill', type: 'fill', source: 'snapshot', paint: { 'fill-color': SELECT, 'fill-opacity': 0.4 } })
+      m.addLayer({ id: 'snapshot-line', type: 'line', source: 'snapshot', paint: { 'line-color': SELECT, 'line-width': 2.5, 'line-opacity': 1 } })
+
       m.on('mouseenter', 'areas-fill', () => (m.getCanvas().style.cursor = 'pointer'))
       m.on('mouseleave', 'areas-fill', () => (m.getCanvas().style.cursor = ''))
       m.on('click', 'areas-fill', (e) => {
@@ -193,6 +200,45 @@ export function AlertMap({
       selectedIdRef.current = null
     }
   }, [map, selected])
+
+  // history snapshot: highlight a past event's areas (cyan) and fit the map to them
+  useEffect(() => {
+    const m = mapRef.current
+    if (!m || !map) return
+    const src = m.getSource('snapshot') as GeoJSONSource | undefined
+    if (!src) return
+    if (!snapshot || snapshot.length === 0) {
+      src.setData(EMPTY)
+      return
+    }
+    const features: Feature<Polygon>[] = []
+    const pts: Point[] = []
+    for (const name of snapshot) {
+      const ring = coordsRef.current.get(name)
+      if (!ring) continue
+      features.push({ type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } })
+      for (const p of ring) pts.push(p)
+    }
+    src.setData({ type: 'FeatureCollection', features })
+    if (pts.length === 0) return
+    let minX = Infinity
+    let minY = Infinity
+    let maxX = -Infinity
+    let maxY = -Infinity
+    for (const [x, y] of pts) {
+      if (x < minX) minX = x
+      if (x > maxX) maxX = x
+      if (y < minY) minY = y
+      if (y > maxY) maxY = y
+    }
+    m.fitBounds(
+      [
+        [minX, minY],
+        [maxX, maxY],
+      ],
+      { padding: 80, maxZoom: 11, duration: 1000 },
+    )
+  }, [map, snapshot])
 
   return (
     <div ref={containerRef} className="h-full w-full">

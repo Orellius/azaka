@@ -51,6 +51,7 @@ export function MapDashboard() {
       // private mode / storage disabled: the toggle still works for this session
     }
   }, [firmsOn])
+  const [snapshot, setSnapshot] = useState<FeedEvent | null>(null)
 
   const alerting = activeAreas.size > 0
   const warning = earlyAreas.size > 0
@@ -64,9 +65,29 @@ export function MapDashboard() {
         earlyAreas={earlyAreas}
         clearedAreas={clearedAreas}
         fires={firmsOn ? firms.detections : []}
+        snapshot={snapshot ? snapshot.cities : null}
       />
 
       <div className="pointer-events-none absolute inset-0 p-4">
+        {snapshot && (
+          <div className="pointer-events-auto absolute start-1/2 top-4 z-10 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl border border-cyan-400/40 bg-slate-950/90 px-3 py-2 shadow-2xl backdrop-blur-md">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-400" />
+            <div className="min-w-0 text-[12px] text-slate-200">
+              <span className="font-semibold text-cyan-200">תצוגת היסטוריה</span>
+              {' · '}
+              {snapshot.title || 'התרעה'} · {snapshot.cities.length} אזורים ·{' '}
+              {new Date(snapshot.ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+            </div>
+            <button
+              type="button"
+              onClick={() => setSnapshot(null)}
+              aria-label="סגור תצוגת היסטוריה"
+              className="shrink-0 text-slate-400 transition hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+        )}
         <div className="feed-scroll pointer-events-auto me-auto flex max-h-[calc(100vh-2rem)] w-80 max-w-[88vw] flex-col gap-3 overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/85 p-4 shadow-2xl backdrop-blur-md">
           <header className="flex items-center gap-3">
             <span className="relative flex h-3.5 w-3.5">
@@ -105,7 +126,7 @@ export function MapDashboard() {
           ) : (
             <div className="feed-scroll flex max-h-[44vh] min-h-0 flex-col gap-2.5 overflow-y-auto pe-1">
               {events.map((ev, i) => (
-                <EventCard key={`${ev.id}-${i}`} ev={ev} />
+                <EventCard key={`${ev.id}-${i}`} ev={ev} active={snapshot?.id === ev.id} onSelect={() => setSnapshot(ev)} />
               ))}
             </div>
           )}
@@ -121,11 +142,15 @@ export function MapDashboard() {
   )
 }
 
-function EventCard({ ev }: { ev: FeedEvent }) {
+function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; onSelect: () => void }) {
   const c = SEV[ev.severity]
   const time = new Date(ev.ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
   return (
-    <div className="flex overflow-hidden rounded-xl border border-white/10 bg-white/5">
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`flex w-full overflow-hidden rounded-xl border bg-white/5 text-start transition hover:bg-white/10 ${active ? 'border-cyan-400/70 ring-1 ring-cyan-400/40' : 'border-white/10'}`}
+    >
       <div className={`w-1.5 shrink-0 ${c.bar}`} />
       <div className="min-w-0 flex-1 px-3 py-2.5">
         <div className={`text-[13px] font-semibold leading-tight ${c.txt}`}>{ev.title || 'התרעה'}</div>
@@ -134,7 +159,7 @@ function EventCard({ ev }: { ev: FeedEvent }) {
         </div>
         <div className="mt-1.5 break-words text-[11px] leading-relaxed text-slate-300">{ev.cities.join(', ')}</div>
       </div>
-    </div>
+    </button>
   )
 }
 
