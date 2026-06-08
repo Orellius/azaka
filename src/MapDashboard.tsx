@@ -82,6 +82,7 @@ export function MapDashboard() {
     }
   }, [firmsOn])
   const [snapshot, setSnapshot] = useState<FeedEvent | null>(null)
+  const [sheetOpen, setSheetOpen] = useState(true) // mobile bottom-sheet expanded by default; desktop ignores it
 
   const alerting = activeAreas.size > 0
   const warning = earlyAreas.size > 0
@@ -101,9 +102,15 @@ export function MapDashboard() {
       {myArea && personal && <PersonalAlertBanner area={myArea} personal={personal} />}
 
       <div className="pointer-events-none absolute inset-0 p-4">
-        {snapshot && <SnapshotBanner event={snapshot} onClose={() => setSnapshot(null)} />}
-        <div className="feed-scroll pointer-events-auto me-auto flex max-h-[calc(100vh-2rem)] w-80 max-w-[88vw] flex-col gap-3 overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/85 p-4 shadow-2xl backdrop-blur-md">
-          <header className="flex items-center gap-3">
+        {snapshot && <SnapshotBanner event={snapshot} onClose={() => setSnapshot(null)} lowered={!!(myArea && personal)} />}
+        <div className="pointer-events-auto fixed inset-x-0 bottom-0 z-20 flex max-h-[78vh] flex-col gap-3 rounded-t-2xl border border-white/10 bg-slate-950/90 p-3 shadow-2xl backdrop-blur-md sm:static sm:me-auto sm:max-h-[calc(100vh-2rem)] sm:w-80 sm:max-w-[88vw] sm:rounded-2xl sm:bg-slate-950/85 sm:p-4">
+          <button
+            type="button"
+            onClick={() => setSheetOpen((v) => !v)}
+            aria-label={sheetOpen ? 'כיווץ הפאנל' : 'הרחבת הפאנל'}
+            className="mx-auto -mt-1 h-1.5 w-10 shrink-0 rounded-full bg-white/25 transition hover:bg-white/40 sm:hidden"
+          />
+          <header className="flex shrink-0 items-center gap-3">
             <span className="relative flex h-3.5 w-3.5">
               {(alerting || warning) && (
                 <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${headDot} opacity-75`} />
@@ -117,8 +124,21 @@ export function MapDashboard() {
             <div className="ms-auto flex items-center gap-2">
               <LiveClock />
               <AlertToggle enabled={notifier.enabled} onToggle={notifier.toggle} />
+              <button
+                type="button"
+                onClick={() => setSheetOpen((v) => !v)}
+                aria-label={sheetOpen ? 'כיווץ הפאנל' : 'הרחבת הפאנל'}
+                aria-expanded={sheetOpen}
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-300 transition hover:bg-white/10 sm:hidden"
+              >
+                <svg className={`size-4 transition-transform ${sheetOpen ? '' : 'rotate-180'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
             </div>
           </header>
+
+          <div className={`feed-scroll min-h-0 flex-1 flex-col gap-3 overflow-y-auto ${sheetOpen ? 'flex' : 'hidden'} sm:flex`}>
 
           {notifier.enabled && notifier.perm === 'default' && (
             <button
@@ -167,13 +187,14 @@ export function MapDashboard() {
           )}
 
           <SidebarFooter lastAt={lastAt} status={status} />
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-function SnapshotBanner({ event, onClose }: { event: FeedEvent; onClose: () => void }) {
+function SnapshotBanner({ event, onClose, lowered = false }: { event: FeedEvent; onClose: () => void; lowered?: boolean }) {
   const sev = SEV[event.severity]
   const [visible, setVisible] = useState(false)
   useEffect(() => {
@@ -186,7 +207,7 @@ function SnapshotBanner({ event, onClose }: { event: FeedEvent; onClose: () => v
   }
   return (
     <div
-      className={`pointer-events-auto absolute left-1/2 top-4 z-10 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl border bg-slate-950/90 px-3 py-2 shadow-2xl backdrop-blur-md transition-opacity duration-200 ${sev.border} ${visible ? 'opacity-100' : 'opacity-0'}`}
+      className={`pointer-events-auto absolute left-1/2 z-10 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl border bg-slate-950/90 px-3 py-2 shadow-2xl backdrop-blur-md transition-opacity duration-200 ${lowered ? 'top-24' : 'top-4'} ${sev.border} ${visible ? 'opacity-100' : 'opacity-0'}`}
     >
       <span className={`h-2 w-2 shrink-0 rounded-full ${sev.bar}`} />
       <div className="min-w-0 text-[12px] text-slate-200">
