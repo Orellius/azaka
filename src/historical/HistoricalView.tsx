@@ -46,7 +46,7 @@ export function HistoricalView() {
   return (
     <div className="h-screen w-screen overflow-y-auto bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-5xl px-5 py-6">
-        <header className="mb-6 flex items-center gap-3">
+        <header className="mb-6 flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={() => navigate('/')}

@@ -141,15 +141,20 @@ Bun.serve({
         broadcast({ type: 'clear', id: 'test-' + ts, cities, ts })
         return Response.json({ cleared: cities }, { headers: CORS })
       }
-      const cat = kindParam === 'early' ? '14' : kindParam === 'special' ? '10' : '1'
-      const c = categoryOf(cat)!
+      // dev: fire any category by name (or ?cat=N) so every severity + card icon is exercisable
+      const KINDS: Record<string, string> = {
+        early: '14', special: '10', uav: '2', terror: '10', tsunami: '11',
+        quake: '8', earthquake: '8', cbrne: '9', hazmat: '12', nonconv: '3', nonconventional: '3',
+      }
+      const cat = url.searchParams.get('cat') ?? (kindParam && KINDS[kindParam]) ?? '1'
+      const c = categoryOf(cat) ?? categoryOf('1')!
       const kind = c.severity === 'early' ? 'early' : c.severity === 'special' ? 'special' : 'active'
       const desc =
-        cat === '1'
-          ? 'היכנסו למרחב המוגן ושהו בו 10 דקות'
+        c.remain === 'release'
+          ? 'היכנסו למרחב המוגן והמתינו להנחיות רשמיות'
           : cat === '14'
             ? 'היכנסו למרחב מוגן בדקות הקרובות'
-            : 'היכנסו לבית, נעלו דלתות וחלונות, התרחקו מהמחבל והמתינו להנחיות'
+            : 'היכנסו למרחב המוגן ושהו בו 10 דקות'
       broadcast({ type: 'alert', kind, id: 'test-' + ts, cat, key: c.key, title: c.he, desc, remain: c.remain, cities, ts })
       return Response.json({ injected: cities, kind, cat }, { headers: CORS })
     }
