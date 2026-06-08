@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { BarList, VBars } from './charts'
 import { useHistoryStats, type HistoryEvent } from './useHistoryStats'
+import { navigate } from '../router'
 
 // Historical statistics dashboard (RTL Hebrew), in the spirit of tzevaadom's /historical page. All
 // figures come server-aggregated from the relay's year-partitioned log; pick a year or view all.
@@ -44,9 +45,7 @@ export function HistoricalView() {
         <header className="mb-6 flex items-center gap-3">
           <button
             type="button"
-            onClick={() => {
-              window.location.hash = ''
-            }}
+            onClick={() => navigate('/')}
             className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[13px] text-slate-200 transition hover:bg-white/10"
           >
             ← מפה חיה

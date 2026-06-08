@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 // stays current during an event. The HTTP base is derived from the same VITE_RELAY_URL as the socket.
 const WS = import.meta.env.VITE_RELAY_URL ?? 'ws://localhost:8787/ws'
 const RELAY_HTTP = WS.replace(/^ws(s?):\/\//, 'http$1://').replace(/\/ws$/, '')
-const REFRESH_MS = 30_000
+const REFRESH_MS = 15_000
 
 export type Stats = {
   year: number | null
@@ -60,6 +60,26 @@ export function useHistoryStats() {
     load()
     const t = setInterval(load, REFRESH_MS)
     return () => clearInterval(t)
+  }, [load])
+
+  // live: refetch the moment the relay broadcasts a new alert/clear, so the stats update in real time
+  useEffect(() => {
+    let ws: WebSocket | null = null
+    let retry: ReturnType<typeof setTimeout> | undefined
+    let closed = false
+    const connect = () => {
+      ws = new WebSocket(WS)
+      ws.onmessage = () => load()
+      ws.onclose = () => {
+        if (!closed) retry = setTimeout(connect, 4000)
+      }
+    }
+    connect()
+    return () => {
+      closed = true
+      if (retry) clearTimeout(retry)
+      ws?.close()
+    }
   }, [load])
 
   return { years, year, setYear, stats, recent, loading, error, reload: load }

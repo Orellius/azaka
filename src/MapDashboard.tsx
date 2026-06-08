@@ -1,5 +1,6 @@
 import { AlertMap } from './map/AlertMap'
 import { useAlertFeed, type FeedEvent } from './alerts/useAlertFeed'
+import { navigate } from './router'
 
 // Dashboard shell: full-bleed alert map + a dark-glass command panel (RTL Hebrew). The panel is a
 // tzevaadom-style FEED: one card per alert event, grouping all of its areas (so a 600-area barrage is
@@ -131,7 +132,14 @@ export function MapDashboard() {
           </div>
 
           <footer className="text-[10px] leading-relaxed text-slate-500">
-            <a href="#stats" className="font-medium text-sky-400 transition hover:text-sky-300">
+            <a
+              href="/historical"
+              onClick={(e) => {
+                e.preventDefault()
+                navigate('/historical')
+              }}
+              className="font-medium text-sky-400 transition hover:text-sky-300"
+            >
               סטטיסטיקה היסטורית ←
             </a>
             <div className="mt-1">
