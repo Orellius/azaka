@@ -13,18 +13,6 @@ const FIRMS_PREF = 'azaka_firms'
 // tzevaadom-style FEED: one card per alert event, grouping all of its areas (so a 600-area barrage is
 // one card, not 600 rows). Colour by severity: red active / amber early / green ended. The verbatim
 // oref instruction shows at top while an alert is live; all state comes from useAlertFeed.
-const GUSH_DAN_DEMO = [
-  'תל אביב - מרכז העיר',
-  'תל אביב - דרום העיר ויפו',
-  'חולון',
-  'בת ים',
-  'רמת גן - מערב',
-  'גבעתיים',
-  'ראשון לציון - מערב',
-  'בני ברק',
-]
-const SHARON_EARLY_DEMO = ['רעננה', 'הוד השרון', 'כפר סבא', 'אבן יהודה', 'הרצליה - מרכז וגליל ים']
-
 const STATUS_LABEL: Record<string, { text: string; dot: string }> = {
   live: { text: 'מחובר', dot: 'bg-emerald-400' },
   connecting: { text: 'מתחבר…', dot: 'bg-amber-400' },
@@ -47,8 +35,7 @@ function relTime(ts: number): string {
 }
 
 export function MapDashboard() {
-  const { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events, simulate, resolve, clear } =
-    useAlertFeed()
+  const { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events } = useAlertFeed()
   const firms = useFirms()
   const [firmsOn, setFirmsOn] = useState(() => {
     try {
@@ -80,7 +67,7 @@ export function MapDashboard() {
       />
 
       <div className="pointer-events-none absolute inset-0 p-4">
-        <div className="pointer-events-auto me-auto flex max-h-[calc(100vh-2rem)] w-80 max-w-[88vw] flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/85 p-4 shadow-2xl backdrop-blur-md">
+        <div className="feed-scroll pointer-events-auto me-auto flex max-h-[calc(100vh-2rem)] w-80 max-w-[88vw] flex-col gap-3 overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/85 p-4 shadow-2xl backdrop-blur-md">
           <header className="flex items-center gap-3">
             <span className="relative flex h-3.5 w-3.5">
               {(alerting || warning) && (
@@ -116,7 +103,7 @@ export function MapDashboard() {
               אין התרעות פעילות
             </div>
           ) : (
-            <div className="flex max-h-[40vh] min-h-0 flex-col gap-2.5 overflow-y-auto pe-1">
+            <div className="feed-scroll flex max-h-[44vh] min-h-0 flex-col gap-2.5 overflow-y-auto pe-1">
               {events.map((ev, i) => (
                 <EventCard key={`${ev.id}-${i}`} ev={ev} />
               ))}
@@ -126,41 +113,6 @@ export function MapDashboard() {
           {firms.configured && (
             <FirmsPanel detections={firms.detections} on={firmsOn} onToggle={() => setFirmsOn((v) => !v)} />
           )}
-
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => simulate(GUSH_DAN_DEMO, 'active')}
-                className="flex-1 rounded-lg bg-rose-600 px-2 py-2 text-[12px] font-medium text-white transition hover:bg-rose-500"
-              >
-                פעילה · גוש דן
-              </button>
-              <button
-                type="button"
-                onClick={() => simulate(SHARON_EARLY_DEMO, 'early')}
-                className="flex-1 rounded-lg bg-amber-600 px-2 py-2 text-[12px] font-medium text-white transition hover:bg-amber-500"
-              >
-                מקדימה · השרון
-              </button>
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => resolve([...activeAreas, ...earlyAreas])}
-                className="flex-1 rounded-lg bg-emerald-600 px-2 py-2 text-[12px] font-medium text-white transition hover:bg-emerald-500"
-              >
-                האירוע הסתיים
-              </button>
-              <button
-                type="button"
-                onClick={clear}
-                className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[12px] text-slate-300 transition hover:bg-white/10"
-              >
-                נקה
-              </button>
-            </div>
-          </div>
 
           <SidebarFooter lastAt={lastAt} />
         </div>
@@ -180,7 +132,7 @@ function EventCard({ ev }: { ev: FeedEvent }) {
         <div className="mt-1 text-[10px] text-slate-500">
           {relTime(ev.ts)} · {time} · {ev.cities.length} אזורים
         </div>
-        <div className="mt-1.5 line-clamp-3 text-[11px] leading-relaxed text-slate-300">{ev.cities.join(', ')}</div>
+        <div className="mt-1.5 break-words text-[11px] leading-relaxed text-slate-300">{ev.cities.join(', ')}</div>
       </div>
     </div>
   )
@@ -252,10 +204,10 @@ function AnomalyGroupCard({ g }: { g: AnomalyGroup }) {
       <div className="w-1 shrink-0 bg-orange-400/80" />
       <div className="min-w-0 flex-1 px-2.5 py-1.5">
         <div className="flex items-center gap-1.5">
-          <span className="truncate text-[12px] font-semibold text-orange-100">
+          <span className="min-w-0 break-words text-[12px] font-semibold text-orange-100">
             אנומליה תרמית{g.label ? ` · ${g.label}` : ''}
           </span>
-          <span className="ms-auto whitespace-nowrap text-[10px] text-slate-500">{anomalyAge(g.latestTs)}</span>
+          <span className="ms-auto shrink-0 whitespace-nowrap text-[10px] text-slate-500">{anomalyAge(g.latestTs)}</span>
         </div>
         <div className="mt-0.5 text-[10px] text-slate-400">
           {g.count > 1 ? `${g.count} זיהויים · ` : ''}

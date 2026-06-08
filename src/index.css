@@ -26,6 +26,25 @@ body {
   opacity: 0.6;
 }
 
+/* Visible, touch-draggable scrollbar for the command panel + feeds. macOS auto-hides the default
+   overlay scrollbar, which reads as "not scrollable"; this keeps a thin thumb always visible. */
+.feed-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+}
+.feed-scroll::-webkit-scrollbar {
+  width: 7px;
+}
+.feed-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.45);
+  border-radius: 4px;
+}
+.feed-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}
+
 /* Hebrew city-name pills: subtle when calm, vivid when the city enters an alert tier. */
 .city-label {
   position: relative;

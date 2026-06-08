@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { CATEGORIES } from './categories'
 
 // Live alert feed off OUR relay (official Pikud HaOref, Israeli egress). SAFETY: an alerted area is
 // NEVER auto-marked "safe" on a short timer. Official guidance is remain 10 min (rockets/UAV) or
@@ -7,9 +6,11 @@ import { CATEGORIES } from './categories'
 // cat-13 all-clear, with a long 180-min fail-safe backstop (mirrors amitfin/oref_alert) used only to
 // avoid a stuck-on state, never as a "safe to leave" signal. 'special' (terror/nonconv) renders red.
 const WS_URL = import.meta.env.VITE_RELAY_URL ?? 'ws://localhost:8787/ws'
+const RELAY_HTTP = WS_URL.replace(/^ws(s?):\/\//, 'http$1://').replace(/\/ws$/, '')
 const BACKSTOP_MS = 180 * 60_000 // 3h fail-safe only; NOT a safe-to-leave signal
 const CLEAR_TTL_MS = 25_000
 const RECONNECT_MS = 3_000
+const FEED_TTL_MS = 24 * 60 * 60_000 // the event feed shows the last 24h, then entries drop off
 
 export type FeedStatus = 'connecting' | 'live' | 'error'
 export type AlertKind = 'active' | 'early' | 'special'
@@ -33,6 +34,40 @@ type RelayMessage =
   | { type: 'hello'; activeAreas?: string[] }
   | { type: 'clear'; cities?: string[]; id?: string; ts?: number }
 
+const GROUP_WINDOW_MS = 30 * 60_000 // alerts with the same title within this window stack into one card
+
+// Merge an event into the feed: if a recent card has the same severity+title (within GROUP_WINDOW_MS),
+// union its areas and bump its time (tzevaadom-style stacking, so one ongoing event is one updating
+// card, not 600 rows); otherwise prepend a new card. Also drops anything older than 24h. Pure, so it is
+// reused for both live events and the history seed.
+function mergeEvent(prev: FeedEvent[], ev: FeedEvent): FeedEvent[] {
+  const cutoff = Date.now() - FEED_TTL_MS
+  const fresh = prev.filter((e) => e.ts >= cutoff && e.id !== ev.id)
+  const i = fresh.findIndex(
+    (e) => e.severity === ev.severity && e.title === ev.title && Math.abs(e.ts - ev.ts) <= GROUP_WINDOW_MS,
+  )
+  const next =
+    i >= 0
+      ? fresh.map((e, idx) =>
+          idx === i ? { ...e, ts: Math.max(e.ts, ev.ts), cities: Array.from(new Set([...e.cities, ...ev.cities])) } : e,
+        )
+      : [ev, ...fresh]
+  return next.sort((a, b) => b.ts - a.ts).slice(0, MAX_EVENTS)
+}
+
+// Map a relay history record (alert/clear) into a feed event; null for anything else (e.g. firms-daily).
+function toFeedEvent(raw: unknown): FeedEvent | null {
+  if (typeof raw !== 'object' || raw === null) return null
+  const e = raw as { type?: string; kind?: string; id?: string; title?: string; cities?: unknown; ts?: number }
+  if (!e.ts || !Array.isArray(e.cities) || e.cities.length === 0) return null
+  if (e.type === 'clear') return { id: e.id ?? String(e.ts), severity: 'cleared', title: 'האירוע הסתיים', ts: e.ts, cities: e.cities as string[] }
+  if (e.type === 'alert') {
+    const severity: FeedEvent['severity'] = e.kind === 'early' ? 'early' : e.kind === 'special' ? 'special' : 'active'
+    return { id: e.id ?? String(e.ts), severity, title: e.title || '', ts: e.ts, cities: e.cities as string[] }
+  }
+  return null
+}
+
 export function useAlertFeed() {
   const [activeAreas, setActive] = useState<Set<string>>(new Set())
   const [earlyAreas, setEarly] = useState<Set<string>>(new Set())
@@ -44,7 +79,38 @@ export function useAlertFeed() {
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
   const pushEvent = useCallback((ev: FeedEvent) => {
-    setEvents((prev) => [ev, ...prev].slice(0, MAX_EVENTS))
+    setEvents((prev) => mergeEvent(prev, ev))
+  }, [])
+
+  // seed the feed with the last 24h from the relay history (grouped) so a refresh keeps recent alerts,
+  // and prune entries older than 24h every minute so the feed is always a rolling 24h window
+  useEffect(() => {
+    let alive = true
+    fetch(`${RELAY_HTTP}/history?limit=300`)
+      .then((r) => r.json())
+      .then((d: { events?: unknown }) => {
+        if (!alive || !Array.isArray(d.events)) return
+        const cutoff = Date.now() - FEED_TTL_MS
+        const hist = d.events
+          .map(toFeedEvent)
+          .filter((e): e is FeedEvent => e !== null && e.ts >= cutoff)
+          .sort((a, b) => a.ts - b.ts) // oldest first so stacking accumulates forward
+        setEvents((prev) => hist.reduce((acc, e) => mergeEvent(acc, e), prev))
+      })
+      .catch(() => {
+        // relay history unavailable: live websocket events still populate the feed
+      })
+    const prune = setInterval(() => {
+      setEvents((prev) => {
+        const cutoff = Date.now() - FEED_TTL_MS
+        const next = prev.filter((e) => e.ts >= cutoff)
+        return next.length === prev.length ? prev : next
+      })
+    }, 60_000)
+    return () => {
+      alive = false
+      clearInterval(prune)
+    }
   }, [])
 
   const removeFrom = useCallback((setter: typeof setActive, name: string) => {
@@ -193,25 +259,5 @@ export function useAlertFeed() {
     }
   }, [activate, resolve, pushEvent])
 
-  const simulate = useCallback(
-    (names: string[], kind: AlertKind = 'active') => {
-      activate(names, kind)
-      const c = kind === 'early' ? CATEGORIES[14] : CATEGORIES[1]
-      const desc = kind === 'early' ? 'היכנסו למרחב מוגן בדקות הקרובות' : 'היכנסו למרחב המוגן ושהו בו 10 דקות'
-      setInstruction({ title: c.he, desc, key: c.key, remain: c.remain })
-      pushEvent({ id: String(Date.now()), severity: kind, title: c.he, ts: Date.now(), cities: names })
-    },
-    [activate, pushEvent],
-  )
-  const clear = useCallback(() => {
-    timers.current.forEach(clearTimeout)
-    timers.current.clear()
-    setActive(new Set())
-    setEarly(new Set())
-    setCleared(new Set())
-    setInstruction(null)
-    setEvents([])
-  }, [])
-
-  return { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events, simulate, resolve, clear }
+  return { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events }
 }
