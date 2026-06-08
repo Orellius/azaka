@@ -8,6 +8,8 @@ import { mapStyle, ISRAEL_CENTER, ISRAEL_ZOOM } from './mapStyle'
 import { computeThreatZone } from '../threat-zone/computeThreatZone'
 import { convexHull, type Point } from '../threat-zone/convexHull'
 import { buildCityLabels, type CityLabel } from './majorCities'
+import { FireLayer, FirePopup, type PickedFire } from './FireLayer'
+import type { FireDetection } from '../firms/useFirms'
 
 // MapLibre map of all Pikud HaOref alert areas. The GL layer (polygons, feature-state colours,
 // threat-zone hull, auto-zoom) is imperative because it lives on the WebGL canvas. The HTML overlays
@@ -50,10 +52,12 @@ export function AlertMap({
   activeAreas,
   earlyAreas,
   clearedAreas,
+  fires = [],
 }: {
   activeAreas: Set<string>
   earlyAreas: Set<string>
   clearedAreas: Set<string>
+  fires?: FireDetection[]
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
@@ -66,6 +70,7 @@ export function AlertMap({
   const [map, setMap] = useState<maplibregl.Map | null>(null)
   const [cities, setCities] = useState<CityLabel[]>([])
   const [selected, setSelected] = useState<Selected | null>(null)
+  const [selectedFire, setSelectedFire] = useState<PickedFire | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -130,10 +135,16 @@ export function AlertMap({
         const f = e.features?.[0]
         if (!f) return
         const p = f.properties as AreaProps
+        setSelectedFire(null) // selecting an area supersedes any open fire popup
         setSelected({ name: String(p.name ?? ''), en: p.en, countdown: p.countdown, lngLat: e.lngLat })
       })
       m.on('click', (e) => {
-        if (m.queryRenderedFeatures(e.point, { layers: ['areas-fill'] }).length === 0) setSelected(null)
+        // a fire-marker click is a DOM event that never reaches the canvas, so an empty-canvas click
+        // means the user tapped neither an area nor a marker: clear both popups.
+        if (m.queryRenderedFeatures(e.point, { layers: ['areas-fill'] }).length === 0) {
+          setSelected(null)
+          setSelectedFire(null)
+        }
       })
 
       setCities(buildCityLabels(points))
@@ -185,6 +196,17 @@ export function AlertMap({
 
   return (
     <div ref={containerRef} className="h-full w-full">
+      {map && (
+        <FireLayer
+          map={map}
+          detections={fires}
+          onPick={(f) => {
+            setSelected(null)
+            setSelectedFire(f)
+          }}
+        />
+      )}
+      {map && selectedFire && <FirePopup map={map} fire={selectedFire} onClose={() => setSelectedFire(null)} />}
       {map &&
         cities.map((c) => (
           <CityMarker key={c.label} map={map} city={c} tier={tierOf(c.names, activeAreas, earlyAreas, clearedAreas)} />

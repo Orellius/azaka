@@ -3,6 +3,8 @@
 // FIRMS detects thermal anomalies (~375m, ~3h latency, a few overpasses/day) and CANNOT attribute
 // cause, so the app says "thermal anomaly / fire detected near X", never "impact confirmed". Needs a
 // free MAP_KEY from https://firms.modaps.eosdis.nasa.gov/api/map_key (set FIRMS_MAP_KEY in env).
+import { persist } from './history'
+
 const MAP_KEY = Bun.env.FIRMS_MAP_KEY ?? ''
 const BBOX = Bun.env.FIRMS_BBOX ?? '34.2,29.4,35.9,33.4' // west,south,east,north (Israel)
 const SOURCES = ['VIIRS_NOAA20_NRT', 'VIIRS_NOAA21_NRT', 'VIIRS_SNPP_NRT']
@@ -22,6 +24,56 @@ let detections: FireDetection[] = []
 
 export const firmsConfigured = () => MAP_KEY.length > 0
 export const getFires = () => detections
+
+// Per-calendar-day accumulation of DISTINCT anomalies (keyed by location+acq-time+satellite), so the
+// midnight rollover can log an accurate daily count even though `detections` is a rolling 24h snapshot.
+type DayBucket = { keys: Set<string>; maxFrp: number }
+const dailyBuckets = new Map<string, DayBucket>()
+
+function dayStr(ts: number): string {
+  const d = new Date(ts)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function accumulate(list: FireDetection[]) {
+  for (const d of list) {
+    const day = dayStr(d.ts)
+    let b = dailyBuckets.get(day)
+    if (!b) {
+      b = { keys: new Set(), maxFrp: 0 }
+      dailyBuckets.set(day, b)
+    }
+    b.keys.add(`${d.lat.toFixed(4)},${d.lng.toFixed(4)},${d.ts},${d.satellite}`)
+    if (d.frp > b.maxFrp) b.maxFrp = d.frp
+  }
+}
+
+// Log a one-line daily summary of the day that just ended into the history log, then drop its bucket so
+// the rolling live feed effectively resets for the new day. Exported so the dev endpoint can trigger it
+// without waiting for midnight. Uses server-local time (the relay runs on Israeli egress, so = Israel).
+export function rolloverDaily(refTs = Date.now()): { date: string; count: number; maxFrp: number } {
+  const endedDay = dayStr(refTs - 60 * 60_000) // ~1h before the post-midnight firing time = yesterday
+  const b = dailyBuckets.get(endedDay)
+  const count = b ? b.keys.size : 0
+  const maxFrp = b ? Math.round(b.maxFrp * 10) / 10 : 0
+  const [y, m, d] = endedDay.split('-').map(Number)
+  const ts = new Date(y, m - 1, d, 23, 59, 59).getTime() // group under the ended day in computeStats
+  persist({ type: 'firms-daily', ts, count, maxFrp })
+  dailyBuckets.delete(endedDay)
+  const cutoff = dayStr(refTs - 3 * 24 * 60 * 60_000)
+  for (const k of dailyBuckets.keys()) if (k < cutoff) dailyBuckets.delete(k)
+  console.log(`[firms] daily rollover: ${count} anomalies logged for ${endedDay}`)
+  return { date: endedDay, count, maxFrp }
+}
+
+function scheduleMidnight() {
+  const now = new Date()
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5)
+  setTimeout(() => {
+    rolloverDaily()
+    setInterval(rolloverDaily, 24 * 60 * 60_000)
+  }, next.getTime() - now.getTime())
+}
 
 function parseCsv(csv: string): FireDetection[] {
   const lines = csv.trim().split('\n')
@@ -77,10 +129,12 @@ async function poll() {
   }
   const cutoff = Date.now() - MAX_AGE_MS
   detections = [...merged.values()].filter((d) => d.ts >= cutoff).sort((a, b) => b.ts - a.ts)
+  accumulate(detections)
   console.log(`[firms] ${detections.length} thermal-anomaly detections (last 24h) over Israel`)
 }
 
 export function startFirms() {
+  scheduleMidnight() // daily rollover runs regardless, so test-injected anomalies still log
   if (!MAP_KEY) {
     console.log('[firms] FIRMS_MAP_KEY not set - fire overlay disabled. Free key: https://firms.modaps.eosdis.nasa.gov/api/map_key')
     return

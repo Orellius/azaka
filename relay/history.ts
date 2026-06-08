@@ -8,7 +8,7 @@ const DATA_DIR = 'relay/data'
 mkdirSync(DATA_DIR, { recursive: true })
 
 export type HistoryEvent = {
-  type?: string // 'alert' | 'clear'
+  type?: string // 'alert' | 'clear' | 'firms-daily'
   kind?: string // 'active' | 'early' | 'special'
   id?: string
   cat?: string
@@ -16,6 +16,8 @@ export type HistoryEvent = {
   title?: string
   cities?: string[]
   ts?: number
+  count?: number // firms-daily: distinct thermal anomalies logged for that day
+  maxFrp?: number // firms-daily: peak fire radiative power (MW) that day
 }
 
 const yearFile = (year: number) => `${DATA_DIR}/history-${year}.jsonl`
@@ -63,7 +65,10 @@ export function readAll(): HistoryEvent[] {
 }
 
 export function recent(limit: number): HistoryEvent[] {
-  return readAll().slice(-limit).reverse()
+  return readAll()
+    .filter((e) => e.type !== 'firms-daily') // keep the recent-events feed to real alerts/clears
+    .slice(-limit)
+    .reverse()
 }
 
 function sizeBucket(n: number): string {
@@ -84,6 +89,8 @@ export type Stats = {
   byType: Record<string, number> // threat key -> event count
   byEventSize: Record<string, number> // locality-count bucket -> event count
   topCities: Array<{ name: string; count: number }>
+  firmsTotal: number // total thermal anomalies logged (from daily rollovers)
+  firmsDays: Record<string, number> // YYYY-MM-DD -> anomaly count
 }
 
 export function computeStats(events: HistoryEvent[], topN = 30): Stats {
@@ -120,6 +127,18 @@ export function computeStats(events: HistoryEvent[], topN = 30): Stats {
     .slice(0, topN)
     .map(([name, count]) => ({ name, count }))
 
+  // FIRMS thermal-anomaly daily rollups live in the same log as their own record type
+  const firmsDays: Record<string, number> = {}
+  let firmsTotal = 0
+  for (const e of events) {
+    if (e.type !== 'firms-daily') continue
+    const d = new Date(e.ts ?? 0)
+    const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const n = e.count ?? 0
+    firmsDays[day] = (firmsDays[day] ?? 0) + n
+    firmsTotal += n
+  }
+
   return {
     totalEvents: alerts.length,
     totalSirens,
@@ -130,5 +149,7 @@ export function computeStats(events: HistoryEvent[], topN = 30): Stats {
     byType,
     byEventSize,
     topCities,
+    firmsTotal,
+    firmsDays: Object.fromEntries(Object.entries(firmsDays).sort()),
   }
 }
