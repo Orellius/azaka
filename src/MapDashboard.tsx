@@ -9,6 +9,7 @@ import { useMyArea } from './myarea/useMyArea'
 import { usePersonalAlert } from './myarea/usePersonalAlert'
 import { PersonalAlertBanner } from './myarea/PersonalAlertBanner'
 import { MyAreaControl } from './myarea/MyAreaControl'
+import { WhereToShelter } from './shelter/WhereToShelter'
 import { useFirms, type FireDetection } from './firms/useFirms'
 import { FIRMS_CREDIT, anomalyAge, confLabel, groupAnomalies, type AnomalyGroup } from './firms/anomaly'
 import { openCookieSettings } from './consent/consentStore'
@@ -161,6 +162,8 @@ export function MapDashboard() {
           )}
 
           <MyAreaControl myArea={myArea} onChange={setMyArea} tier={personal?.tier ?? null} />
+
+          <WhereToShelter alerting={alerting || warning} />
 
           {(alerting || warning) && instruction && (instruction.title || instruction.desc) && (
             <div className="rounded-xl border border-rose-500/50 bg-rose-500/15 px-3 py-2.5">

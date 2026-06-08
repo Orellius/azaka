@@ -179,6 +179,45 @@ export const STRINGS = {
   // sheet collapse
   sheet_collapse: { he: 'כיווץ הפאנל', en: 'Collapse panel', ar: 'طيّ اللوحة', ru: 'Свернуть панель' },
   sheet_expand: { he: 'הרחבת הפאנל', en: 'Expand panel', ar: 'توسيع اللوحة', ru: 'Развернуть панель' },
+
+  // Where to shelter (official Home Front Command protected-space guidance; honest, no specific pins)
+  shelter_where_title: { he: 'לאן נכנסים?', en: 'Where to take shelter', ar: 'إلى أين تحتمي؟', ru: 'Куда укрыться' },
+  shelter_step_room: {
+    he: 'ממ"ד, ממ"ק או מקלט ציבורי — היכנסו אליו.',
+    en: 'A protected room (mamad), protected space (mamak), or public shelter (miklat) — go there.',
+    ar: 'غرفة محمية (ممد) أو مساحة محمية (ممك) أو ملجأ عام — توجّه إليه.',
+    ru: 'Защищённая комната (мамад), защищённое помещение (мамак) или общественное укрытие — идите туда.',
+  },
+  shelter_step_stairwell: {
+    he: 'אין מרחב מוגן? היכנסו לחדר המדרגות הפנימי, הרחק מהקומה העליונה.',
+    en: 'No protected space? Enter the building’s interior stairwell, away from the top floor.',
+    ar: 'لا توجد مساحة محمية؟ ادخل بئر الدرج الداخلي، بعيدًا عن الطابق العلوي.',
+    ru: 'Нет защищённого помещения? Зайдите во внутренний лестничный пролёт, подальше от верхнего этажа.',
+  },
+  shelter_step_interior: {
+    he: 'אין חדר מדרגות? חדר פנימי עם מעט קירות וחלונות חיצוניים, וסגרו את הדלת.',
+    en: 'No stairwell? An interior room with the fewest outer walls and windows; close the door.',
+    ar: 'لا يوجد درج؟ غرفة داخلية بأقل عدد من الجدران والنوافذ الخارجية، وأغلق الباب.',
+    ru: 'Нет лестницы? Внутренняя комната с минимумом наружных стен и окон; закройте дверь.',
+  },
+  shelter_step_outdoors: {
+    he: 'בשטח פתוח? שכבו על הקרקע וחפו על הראש; היכנסו למבנה קרוב אם אפשר.',
+    en: 'Outdoors? Lie on the ground and cover your head; enter a nearby building if you can.',
+    ar: 'في العراء؟ استلقِ على الأرض وغطِّ رأسك؛ وادخل مبنى قريبًا إن أمكن.',
+    ru: 'На улице? Лягте на землю и закройте голову; зайдите в ближайшее здание, если можете.',
+  },
+  shelter_step_driving: {
+    he: 'נוהגים? עצרו בצד, צאו מהרכב ושכבו על הקרקע עם הגנה על הראש.',
+    en: 'Driving? Pull over, get out, and lie down covering your head; shelter in a building if one is near.',
+    ar: 'تقود؟ توقّف جانبًا، اخرج من السيارة واستلقِ مع حماية رأسك؛ واحتمِ بمبنى إن وُجد قريبًا.',
+    ru: 'За рулём? Остановитесь, выйдите и лягте, прикрыв голову; укройтесь в здании, если оно рядом.',
+  },
+  shelter_note: {
+    he: 'הנחיה כללית של פיקוד העורף. מיקומי מקלטים ציבוריים אינם זמינים כמידע פתוח אמין; פנו למרחב המוגן הקרוב המוכר לכם.',
+    en: 'General Home Front Command guidance. Public-shelter locations are not available as reliable open data; go to the nearest protected space you know.',
+    ar: 'إرشادات عامة من قيادة الجبهة الداخلية. مواقع الملاجئ العامة غير متوفرة كبيانات مفتوحة موثوقة؛ توجّه إلى أقرب مساحة محمية تعرفها.',
+    ru: 'Общие указания Командования тыла. Расположение общественных укрытий недоступно как надёжные открытые данные; идите к ближайшему известному вам защищённому месту.',
+  },
 } satisfies Record<string, Entry>
 
 export type StringKey = keyof typeof STRINGS
