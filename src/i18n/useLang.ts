@@ -65,5 +65,23 @@ export function useLang() {
   const t = (key: StringKey, vars?: Record<string, string | number>) => fill(STRINGS[key][lang], vars)
   const tGuide = (remain: 'tenmin' | 'release') => GUIDANCE[remain][lang]
   const tThreat = (key?: string) => (key && THREAT[key] ? THREAT[key][lang] : '')
-  return { lang, dir, t, tGuide, tThreat, setLang }
+  // relative time ("now" / "3 min ago"); shared by the feed, FIRMS popup, and anomaly cards
+  const tAgo = (ts: number): string => {
+    if (!ts) return ''
+    const mins = Math.floor((Date.now() - ts) / 60000)
+    if (mins < 1) return t('rel_now')
+    if (mins < 60) return mins === 1 ? t('rel_1min') : t('rel_min', { n: mins })
+    const hrs = Math.floor(mins / 60)
+    return hrs === 1 ? t('rel_1hr') : t('rel_hr', { n: hrs })
+  }
+  // FIRMS confidence word (high/medium/low/unknown, or a raw percentage)
+  const tConf = (c: string): string => {
+    const s = (c || '').toLowerCase()
+    if (s.startsWith('h')) return t('conf_high')
+    if (s.startsWith('n')) return t('conf_medium')
+    if (s.startsWith('l')) return t('conf_low')
+    const n = Number(c)
+    return Number.isFinite(n) && c !== '' ? `${n}%` : t('conf_unknown')
+  }
+  return { lang, dir, t, tGuide, tThreat, tAgo, tConf, setLang }
 }

@@ -1,6 +1,7 @@
 // Header bell that mutes/unmutes audible alerts + browser notifications. Sits in the always-visible
 // panel header so it is reachable even when the mobile sheet is collapsed. State + persistence live in
 // useNotifier; this is presentation only.
+import { useLang } from '../i18n/useLang'
 
 function BellIcon({ className }: { className?: string }) {
   return (
@@ -24,13 +25,14 @@ function BellOffIcon({ className }: { className?: string }) {
 }
 
 export function AlertToggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
+  const { t } = useLang()
   return (
     <button
       type="button"
       role="switch"
       aria-checked={enabled}
-      aria-label={enabled ? 'השתקת התרעות קוליות' : 'הפעלת התרעות קוליות'}
-      title={enabled ? 'התרעות קוליות פעילות' : 'התרעות מושתקות'}
+      aria-label={enabled ? t('notif_mute') : t('notif_unmute')}
+      title={enabled ? t('alerts_on') : t('alerts_off')}
       onClick={onToggle}
       className={`flex h-8 w-8 items-center justify-center rounded-lg border transition ${
         enabled

@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AlertKind, LiveAlert } from '../alerts/useAlertFeed'
+import { useLang } from '../i18n/useLang'
+
+type T = ReturnType<typeof useLang>['t']
 
 // Audible-alarm + browser-Notification layer for genuinely-new LIVE alerts.
 // Public surface: useNotifier(lastLiveAlert, myAreaName) returns { enabled, toggle, perm, requestPermission }.
@@ -65,18 +68,14 @@ function playAlarm(ctx: AudioContext, kind: AlertKind) {
   }
 }
 
-function showNotification(a: LiveAlert, myArea?: string | null) {
+function showNotification(a: LiveAlert, myArea: string | null | undefined, t: T) {
   const mine = !!myArea && a.cities.includes(myArea)
-  const heading = mine
-    ? '🚨 התרעה באזור שלך'
-    : a.kind === 'early'
-      ? 'התרעה מקדימה · פיקוד העורף'
-      : 'אזעקה · צבע אדום'
+  const heading = mine ? t('notif_in_area') : a.kind === 'early' ? t('notif_early_head') : t('notif_active_head')
   const shown = a.cities.slice(0, 6).join(', ')
-  const more = a.cities.length > 6 ? ` ועוד ${a.cities.length - 6}` : ''
+  const more = a.cities.length > 6 ? ` ${t('notif_more', { n: a.cities.length - 6 })}` : ''
   try {
     const n = new Notification(heading, {
-      body: `${a.title || 'התרעה'} · ${shown}${more}`,
+      body: `${a.title || t('alert_generic')} · ${shown}${more}`,
       tag: 'azaka-alert', // collapse a barrage into one updating notification, not 600
       icon: '/favicon.svg',
       badge: '/favicon.svg',
@@ -94,17 +93,20 @@ function showNotification(a: LiveAlert, myArea?: string | null) {
 }
 
 export function useNotifier(lastLiveAlert: LiveAlert | null, myAreaName?: string | null) {
+  const { t } = useLang()
   const [enabled, setEnabled] = useState(loadEnabled)
   const [perm, setPerm] = useState<Perm>(currentPerm)
   const ctxRef = useRef<AudioContext | null>(null)
   const enabledRef = useRef(enabled)
   const myAreaRef = useRef(myAreaName)
+  const tRef = useRef<T>(t)
 
-  // mirror the latest enabled/myArea into refs so the live-alert effect can read them without
+  // mirror the latest enabled/myArea/t into refs so the live-alert effect can read them without
   // re-subscribing (a ref write during render is disallowed; this syncs after each commit instead)
   useEffect(() => {
     enabledRef.current = enabled
     myAreaRef.current = myAreaName
+    tRef.current = t
   })
 
   const ensureCtx = useCallback((): AudioContext | null => {
@@ -175,7 +177,7 @@ export function useNotifier(lastLiveAlert: LiveAlert | null, myAreaName?: string
       }
     }
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      showNotification(lastLiveAlert, myAreaRef.current)
+      showNotification(lastLiveAlert, myAreaRef.current, tRef.current)
     }
   }, [lastLiveAlert, ensureCtx])
 

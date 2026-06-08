@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import maplibregl from 'maplibre-gl'
 import type { FireDetection } from '../firms/useFirms'
-import { FIRMS_CAVEAT, FIRMS_CREDIT, anomalyAge, confLabel, nearestCity } from '../firms/anomaly'
+import { FIRMS_CREDIT, nearestCity } from '../firms/anomaly'
+import { useLang } from '../i18n/useLang'
 
 // NASA FIRMS thermal-anomaly overlay. Each detection is an HTML fire-icon marker (createPortal into a
 // MapLibre-owned container) with a drop-shadow so it reads as a real detection, not a flat dot. Using
@@ -44,6 +45,7 @@ export function FireLayer({
 }
 
 function FireMarker({ map, d, onPick }: { map: maplibregl.Map; d: FireDetection; onPick: (fire: PickedFire) => void }) {
+  const { t } = useLang()
   const [el] = useState(() => document.createElement('div'))
   useEffect(() => {
     const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([d.lng, d.lat]).addTo(map)
@@ -54,7 +56,7 @@ function FireMarker({ map, d, onPick }: { map: maplibregl.Map; d: FireDetection;
   return createPortal(
     <button
       type="button"
-      aria-label="אנומליה תרמית"
+      aria-label={t('firms_anomaly')}
       onClick={() => onPick({ ...d, lngLat: new maplibregl.LngLat(d.lng, d.lat) })}
       className="flex cursor-pointer items-center justify-center text-orange-500 transition hover:text-orange-400"
     >
@@ -65,6 +67,7 @@ function FireMarker({ map, d, onPick }: { map: maplibregl.Map; d: FireDetection;
 }
 
 export function FirePopup({ map, fire, onClose }: { map: maplibregl.Map; fire: PickedFire; onClose: () => void }) {
+  const { t, tAgo, tConf } = useLang()
   const [el] = useState(() => document.createElement('div'))
   const popupRef = useRef<maplibregl.Popup | null>(null)
   useEffect(() => {
@@ -90,21 +93,24 @@ export function FirePopup({ map, fire, onClose }: { map: maplibregl.Map; fire: P
     ? new Date(fire.ts).toLocaleString('he-IL', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })
     : '—'
   return createPortal(
-    <div dir="rtl" className="w-52">
+    <div className="w-52">
       <div className="flex items-start gap-2">
         <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-orange-400" />
         <div className="min-w-0 flex-1">
-          <div className="text-[13px] font-bold leading-tight text-orange-200">אנומליה תרמית{near ? ` · ${near}` : ''}</div>
-          <div className="text-[10px] text-slate-400">{anomalyAge(fire.ts)} · {time}</div>
+          <div className="text-[13px] font-bold leading-tight text-orange-200">
+            {t('firms_anomaly')}
+            {near ? ` · ${t('firms_near')} ${near}` : ''}
+          </div>
+          <div className="text-[10px] text-slate-400">{tAgo(fire.ts)} · {time}</div>
         </div>
       </div>
-      <div className="mt-2 text-[11px] leading-relaxed text-slate-300">{FIRMS_CAVEAT}</div>
+      <div className="mt-2 text-[11px] leading-relaxed text-slate-300">{t('firms_disclaimer')}</div>
       <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 rounded-lg bg-white/5 px-2.5 py-1.5 text-[10px]">
-        <span className="text-slate-400">ודאות</span>
-        <span className="text-end font-medium text-white">{confLabel(fire.confidence).replace('ודאות ', '')}</span>
-        <span className="text-slate-400">עוצמה (FRP)</span>
+        <span className="text-slate-400">{t('firms_confidence')}</span>
+        <span className="text-end font-medium text-white">{tConf(fire.confidence)}</span>
+        <span className="text-slate-400">{t('firms_intensity')}</span>
         <span className="text-end font-medium text-white">{fire.frp ? `${fire.frp} MW` : '—'}</span>
-        <span className="text-slate-400">לוויין</span>
+        <span className="text-slate-400">{t('firms_satellite')}</span>
         <span className="text-end font-medium text-white">{fire.satellite || '—'}</span>
       </div>
       <div className="mt-1.5 text-[9px] text-slate-500">{FIRMS_CREDIT}</div>

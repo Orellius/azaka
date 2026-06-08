@@ -11,7 +11,7 @@ import { PersonalAlertBanner } from './myarea/PersonalAlertBanner'
 import { MyAreaControl } from './myarea/MyAreaControl'
 import { WhereToShelter } from './shelter/WhereToShelter'
 import { useFirms, type FireDetection } from './firms/useFirms'
-import { FIRMS_CREDIT, anomalyAge, confLabel, groupAnomalies, type AnomalyGroup } from './firms/anomaly'
+import { FIRMS_CREDIT, groupAnomalies, type AnomalyGroup } from './firms/anomaly'
 import { openCookieSettings } from './consent/consentStore'
 import { navigate } from './router'
 import { useLang } from './i18n/useLang'
@@ -39,15 +39,6 @@ const SEV_HEX: Record<FeedEvent['severity'], string> = {
   special: '#ff2532',
   early: '#f59e0b',
   cleared: '#10b981',
-}
-
-function relTime(ts: number, t: ReturnType<typeof useLang>['t']): string {
-  const mins = Math.floor((Date.now() - ts) / 60000)
-  if (mins < 1) return t('rel_now')
-  if (mins === 1) return t('rel_1min')
-  if (mins < 60) return t('rel_min', { n: mins })
-  const hrs = Math.floor(mins / 60)
-  return hrs === 1 ? t('rel_1hr') : t('rel_hr', { n: hrs })
 }
 
 function LiveClock() {
@@ -226,7 +217,7 @@ function SnapshotBanner({ event, onClose, lowered = false }: { event: FeedEvent;
       <div className="min-w-0 text-[12px] text-slate-200">
         <span className={`font-semibold ${sev.txt}`}>{t('snap_label')}</span>
         {' · '}
-        {event.title || t('alert_generic')} · {t('areas_n', { n: event.cities.length })} ·{' '}
+        {event.severity === 'cleared' ? t('status_cleared') : event.title || t('alert_generic')} · {t('areas_n', { n: event.cities.length })} ·{' '}
         {new Date(event.ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
       </div>
       <button
@@ -242,7 +233,7 @@ function SnapshotBanner({ event, onClose, lowered = false }: { event: FeedEvent;
 }
 
 function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; onSelect: () => void }) {
-  const { t, lang, tThreat } = useLang()
+  const { t, lang, tThreat, tAgo } = useLang()
   const c = SEV[ev.severity]
   const [expanded, setExpanded] = useState(false)
   const time = new Date(ev.ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
@@ -265,14 +256,16 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
       <div className="flex items-center gap-2">
         <AlertIcon ev={ev} className={`size-4 shrink-0 ${c.txt}`} />
         <div className="min-w-0 flex-1">
-          <div className={`text-[13px] font-semibold leading-tight ${c.txt}`}>{ev.title || t('alert_generic')}</div>
-          {lang !== 'he' && threat && threat !== ev.title && (
+          <div className={`text-[13px] font-semibold leading-tight ${c.txt}`}>
+            {ev.severity === 'cleared' ? t('status_cleared') : ev.title || t('alert_generic')}
+          </div>
+          {lang !== 'he' && ev.severity !== 'cleared' && threat && threat !== ev.title && (
             <div className="text-[10px] font-medium text-slate-400">{threat}</div>
           )}
         </div>
       </div>
       <div className="mt-1 text-[10px] text-slate-500">
-        {relTime(ev.ts, t)} · {time} · {t('areas_n', { n: ev.cities.length })}
+        {tAgo(ev.ts)} · {time} · {t('areas_n', { n: ev.cities.length })}
       </div>
         <div
           className={`mt-1.5 break-words text-[11px] leading-relaxed text-slate-300 ${long && !expanded ? 'line-clamp-3' : ''}`}
@@ -357,7 +350,7 @@ function FirmsPanel({ detections, on, onToggle }: { detections: FireDetection[];
 }
 
 function AnomalyGroupCard({ g }: { g: AnomalyGroup }) {
-  const { t } = useLang()
+  const { t, tAgo, tConf } = useLang()
   return (
     <div className="flex overflow-hidden rounded-lg border border-orange-500/20 bg-orange-500/5">
       <div className="w-1 shrink-0 bg-orange-400/80" />
@@ -366,11 +359,11 @@ function AnomalyGroupCard({ g }: { g: AnomalyGroup }) {
           <span className="min-w-0 break-words text-[12px] font-semibold text-orange-100">
             {t('firms_anomaly')}{g.label ? ` · ${g.label}` : ''}
           </span>
-          <span className="ms-auto shrink-0 whitespace-nowrap text-[10px] text-slate-500">{anomalyAge(g.latestTs)}</span>
+          <span className="ms-auto shrink-0 whitespace-nowrap text-[10px] text-slate-500">{tAgo(g.latestTs)}</span>
         </div>
         <div className="mt-0.5 text-[10px] text-slate-400">
           {g.count > 1 ? `${t('firms_detections', { n: g.count })} · ` : ''}
-          {confLabel(g.topConf)}
+          {t('firms_confidence')} {tConf(g.topConf)}
           {g.maxFrp ? ` · ${g.maxFrp} MW` : ''}
         </div>
       </div>

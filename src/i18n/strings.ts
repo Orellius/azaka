@@ -218,6 +218,71 @@ export const STRINGS = {
     ar: 'إرشادات عامة من قيادة الجبهة الداخلية. مواقع الملاجئ العامة غير متوفرة كبيانات مفتوحة موثوقة؛ توجّه إلى أقرب مساحة محمية تعرفها.',
     ru: 'Общие указания Командования тыла. Расположение общественных укрытий недоступно как надёжные открытые данные; идите к ближайшему известному вам защищённому месту.',
   },
+
+  // FIRMS popup details
+  firms_confidence: { he: 'ודאות', en: 'Confidence', ar: 'الثقة', ru: 'Достоверность' },
+  conf_high: { he: 'גבוהה', en: 'High', ar: 'عالية', ru: 'Высокая' },
+  conf_medium: { he: 'בינונית', en: 'Medium', ar: 'متوسطة', ru: 'Средняя' },
+  conf_low: { he: 'נמוכה', en: 'Low', ar: 'منخفضة', ru: 'Низкая' },
+  conf_unknown: { he: 'לא ידועה', en: 'Unknown', ar: 'غير معروفة', ru: 'Неизвестна' },
+  firms_intensity: { he: 'עוצמה (FRP)', en: 'Intensity (FRP)', ar: 'الشدة (FRP)', ru: 'Интенсивность (FRP)' },
+  firms_satellite: { he: 'לוויין', en: 'Satellite', ar: 'قمر صناعي', ru: 'Спутник' },
+  firms_near: { he: 'סמוך ל', en: 'near', ar: 'قرب', ru: 'рядом с' },
+
+  // Notifications (browser Notification text)
+  notif_in_area: { he: '🚨 התרעה באזור שלך', en: '🚨 Alert in your area', ar: '🚨 إنذار في منطقتك', ru: '🚨 Тревога в вашем районе' },
+  notif_early_head: { he: 'התרעה מקדימה · פיקוד העורף', en: 'Early warning · Home Front Command', ar: 'إنذار مبكر · قيادة الجبهة الداخلية', ru: 'Раннее предупреждение · Командование тыла' },
+  notif_active_head: { he: 'אזעקה · צבע אדום', en: 'Air-raid · Red Alert', ar: 'إنذار · لون أحمر', ru: 'Воздушная тревога · Красный' },
+  notif_more: { he: 'ועוד {n}', en: 'and {n} more', ar: 'و{n} أخرى', ru: 'и ещё {n}' },
+  notif_mute: { he: 'השתקת התרעות קוליות', en: 'Mute audible alerts', ar: 'كتم التنبيهات الصوتية', ru: 'Отключить звуковые оповещения' },
+  notif_unmute: { he: 'הפעלת התרעות קוליות', en: 'Enable audible alerts', ar: 'تفعيل التنبيهات الصوتية', ru: 'Включить звуковые оповещения' },
+
+  // Cookie consent
+  cookie_bold: { he: 'אנו משתמשים בעוגיות.', en: 'We use cookies.', ar: 'نستخدم ملفات تعريف الارتباط.', ru: 'Мы используем cookie.' },
+  cookie_text: {
+    he: 'עוגיות חיוניות נדרשות לתפעול האתר. בהסכמתך נשתמש גם בעוגיות נוספות לשיפור השירות. ניתן לשנות בכל עת דרך «הגדרות עוגיות».',
+    en: 'Essential cookies are required to run the site. With your consent we will also use additional cookies to improve the service. You can change this any time via “Cookie settings”.',
+    ar: 'ملفات تعريف الارتباط الأساسية مطلوبة لتشغيل الموقع. بموافقتك سنستخدم أيضًا ملفات إضافية لتحسين الخدمة. يمكنك التغيير في أي وقت عبر «إعدادات الكوكيز».',
+    ru: 'Основные cookie необходимы для работы сайта. С вашего согласия мы также будем использовать дополнительные cookie для улучшения сервиса. Изменить можно в любое время через «Настройки cookie».',
+  },
+  cookie_essential: { he: 'חיוני בלבד', en: 'Essential only', ar: 'الأساسية فقط', ru: 'Только основные' },
+  cookie_accept_all: { he: 'אשר הכל', en: 'Accept all', ar: 'قبول الكل', ru: 'Принять все' },
+
+  // Historical page
+  hist_live_map: { he: 'מפה חיה', en: 'Live map', ar: 'خريطة مباشرة', ru: 'Карта в реальном времени' },
+  hist_subtitle: { he: 'לוג התרעות פיקוד העורף', en: 'Home Front Command alert log', ar: 'سجل تنبيهات قيادة الجبهة الداخلية', ru: 'Журнал оповещений Командования тыла' },
+  hist_all: { he: 'הכל', en: 'All', ar: 'الكل', ru: 'Все' },
+  hist_no_data: { he: 'אין נתונים', en: 'No data', ar: 'لا توجد بيانات', ru: 'Нет данных' },
+  hist_loading: { he: 'טוען נתונים…', en: 'Loading data…', ar: 'جارٍ تحميل البيانات…', ru: 'Загрузка данных…' },
+  hist_relay_error: {
+    he: 'לא ניתן להתחבר לממסר. ודאו ש-bun relay/server.ts פועל.',
+    en: 'Cannot connect to the relay. Make sure bun relay/server.ts is running.',
+    ar: 'تعذّر الاتصال بالمُرحِّل. تأكّد من تشغيل bun relay/server.ts.',
+    ru: 'Не удаётся подключиться к ретранслятору. Убедитесь, что bun relay/server.ts запущен.',
+  },
+  hist_card_alerts: { he: 'התרעות', en: 'Alerts', ar: 'إنذارات', ru: 'Тревоги' },
+  hist_card_sirens: { he: 'אזעקות (סך יישובים)', en: 'Sirens (total localities)', ar: 'صفّارات (إجمالي المناطق)', ru: 'Сирены (всего населённых пунктов)' },
+  hist_card_unique: { he: 'יישובים ייחודיים', en: 'Unique localities', ar: 'مناطق فريدة', ru: 'Уникальные нас. пункты' },
+  hist_card_range: { he: 'טווח תאריכים', en: 'Date range', ar: 'النطاق الزمني', ru: 'Период' },
+  hist_panel_hour: { he: 'התרעות לפי שעה ביממה', en: 'Alerts by hour of day', ar: 'الإنذارات حسب ساعة اليوم', ru: 'Тревоги по часам суток' },
+  hist_panel_day: { he: 'התרעות לפי יום', en: 'Alerts by day', ar: 'الإنذارات حسب اليوم', ru: 'Тревоги по дням' },
+  hist_panel_types: { he: 'סוגי התרעות', en: 'Alert types', ar: 'أنواع الإنذارات', ru: 'Типы тревог' },
+  hist_panel_size: { he: 'גודל אירוע (מספר יישובים)', en: 'Event size (localities)', ar: 'حجم الحدث (عدد المناطق)', ru: 'Масштаб события (нас. пункты)' },
+  hist_panel_cities: { he: 'יישובים מובילים', en: 'Top localities', ar: 'أكثر المناطق', ru: 'Топ населённых пунктов' },
+  hist_panel_recent: { he: 'אירועים אחרונים', en: 'Recent events', ar: 'أحدث الأحداث', ru: 'Недавние события' },
+  hist_size_1: { he: 'יישוב 1', en: '1 locality', ar: 'منطقة واحدة', ru: '1 нас. пункт' },
+  hist_localities_n: { he: '{n} יישובים', en: '{n} localities', ar: '{n} منطقة', ru: '{n} нас. пунктов' },
+  hist_other: { he: 'אחר', en: 'Other', ar: 'أخرى', ru: 'Другое' },
+  hist_source: {
+    he: 'מקור: פיקוד העורף (oref.org.il) · הלוג נשמר ומתעדכן אוטומטית · ארכיון לפי שנה',
+    en: 'Source: Home Front Command (oref.org.il) · log saved and auto-updated · archived by year',
+    ar: 'المصدر: قيادة الجبهة الداخلية (oref.org.il) · يُحفظ السجل ويُحدَّث تلقائيًا · أرشيف سنوي',
+    ru: 'Источник: Командование тыла (oref.org.il) · журнал сохраняется и обновляется · архив по годам',
+  },
+
+  // Info pages chrome
+  info_back: { he: 'חזרה למפה', en: 'Back to map', ar: 'العودة إلى الخريطة', ru: 'Назад к карте' },
+  info_updated: { he: 'עודכן: 8 ביוני 2026', en: 'Updated: 8 June 2026', ar: 'آخر تحديث: 8 يونيو 2026', ru: 'Обновлено: 8 июня 2026' },
 } satisfies Record<string, Entry>
 
 export type StringKey = keyof typeof STRINGS
