@@ -42,8 +42,9 @@ itself cannot answer.
   "wait for official release" instead of a countdown.
 - **Computed threat zone.** A dashed polygon over the live cluster of active areas. Grounded geometry,
   not a guess.
-- **Hebrew city labels and click-to-inspect.** Major cities light up by tier. Click any sub-area to see
-  its name and shelter-entry time.
+- **Alert-driven map labels.** Only the areas currently under alert are labelled, coloured by tier and
+  decluttered by zoom (minor localities reveal as you zoom in); the map clears when calm. Click any
+  sub-area to see its name and shelter-entry time.
 - **Auto-zoom to fresh alerts**, with guards so it never hijacks the view while you are panning.
 - **Sound + browser notifications** on a genuinely-new live alert (distinct for active vs early), with a
   mute toggle. Permission is requested only on an explicit opt-in, never on page load.
@@ -133,7 +134,7 @@ bun scripts/build-areas.mjs    # -> public/data/areas.geojson
 ```
 src/
   App.tsx                  history-API router (map / historical / about / privacy / terms / contact)
-  MapDashboard.tsx         dashboard shell: map + command panel, grouped feed, FIRMS panel, legend
+  MapDashboard.tsx         dashboard shell: map + command panel, grouped feed, legend
   alerts/
     useAlertFeed.ts        WebSocket client; rolling 24h feed seeded from /history, stacking, backstop
     categories.ts          authoritative title classifier (single source of truth)
@@ -145,8 +146,6 @@ src/
   map/
     AlertMap.tsx           MapLibre map: tiers, threat-zone, history-snapshot layer, portal overlays
     majorCities.ts / mapStyle.ts
-  firms/                   NASA FIRMS thermal-anomaly overlay (useFirms, anomaly grouping/labels)
-    map/FireLayer.tsx      fire-icon markers + popup (lives under src/map)
   historical/              /historical stats page (server-aggregated)
   pages/InfoPage.tsx       about / privacy / terms / contact
   consent/                 cookie consent banner + store
@@ -154,7 +153,6 @@ src/
 relay/
   server.ts                poll official feed, classify, fan out, persist, HTTP routes
   history.ts               year-partitioned history log + computeStats
-  firms.ts                 NASA FIRMS poller + local-midnight daily rollover
 scripts/build-areas.mjs    build areas.geojson from upstream sources
 ```
 
@@ -175,17 +173,16 @@ them correctly. The full UI builds and typechecks clean. Beyond the core map it 
 grouped feed (seeded from history, survives refresh), per-event history snapshots (click a card to
 replay its areas on the map), audible alarm + browser notifications, a personal "My Area" alert with a
 live shelter countdown, "where to take shelter" guidance, a multilingual UI (he/en/ar/ru), a mobile
-bottom-sheet layout, a NASA FIRMS thermal-anomaly overlay (opt-in), a historical stats page, and the
-legal/consent scaffolding.
+bottom-sheet layout, a historical stats page, and the legal/consent scaffolding.
 
-Before launch: gate the dev-only `/test/alert` endpoint and serve the relay over `wss://` (an HTTPS page
-cannot connect to `ws://`); production Israeli egress under process supervision; legal pages + a real
-contact email need real content; the Arabic and Russian strings need a native/professional review.
+Before launch: `/test/alert` is now disabled when `NODE_ENV=production` (opt back in with
+`ALLOW_TEST_ALERTS=1`); still to do is serving the relay over `wss://` (an HTTPS page cannot connect to
+`ws://`); a production Israeli egress under process supervision; legal pages + a real contact email need
+real content; the Arabic and Russian strings need a native/professional review.
 
 Roadmap: an optional real public-shelter layer for the 2-3 cities with good open data (Jerusalem ODbL +
-Be'er Sheva), with explicit coverage labels and a "may be locked, verify" disclaimer; "full event
-extent" historical snapshots (union every wave of an ended event); FIRMS counts on the historical page;
-an honest alert-correlation tag (anomaly inside a recently-alerted polygon vs. random fire).
+Be'er Sheva), with explicit coverage labels and a "may be locked, verify" disclaimer; and "full event
+extent" historical snapshots (union every wave of an ended event).
 
 ## License
 
