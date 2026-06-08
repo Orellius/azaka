@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: "Rubik", system-ui, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  background: #0b0d12;
+  color: #e7e9ee;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* MapLibre attribution: keep it, but quiet it against the dark chrome */
+.maplibregl-ctrl-attrib {
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+/* Hebrew city-name pills: subtle when calm, vivid when the city enters an alert tier. */
+.city-label {
+  position: relative;
+  display: inline-block;
+  width: max-content;
+  box-sizing: border-box;
+  font: 600 12px/1.1 "Rubik", system-ui, sans-serif;
+  color: #1f2430;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  padding: 3px 8px;
+  border-radius: 7px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
+  opacity: 0.78;
+  pointer-events: none;
+  user-select: none;
+  transition: background 0.25s, color 0.25s, opacity 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+.city-label::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 7px;
+  height: 7px;
+  background: inherit;
+  border-right: inherit;
+  border-bottom: inherit;
+  transform: translateX(-50%) rotate(45deg);
+}
+.city-label--active {
+  background: #ff2532;
+  color: #fff;
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 3px 12px rgba(255, 37, 50, 0.55);
+  transform: translateY(-2px) scale(1.06);
+  z-index: 5;
+}
+.city-label--early {
+  background: #f59e0b;
+  color: #231300;
+  opacity: 1;
+  box-shadow: 0 3px 10px rgba(245, 158, 11, 0.45);
+}
+.city-label--cleared {
+  background: #10b981;
+  color: #032015;
+  opacity: 1;
+}
+
+/* Area click popup: dark glass to match the command panel. !important beats maplibre-gl.css, which is
+   imported from a component module and otherwise wins the cascade with its white default background. */
+.maplibregl-popup-content {
+  background: #0b0d12 !important;
+  color: #e7e9ee !important;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  padding: 10px 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  font: 500 13px/1.35 "Rubik", system-ui, sans-serif;
+}
+.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: #0b0d12 !important;
+}
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: #0b0d12 !important;
+}
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: #0b0d12 !important;
+}
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: #0b0d12 !important;
+}
+.maplibregl-popup-close-button {
+  color: #cbd5e1 !important;
+  font-size: 18px;
+  width: 22px;
+  height: 22px;
+  inset-inline-end: 2px;
+}

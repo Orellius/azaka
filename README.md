@@ -1,0 +1,152 @@
+<p align="center">
+  <img src="public/favicon.svg" width="96" height="96" alt="Azaka logo" />
+</p>
+
+<h1 align="center">אזעקה · Azaka</h1>
+
+<p align="center">A faster, official-sourced Red Alert live map for Israel.</p>
+
+<p align="center">
+  <code>Vite</code> · <code>React 19</code> · <code>TypeScript</code> · <code>MapLibre GL</code> · <code>Tailwind v4</code> · <code>Bun relay</code>
+</p>
+
+---
+
+> [!WARNING]
+> **Unofficial tool. Not a substitute for official Home Front Command (Pikud HaOref) alerts.**
+> Always rely on the physical siren, the official Pikud HaOref app, and Home Front Command
+> instructions. Azaka mirrors a public feed with no SLA and can be wrong, late, or offline.
+
+## What it is
+
+Azaka renders Israel's official Pikud HaOref rocket and missile alerts on a live map, the moment
+they fire. It exists to be sharper than the typical Red Alert clone: the same official data, but
+read more carefully and shown more usefully.
+
+It is built around one honest constraint: **you cannot predict where a missile will land from open
+data.** The trajectory and interception data that produce an impact point are classified. So Azaka
+does not fake a "where it lands" dot. What it does instead is draw a grounded **threat zone** (the
+convex hull of the areas actually alerted right now), and it focuses on the questions the siren
+itself cannot answer.
+
+## Features
+
+- **Live map of every alert area.** All 1,449 official Pikud HaOref alert polygons are loaded once
+  at boot, so an incoming alert is a GPU repaint with zero network on the hot path.
+- **Three alert tiers, by Home Front Command's own convention.** Red for active (take shelter now),
+  amber for early warning ("התקרבו למרחב מוגן"), green for "האירוע הסתיים" (event ended, safe to leave).
+- **Grouped event feed.** One card per alert event with all of its areas grouped, newest first, like
+  tzevaadom. A 600-area barrage is one card, not 600 rows.
+- **Verbatim official instructions.** The exact oref text is shown ("היכנסו למרחב המוגן ושהו בו 10 דקות"),
+  never a paraphrase. Threats that have no fixed remain time (ballistic, terror, nonconventional) say
+  "wait for official release" instead of a countdown.
+- **Computed threat zone.** A dashed polygon over the live cluster of active areas. Grounded geometry,
+  not a guess.
+- **Hebrew city labels and click-to-inspect.** Major cities light up by tier. Click any sub-area to see
+  its name and shelter-entry time.
+- **Auto-zoom to fresh alerts**, with guards so it never hijacks the view while you are panning.
+
+## Architecture
+
+The official oref feed is geoblocked to Israeli IPs and sends no CORS headers, so a browser (and a
+Cloudflare Worker) cannot read it directly. Azaka runs its own thin relay from an Israeli egress.
+
+```
+ Pikud HaOref                 azaka relay  (Israeli IP)           Browser
+ oref.org.il    ──poll──▶     Bun WebSocket server     ──push──▶  React + MapLibre GL
+ Alerts.json     ~1.5s        classify, dedup,         WS push    live map · grouped feed
+ (official)                   persist history                     three alert tiers
+```
+
+- **Frontend** (`src/`): Vite + React 19 + TypeScript + MapLibre GL + Tailwind v4, RTL Hebrew. The
+  GL layer (polygons, colors, threat-zone hull) is imperative; the HTML overlays (city pills, popup)
+  are React via `createPortal`.
+- **Relay** (`relay/server.ts`): a Bun WebSocket server that polls the official `Alerts.json`, dedups
+  by alert id, classifies each alert, fans it out to every connected browser, and appends it to a
+  history log. No third party in the data path.
+
+## Safety design
+
+This is a life-safety surface, so a few rules are non-negotiable in the code:
+
+1. **Classify by oref's verbatim title, not the category number.** The live feed's `cat` numbering
+   does not match the public category table (the live `cat 10` carries "האירוע הסתיים", an all-clear,
+   not a terror attack). The Hebrew title is unambiguous and is the source of truth.
+2. **Never auto-mark an area "safe" on a short timer.** Official guidance is remain 10 minutes for
+   rockets and drones, and "wait for an official release" for ballistic, terror, and nonconventional
+   threats. An area is held until an explicit all-clear, with a long fail-safe backstop only to avoid
+   a stuck state.
+3. **Filter non-attacks.** Memorial-day sirens and drills are never shown as real alerts.
+
+## Getting started
+
+Requires [Bun](https://bun.sh).
+
+```bash
+bun install
+
+# 1) the relay (polls the official feed; must run from an Israeli IP)
+bun relay/server.ts            # ws://localhost:8787/ws
+
+# 2) the web app
+bun dev                        # http://localhost:5173
+```
+
+Inject test alerts without waiting for a real siren:
+
+```bash
+curl 'http://localhost:8787/test/alert?cities=חולון|בת ים'
+curl 'http://localhost:8787/test/alert?kind=early&cities=רעננה|כפר סבא'
+curl 'http://localhost:8787/test/alert?kind=clear&cities=חולון|בת ים'
+```
+
+Point the app at a different relay with `VITE_RELAY_URL`. In production the relay must egress from an
+Israeli IP (for example GCP `me-west1` / Tel Aviv); during development your own connection works.
+
+Regenerate the area polygons from source:
+
+```bash
+bun scripts/build-areas.mjs    # -> public/data/areas.geojson
+```
+
+## Project structure
+
+```
+src/
+  App.tsx                  dashboard shell + grouped event feed
+  alerts/
+    useAlertFeed.ts        WebSocket client, alert state, fail-safe backstop
+    categories.ts          authoritative category + title classifier (single source of truth)
+  map/
+    AlertMap.tsx           MapLibre map, tiers, threat-zone, React-portal overlays
+    majorCities.ts         curated city labels
+    mapStyle.ts            basemap config
+  threat-zone/
+    convexHull.ts          monotone-chain hull (no deps)
+    computeThreatZone.ts   active areas -> threat polygon
+relay/
+  server.ts                Bun relay: poll official feed, classify, fan out, persist
+scripts/
+  build-areas.mjs          build areas.geojson from upstream sources
+```
+
+## Data sources and credits
+
+- **Pikud HaOref / Home Front Command** (`oref.org.il`): the official alert feed and category data.
+- **[amitfin/oref_alert](https://github.com/amitfin/oref_alert)**: alert-area polygon and metadata
+  reference, and the model for active-versus-ended handling.
+- **tzevaadom.co.il**: city lookup (multilingual names, shelter-entry seconds, coordinates).
+- **[CARTO](https://carto.com/) / OpenStreetMap**: basemap tiles.
+
+These feeds are unofficial and carry no SLA. Treat them accordingly.
+
+## Status
+
+Early but real. The relay has caught real live alerts end to end from the official feed and classifies
+them correctly. The full UI builds and typechecks clean. See the project notes for the current roadmap
+(production Israeli egress, a distinct visual for terror and nonconventional threats, and a predictive
+"next likely areas" model from the persisting history).
+
+## License
+
+Private. Not for redistribution.
