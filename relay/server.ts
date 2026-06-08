@@ -3,40 +3,14 @@
 // an Israeli IP), dedups by alert id, and pushes new alerts to every connected browser over our own
 // WebSocket. No third party in the path. Run: bun relay/server.ts (PORT, OREF_POLL_MS, OREF_URL env).
 // Dev runs on an Israeli IP; production needs an Israeli egress (GCP me-west1 / IL VPS).
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { categoryOf, classifyAlert } from '../src/alerts/categories'
+import { availableYears, computeStats, persist, readAll, readYear, recent } from './history'
 
 const PORT = Number(Bun.env.PORT ?? 8787)
 const POLL_MS = Number(Bun.env.OREF_POLL_MS ?? 1500)
 const OREF_URL = Bun.env.OREF_URL ?? 'https://www.oref.org.il/warningMessages/alert/Alerts.json'
 
 const CORS = { 'Access-Control-Allow-Origin': '*' }
-const HISTORY_FILE = 'relay/data/history.jsonl'
-mkdirSync('relay/data', { recursive: true })
-
-function persist(ev: unknown) {
-  try {
-    appendFileSync(HISTORY_FILE, JSON.stringify(ev) + '\n')
-  } catch (err) {
-    console.error('[persist]', (err as Error).message)
-  }
-}
-
-function readHistory(): Array<Record<string, unknown>> {
-  if (!existsSync(HISTORY_FILE)) return []
-  return readFileSync(HISTORY_FILE, 'utf8')
-    .trim()
-    .split('\n')
-    .filter(Boolean)
-    .map((l) => {
-      try {
-        return JSON.parse(l) as Record<string, unknown>
-      } catch {
-        return null
-      }
-    })
-    .filter((x): x is Record<string, unknown> => x !== null)
-}
 const OREF_HEADERS = {
   Referer: 'https://www.oref.org.il/',
   'X-Requested-With': 'XMLHttpRequest',
@@ -140,17 +114,19 @@ Bun.serve({
     }
     if (url.pathname === '/history') {
       const limit = Number(url.searchParams.get('limit') ?? 200)
-      return Response.json({ events: readHistory().slice(-limit).reverse() }, { headers: CORS })
+      return Response.json({ events: recent(limit) }, { headers: CORS })
+    }
+    if (url.pathname === '/history/years') {
+      const years = availableYears().map((year) => ({
+        year,
+        events: readYear(year).filter((e) => e.type === 'alert').length,
+      }))
+      return Response.json({ years }, { headers: CORS })
     }
     if (url.pathname === '/history/stats') {
-      const events = readHistory()
-      const byCity: Record<string, number> = {}
-      for (const ev of events) {
-        if (ev.type === 'clear') continue
-        for (const city of (ev.cities as string[] | undefined) ?? []) byCity[city] = (byCity[city] ?? 0) + 1
-      }
-      const sorted = Object.fromEntries(Object.entries(byCity).sort((a, b) => b[1] - a[1]))
-      return Response.json({ totalEvents: events.length, byCity: sorted }, { headers: CORS })
+      const yearParam = url.searchParams.get('year')
+      const events = yearParam ? readYear(Number(yearParam)) : readAll()
+      return Response.json({ year: yearParam ? Number(yearParam) : null, ...computeStats(events) }, { headers: CORS })
     }
     // DEV-ONLY: inject a fake alert to exercise the end-to-end push path without a real siren.
     if (url.pathname === '/test/alert') {
