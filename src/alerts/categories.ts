@@ -37,9 +37,23 @@ export const CATEGORIES: Record<number, Category> = {
   12: { id: 12, key: 'hazmat', he: 'חומרים מסוכנים', severity: 'special', isThreat: true, remain: 'release' },
   13: { id: 13, key: 'update', he: 'האירוע הסתיים', severity: 'cleared', isThreat: false, remain: 'none' },
   14: { id: 14, key: 'flash', he: 'התקרבו למרחב מוגן', severity: 'early', isThreat: true, remain: 'tenmin' },
+  // Drills 15-28 (verified slugs from oref's alertCategories.json). All are non-threats, filtered before
+  // display, so the `he` is a generic "תרגיל" — oref does not publish a per-drill Hebrew title and the
+  // live classifier catches the verbatim "תרגיל" in the title anyway (see classifyAlert).
   15: { id: 15, key: 'missilealertdrill', he: 'תרגיל - ירי רקטות', severity: 'drill', isThreat: false, remain: 'none' },
   16: { id: 16, key: 'uavdrill', he: 'תרגיל - כלי טיס', severity: 'drill', isThreat: false, remain: 'none' },
   17: { id: 17, key: 'nonconventionaldrill', he: 'תרגיל - בלתי שגרתי', severity: 'drill', isThreat: false, remain: 'none' },
+  18: { id: 18, key: 'warningdrill', he: 'תרגיל', severity: 'drill', isThreat: false, remain: 'none' },
+  19: { id: 19, key: 'memorialdaydrill1', he: 'תרגיל', severity: 'drill', isThreat: false, remain: 'none' },
+  20: { id: 20, key: 'memorialdaydrill2', he: 'תרגיל', severity: 'drill', isThreat: false, remain: 'none' },
+  21: { id: 21, key: 'earthquakedrill1', he: 'תרגיל', severity: 'drill', isThreat: false, remain: 'none' },
+  22: { id: 22, key: 'earthquakedrill2', he: 'תרגיל', severity: 'drill', isThreat: false, remain: 'none' },
+  23: { id: 23, key: 'cbrnedrill', he: 'תרגיל', severity: 'drill', isThreat: false, remain: 'none' },
+  24: { id: 24, key: 'terrorattackdrill', he: 'תרגיל', severity: 'drill', isThreat: false, remain: 'none' },
+  25: { id: 25, key: 'tsunamidrill', he: 'תרגיל', severity: 'drill', isThreat: false, remain: 'none' },
+  26: { id: 26, key: 'hazmatdrill', he: 'תרגיל', severity: 'drill', isThreat: false, remain: 'none' },
+  27: { id: 27, key: 'updatedrill', he: 'תרגיל', severity: 'drill', isThreat: false, remain: 'none' },
+  28: { id: 28, key: 'flashdrill', he: 'תרגיל', severity: 'drill', isThreat: false, remain: 'none' },
 }
 
 // oref category ids 15-28 are all drills (verified). Anything outside the known table is treated as a
