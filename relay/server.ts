@@ -5,6 +5,7 @@
 // Dev runs on an Israeli IP; production needs an Israeli egress (GCP me-west1 / IL VPS).
 import { categoryOf, classifyAlert } from '../src/alerts/categories'
 import { availableYears, computeStats, persist, readAll, readYear, recent } from './history'
+import { firmsConfigured, getFires, startFirms } from './firms'
 
 const PORT = Number(Bun.env.PORT ?? 8787)
 const POLL_MS = Number(Bun.env.OREF_POLL_MS ?? 1500)
@@ -100,6 +101,7 @@ async function pollOref() {
 
 setInterval(pollOref, POLL_MS)
 pollOref()
+startFirms()
 
 Bun.serve({
   port: PORT,
@@ -127,6 +129,12 @@ Bun.serve({
       const yearParam = url.searchParams.get('year')
       const events = yearParam ? readYear(Number(yearParam)) : readAll()
       return Response.json({ year: yearParam ? Number(yearParam) : null, ...computeStats(events) }, { headers: CORS })
+    }
+    if (url.pathname === '/firms') {
+      return Response.json(
+        { configured: firmsConfigured(), detections: getFires(), attribution: 'NASA FIRMS (LANCE/EOSDIS)' },
+        { headers: CORS },
+      )
     }
     // DEV-ONLY: inject a fake alert to exercise the end-to-end push path without a real siren.
     if (url.pathname === '/test/alert') {
