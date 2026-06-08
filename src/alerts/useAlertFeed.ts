@@ -17,6 +17,11 @@ export type AlertKind = 'active' | 'early' | 'special'
 export type Instruction = { title: string; desc: string; key: string; remain: 'tenmin' | 'release' | 'none' }
 // one entry per alert EVENT (tzevaadom-style), grouping all of its areas, newest first
 export type FeedEvent = { id: string; severity: AlertKind | 'cleared'; title: string; ts: number; cities: string[]; key?: string }
+// A genuinely-NEW live alert that arrived over the websocket — NOT the /history seed or the `hello`
+// active-area restore. Consumed by the notifier (sound + browser Notification) and the "my area"
+// banner, both of which must fire only for live alerts, never for seeded history. A fresh object
+// reference is emitted per live 'alert' message so a downstream effect fires exactly once per alert.
+export type LiveAlert = { id: string; kind: AlertKind; title: string; cities: string[]; ts: number }
 const MAX_EVENTS = 60
 
 type RelayMessage =
@@ -76,6 +81,7 @@ export function useAlertFeed() {
   const [lastAt, setLastAt] = useState<number | null>(null)
   const [instruction, setInstruction] = useState<Instruction | null>(null)
   const [events, setEvents] = useState<FeedEvent[]>([])
+  const [lastLiveAlert, setLastLiveAlert] = useState<LiveAlert | null>(null)
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
   const pushEvent = useCallback((ev: FeedEvent) => {
@@ -235,6 +241,8 @@ export function useAlertFeed() {
               remain: msg.remain ?? 'release',
             })
             pushEvent({ id: msg.id ?? String(Date.now()), severity: kind, title: msg.title || '', ts: Date.now(), cities: msg.cities, key: msg.key })
+            // signal the notifier + my-area banner: this is a live alert, not a seeded historical one
+            setLastLiveAlert({ id: msg.id ?? String(Date.now()), kind, title: msg.title || '', cities: msg.cities, ts: Date.now() })
           } else if (msg.type === 'clear' && Array.isArray(msg.cities)) {
             resolve(msg.cities)
             pushEvent({ id: msg.id ?? String(Date.now()), severity: 'cleared', title: 'האירוע הסתיים', ts: Date.now(), cities: msg.cities })
@@ -264,5 +272,5 @@ export function useAlertFeed() {
     }
   }, [activate, resolve, pushEvent])
 
-  return { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events }
+  return { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events, lastLiveAlert }
 }

@@ -3,6 +3,8 @@ import { AlertMap } from './map/AlertMap'
 import { FlameIcon } from './map/FireLayer'
 import { useAlertFeed, type FeedEvent, type FeedStatus } from './alerts/useAlertFeed'
 import { AlertIcon } from './alerts/AlertIcon'
+import { useNotifier } from './notify/useNotifier'
+import { AlertToggle } from './notify/AlertToggle'
 import { useFirms, type FireDetection } from './firms/useFirms'
 import { FIRMS_CREDIT, anomalyAge, confLabel, groupAnomalies, type AnomalyGroup } from './firms/anomaly'
 import { openCookieSettings } from './consent/consentStore'
@@ -56,7 +58,8 @@ function LiveClock() {
 }
 
 export function MapDashboard() {
-  const { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events } = useAlertFeed()
+  const { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events, lastLiveAlert } = useAlertFeed()
+  const notifier = useNotifier(lastLiveAlert)
   const firms = useFirms()
   const [firmsOn, setFirmsOn] = useState(() => {
     try {
@@ -103,10 +106,26 @@ export function MapDashboard() {
               <div className="text-lg font-bold tracking-tight text-white">אזעקה</div>
               <div className="text-[11px] text-slate-400">התרעות פיקוד העורף · חי</div>
             </div>
-            <div className="ms-auto">
+            <div className="ms-auto flex items-center gap-2">
               <LiveClock />
+              <AlertToggle enabled={notifier.enabled} onToggle={notifier.toggle} />
             </div>
           </header>
+
+          {notifier.enabled && notifier.perm === 'default' && (
+            <button
+              type="button"
+              onClick={() => void notifier.requestPermission()}
+              className="rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-1.5 text-start text-[11px] font-medium text-sky-200 transition hover:bg-sky-400/20"
+            >
+              אפשרו התראות דפדפן כדי לקבל התרעה גם כשהלשונית ברקע ←
+            </button>
+          )}
+          {notifier.enabled && notifier.perm === 'denied' && (
+            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] text-slate-400">
+              התראות הדפדפן חסומות. צליל ההתרעה עדיין יישמע. ניתן לאפשר התראות בהגדרות הדפדפן.
+            </div>
+          )}
 
           {(alerting || warning) && instruction && (instruction.title || instruction.desc) && (
             <div className="rounded-xl border border-rose-500/50 bg-rose-500/15 px-3 py-2.5">
