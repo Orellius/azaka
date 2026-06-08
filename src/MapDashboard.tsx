@@ -5,6 +5,10 @@ import { useAlertFeed, type FeedEvent, type FeedStatus } from './alerts/useAlert
 import { AlertIcon } from './alerts/AlertIcon'
 import { useNotifier } from './notify/useNotifier'
 import { AlertToggle } from './notify/AlertToggle'
+import { useMyArea } from './myarea/useMyArea'
+import { usePersonalAlert } from './myarea/usePersonalAlert'
+import { PersonalAlertBanner } from './myarea/PersonalAlertBanner'
+import { MyAreaControl } from './myarea/MyAreaControl'
 import { useFirms, type FireDetection } from './firms/useFirms'
 import { FIRMS_CREDIT, anomalyAge, confLabel, groupAnomalies, type AnomalyGroup } from './firms/anomaly'
 import { openCookieSettings } from './consent/consentStore'
@@ -59,7 +63,9 @@ function LiveClock() {
 
 export function MapDashboard() {
   const { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events, lastLiveAlert } = useAlertFeed()
-  const notifier = useNotifier(lastLiveAlert)
+  const [myArea, setMyArea] = useMyArea()
+  const notifier = useNotifier(lastLiveAlert, myArea?.name ?? null)
+  const personal = usePersonalAlert(myArea?.name ?? null, activeAreas, earlyAreas, clearedAreas, lastLiveAlert)
   const firms = useFirms()
   const [firmsOn, setFirmsOn] = useState(() => {
     try {
@@ -91,6 +97,8 @@ export function MapDashboard() {
         snapshot={snapshot ? snapshot.cities : null}
         snapshotColor={snapshot ? SEV_HEX[snapshot.severity] : undefined}
       />
+
+      {myArea && personal && <PersonalAlertBanner area={myArea} personal={personal} />}
 
       <div className="pointer-events-none absolute inset-0 p-4">
         {snapshot && <SnapshotBanner event={snapshot} onClose={() => setSnapshot(null)} />}
@@ -126,6 +134,8 @@ export function MapDashboard() {
               התראות הדפדפן חסומות. צליל ההתרעה עדיין יישמע. ניתן לאפשר התראות בהגדרות הדפדפן.
             </div>
           )}
+
+          <MyAreaControl myArea={myArea} onChange={setMyArea} tier={personal?.tier ?? null} />
 
           {(alerting || warning) && instruction && (instruction.title || instruction.desc) && (
             <div className="rounded-xl border border-rose-500/50 bg-rose-500/15 px-3 py-2.5">
