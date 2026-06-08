@@ -3,6 +3,7 @@ import { AreaPicker } from './AreaPicker'
 import type { MyArea } from './useMyArea'
 import type { PersonalTier } from './usePersonalAlert'
 import { useLang } from '../i18n/useLang'
+import { useAreaName } from '../i18n/areaNames'
 import type { StringKey } from '../i18n/strings'
 
 // Sidebar control to pick / change / clear the home area. Owns the picker-open state and renders the
@@ -33,6 +34,7 @@ export function MyAreaControl({
   tier: PersonalTier | null
 }) {
   const { t } = useLang()
+  const localizeArea = useAreaName()
   const [picking, setPicking] = useState(false)
   const status = tier ? STATUS[tier] : null
 
@@ -43,7 +45,7 @@ export function MyAreaControl({
           <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${status ? status.dot : 'bg-slate-500'}`} />
           <PinIcon className="size-4 shrink-0 text-sky-300/80" />
           <div className="min-w-0 flex-1 leading-tight">
-            <div className="truncate text-[13px] font-semibold text-white">{myArea.name}</div>
+            <div className="truncate text-[13px] font-semibold text-white">{localizeArea(myArea.name)}</div>
             <div className={`text-[10px] ${status ? status.txt : 'text-slate-400'}`}>
               {status ? t(status.key) : t('myarea_mine_no_alert')}
             </div>

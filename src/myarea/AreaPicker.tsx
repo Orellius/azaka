@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { MyArea } from './useMyArea'
 import { useLang } from '../i18n/useLang'
+import { useAreaName } from '../i18n/areaNames'
 
 // Searchable modal for picking a home area from public/data/cities.json (~1449 entries, 422 KB).
 // Fetched lazily only when the picker opens, so it never weighs on first paint. Results are capped
@@ -11,7 +12,8 @@ type CitiesFile = { cities: Record<string, CityRec> }
 const MAX_RESULTS = 60
 
 export function AreaPicker({ onPick, onClose }: { onPick: (area: MyArea) => void; onClose: () => void }) {
-  const { t } = useLang()
+  const { t, lang } = useLang()
+  const localizeArea = useAreaName()
   const [all, setAll] = useState<MyArea[] | null>(null)
   const [error, setError] = useState(false)
   const [q, setQ] = useState('')
@@ -117,8 +119,8 @@ export function AreaPicker({ onPick, onClose }: { onPick: (area: MyArea) => void
                     className="flex w-full items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-3 py-2.5 text-start transition hover:border-sky-400/40 hover:bg-sky-400/10"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[14px] font-semibold text-white">{a.name}</div>
-                      {a.en && <div className="truncate text-[11px] text-slate-400">{a.en}</div>}
+                      <div className="truncate text-[14px] font-semibold text-white">{localizeArea(a.name)}</div>
+                      {lang === 'he' && a.en && <div className="truncate text-[11px] text-slate-400">{a.en}</div>}
                     </div>
                     {a.countdown != null && (
                       <span className="shrink-0 whitespace-nowrap rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">

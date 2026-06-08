@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { MyArea } from './useMyArea'
 import type { PersonalAlert, PersonalTier } from './usePersonalAlert'
 import { useLang } from '../i18n/useLang'
+import { useAreaName } from '../i18n/areaNames'
 
 // Full-width PERSONAL alert banner: the single biggest jump from "national map" to "warns ME".
 // Shows when the user's chosen area is under alert, with a live ticking shelter countdown.
@@ -40,6 +41,7 @@ function fmt(sec: number): string {
 
 export function PersonalAlertBanner({ area, personal }: { area: MyArea; personal: PersonalAlert }) {
   const { t } = useLang()
+  const localizeArea = useAreaName()
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000)
@@ -69,7 +71,7 @@ export function PersonalAlertBanner({ area, personal }: { area: MyArea; personal
         <div className="flex items-baseline gap-2">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-white/80">{t(LABEL_KEY[personal.tier])}</span>
         </div>
-        <div className="truncate text-xl font-extrabold leading-tight text-white">{area.name}</div>
+        <div className="truncate text-xl font-extrabold leading-tight text-white">{localizeArea(area.name)}</div>
         {personal.tier === 'cleared' ? (
           <div className={`mt-0.5 text-[12px] ${skin.accent}`}>{t('pb_cleared_msg')}</div>
         ) : left == null ? (

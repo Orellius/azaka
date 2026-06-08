@@ -15,6 +15,7 @@ import { FIRMS_CREDIT, groupAnomalies, type AnomalyGroup } from './firms/anomaly
 import { openCookieSettings } from './consent/consentStore'
 import { navigate } from './router'
 import { useLang } from './i18n/useLang'
+import { useAreaName } from './i18n/areaNames'
 import { LangChips } from './i18n/LangChips'
 import type { StringKey } from './i18n/strings'
 
@@ -115,7 +116,7 @@ export function MapDashboard() {
               <span className={`relative inline-flex h-3.5 w-3.5 rounded-full ${headDot}`} />
             </span>
             <div className="leading-tight">
-              <div className="text-lg font-bold tracking-tight text-white">אזעקה</div>
+              <div className="text-lg font-bold tracking-tight text-white">{t('brand')}</div>
               <div className="text-[11px] text-slate-400">{t('brand_sub')}</div>
             </div>
             <div className="ms-auto flex items-center gap-2">
@@ -234,6 +235,7 @@ function SnapshotBanner({ event, onClose, lowered = false }: { event: FeedEvent;
 
 function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; onSelect: () => void }) {
   const { t, lang, tThreat, tAgo } = useLang()
+  const localizeArea = useAreaName()
   const c = SEV[ev.severity]
   const [expanded, setExpanded] = useState(false)
   const time = new Date(ev.ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
@@ -270,7 +272,7 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
         <div
           className={`mt-1.5 break-words text-[11px] leading-relaxed text-slate-300 ${long && !expanded ? 'line-clamp-3' : ''}`}
         >
-          {ev.cities.join(', ')}
+          {ev.cities.map(localizeArea).join(', ')}
         </div>
         {long && (
           <button

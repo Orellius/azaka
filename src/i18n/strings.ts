@@ -19,6 +19,7 @@ export const RTL_LANGS: Lang[] = ['he', 'ar']
 type Entry = Record<Lang, string>
 
 export const STRINGS = {
+  brand: { he: 'אזעקה', en: 'Azaka', ar: 'أزاكا', ru: 'Azaka' },
   brand_sub: {
     he: 'התרעות פיקוד העורף · חי',
     en: 'Home Front Command alerts · live',

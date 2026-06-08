@@ -11,6 +11,7 @@ import { buildCityLabels, type CityLabel } from './majorCities'
 import { FireLayer, FirePopup, type PickedFire } from './FireLayer'
 import type { FireDetection } from '../firms/useFirms'
 import { useLang } from '../i18n/useLang'
+import { useAreaName } from '../i18n/areaNames'
 import type { StringKey } from '../i18n/strings'
 
 // MapLibre map of all Pikud HaOref alert areas. The GL layer (polygons, feature-state colours,
@@ -347,7 +348,8 @@ function AreaPopup({
   tier: Tier
   onClose: () => void
 }) {
-  const { t } = useLang()
+  const { t, lang } = useLang()
+  const localizeArea = useAreaName()
   const [el] = useState(() => document.createElement('div'))
   const popupRef = useRef<maplibregl.Popup | null>(null)
   useEffect(() => {
@@ -375,8 +377,8 @@ function AreaPopup({
       <div className="flex items-start gap-2">
         <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${status.dot}`} />
         <div className="min-w-0 flex-1">
-          <div className="text-[14px] font-bold leading-tight text-white">{selected.name}</div>
-          {selected.en && <div className="truncate text-[10px] text-slate-400">{selected.en}</div>}
+          <div className="text-[14px] font-bold leading-tight text-white">{localizeArea(selected.name)}</div>
+          {lang === 'he' && selected.en && <div className="truncate text-[10px] text-slate-400">{selected.en}</div>}
           <div className={`mt-0.5 text-[11px] font-medium ${status.txt}`}>{t(status.key)}</div>
         </div>
       </div>

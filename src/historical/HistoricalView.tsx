@@ -3,6 +3,7 @@ import { BarList, VBars } from './charts'
 import { useHistoryStats, type HistoryEvent } from './useHistoryStats'
 import { navigate } from '../router'
 import { useLang } from '../i18n/useLang'
+import { useAreaName } from '../i18n/areaNames'
 
 // Historical statistics dashboard, in the spirit of tzevaadom's /historical page. All figures come
 // server-aggregated from the relay's year-partitioned log; pick a year or view all. UI is translated
@@ -30,6 +31,7 @@ function fmtRange(from: number | null, to: number | null, t: T): string {
 
 export function HistoricalView() {
   const { t, tThreat } = useLang()
+  const localizeArea = useAreaName()
   const { years, year, setYear, stats, recent, loading, error } = useHistoryStats()
 
   const typeRows = stats
@@ -38,7 +40,7 @@ export function HistoricalView() {
         .map(([k, v]) => ({ label: typeLabel(k, t, tThreat), value: v }))
     : []
   const sizeRows = stats ? SIZE_ORDER.map((b) => ({ label: b === '1' ? t('hist_size_1') : b, value: stats.byEventSize[b] ?? 0 })) : []
-  const cityRows = stats ? stats.topCities.map((c) => ({ label: c.name, value: c.count })) : []
+  const cityRows = stats ? stats.topCities.map((c) => ({ label: localizeArea(c.name), value: c.count })) : []
   const dayValues = stats ? Object.values(stats.byDay) : []
 
   return (
@@ -154,6 +156,7 @@ function YearChip({ active, onClick, children }: { active: boolean; onClick: () 
 
 function EventRow({ e }: { e: HistoryEvent }) {
   const { t, tThreat } = useLang()
+  const localizeArea = useAreaName()
   const time = e.ts ? new Date(e.ts).toLocaleString('he-IL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''
   const bar = e.type === 'clear' ? 'bg-emerald-500' : KIND_BAR[e.kind ?? 'active'] ?? 'bg-rose-500'
   const title = e.type === 'clear' ? t('status_cleared') : e.title || typeLabel(e.key ?? 'unknown', t, tThreat)
@@ -168,7 +171,7 @@ function EventRow({ e }: { e: HistoryEvent }) {
             {time} · {t('hist_localities_n', { n: cities.length })}
           </span>
         </div>
-        <div className="mt-0.5 line-clamp-2 text-[11px] text-slate-400">{cities.join(', ')}</div>
+        <div className="mt-0.5 line-clamp-2 text-[11px] text-slate-400">{cities.map(localizeArea).join(', ')}</div>
       </div>
     </div>
   )
