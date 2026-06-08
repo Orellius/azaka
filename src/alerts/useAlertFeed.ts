@@ -16,7 +16,7 @@ export type FeedStatus = 'connecting' | 'live' | 'error'
 export type AlertKind = 'active' | 'early' | 'special'
 export type Instruction = { title: string; desc: string; key: string; remain: 'tenmin' | 'release' | 'none' }
 // one entry per alert EVENT (tzevaadom-style), grouping all of its areas, newest first
-export type FeedEvent = { id: string; severity: AlertKind | 'cleared'; title: string; ts: number; cities: string[] }
+export type FeedEvent = { id: string; severity: AlertKind | 'cleared'; title: string; ts: number; cities: string[]; key?: string }
 const MAX_EVENTS = 60
 
 type RelayMessage =
@@ -58,12 +58,12 @@ function mergeEvent(prev: FeedEvent[], ev: FeedEvent): FeedEvent[] {
 // Map a relay history record (alert/clear) into a feed event; null for anything else (e.g. firms-daily).
 function toFeedEvent(raw: unknown): FeedEvent | null {
   if (typeof raw !== 'object' || raw === null) return null
-  const e = raw as { type?: string; kind?: string; id?: string; title?: string; cities?: unknown; ts?: number }
+  const e = raw as { type?: string; kind?: string; id?: string; title?: string; cities?: unknown; ts?: number; key?: string }
   if (!e.ts || !Array.isArray(e.cities) || e.cities.length === 0) return null
   if (e.type === 'clear') return { id: e.id ?? String(e.ts), severity: 'cleared', title: 'האירוע הסתיים', ts: e.ts, cities: e.cities as string[] }
   if (e.type === 'alert') {
     const severity: FeedEvent['severity'] = e.kind === 'early' ? 'early' : e.kind === 'special' ? 'special' : 'active'
-    return { id: e.id ?? String(e.ts), severity, title: e.title || '', ts: e.ts, cities: e.cities as string[] }
+    return { id: e.id ?? String(e.ts), severity, title: e.title || '', ts: e.ts, cities: e.cities as string[], key: e.key }
   }
   return null
 }
@@ -234,7 +234,7 @@ export function useAlertFeed() {
               key: msg.key ?? '',
               remain: msg.remain ?? 'release',
             })
-            pushEvent({ id: msg.id ?? String(Date.now()), severity: kind, title: msg.title || '', ts: Date.now(), cities: msg.cities })
+            pushEvent({ id: msg.id ?? String(Date.now()), severity: kind, title: msg.title || '', ts: Date.now(), cities: msg.cities, key: msg.key })
           } else if (msg.type === 'clear' && Array.isArray(msg.cities)) {
             resolve(msg.cities)
             pushEvent({ id: msg.id ?? String(Date.now()), severity: 'cleared', title: 'האירוע הסתיים', ts: Date.now(), cities: msg.cities })

@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react'
 import { AlertMap } from './map/AlertMap'
 import { FlameIcon } from './map/FireLayer'
 import { useAlertFeed, type FeedEvent } from './alerts/useAlertFeed'
+import { AlertIcon } from './alerts/AlertIcon'
 import { useFirms, type FireDetection } from './firms/useFirms'
 import { FIRMS_CREDIT, anomalyAge, confLabel, groupAnomalies, type AnomalyGroup } from './firms/anomaly'
 import { openCookieSettings } from './consent/consentStore'
@@ -19,10 +20,10 @@ const STATUS_LABEL: Record<string, { text: string; dot: string }> = {
   error: { text: 'שגיאת חיבור', dot: 'bg-rose-500' },
 }
 const SEV: Record<FeedEvent['severity'], { bar: string; txt: string; border: string }> = {
-  active: { bar: 'bg-rose-500', txt: 'text-rose-200', border: 'border-rose-500/50' },
-  special: { bar: 'bg-rose-500', txt: 'text-rose-200', border: 'border-rose-500/50' },
-  early: { bar: 'bg-amber-500', txt: 'text-amber-200', border: 'border-amber-500/50' },
-  cleared: { bar: 'bg-emerald-500', txt: 'text-emerald-200', border: 'border-emerald-500/50' },
+  active: { bar: 'bg-rose-500', txt: 'text-rose-400', border: 'border-rose-500/50' },
+  special: { bar: 'bg-rose-500', txt: 'text-rose-400', border: 'border-rose-500/50' },
+  early: { bar: 'bg-amber-500', txt: 'text-amber-400', border: 'border-amber-500/50' },
+  cleared: { bar: 'bg-emerald-500', txt: 'text-emerald-400', border: 'border-emerald-500/50' },
 }
 // hex equivalents for the MapLibre snapshot highlight (paint props need hex, not Tailwind classes)
 const SEV_HEX: Record<FeedEvent['severity'], string> = {
@@ -182,14 +183,15 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
           onSelect()
         }
       }}
-      className={`flex w-full shrink-0 cursor-pointer overflow-hidden rounded-xl border bg-white/5 text-start transition hover:bg-white/10 ${active ? 'border-cyan-400/70 ring-1 ring-cyan-400/40' : 'border-white/10'}`}
+      className={`w-full shrink-0 cursor-pointer rounded-xl border bg-white/5 px-3 py-2.5 text-start transition hover:bg-white/10 ${active ? 'border-cyan-400/70 ring-1 ring-cyan-400/40' : 'border-white/10'}`}
     >
-      <div className={`w-1.5 shrink-0 ${c.bar}`} />
-      <div className="min-w-0 flex-1 px-3 py-2.5">
-        <div className={`text-[13px] font-semibold leading-tight ${c.txt}`}>{ev.title || 'התרעה'}</div>
-        <div className="mt-1 text-[10px] text-slate-500">
-          {relTime(ev.ts)} · {time} · {ev.cities.length} אזורים
-        </div>
+      <div className="flex items-center gap-2">
+        <AlertIcon ev={ev} className={`size-4 shrink-0 ${c.txt}`} />
+        <div className={`min-w-0 flex-1 text-[13px] font-semibold leading-tight ${c.txt}`}>{ev.title || 'התרעה'}</div>
+      </div>
+      <div className="mt-1 text-[10px] text-slate-500">
+        {relTime(ev.ts)} · {time} · {ev.cities.length} אזורים
+      </div>
         <div
           className={`mt-1.5 break-words text-[11px] leading-relaxed text-slate-300 ${long && !expanded ? 'line-clamp-3' : ''}`}
         >
@@ -207,7 +209,6 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
             {expanded ? 'הצג פחות ▲' : `הצג את כל ${ev.cities.length} האזורים ▼`}
           </button>
         )}
-      </div>
     </div>
   )
 }
