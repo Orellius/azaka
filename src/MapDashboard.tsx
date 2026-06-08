@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { AlertMap } from './map/AlertMap'
 import { FlameIcon } from './map/FireLayer'
-import { useAlertFeed, type FeedEvent } from './alerts/useAlertFeed'
+import { useAlertFeed, type FeedEvent, type FeedStatus } from './alerts/useAlertFeed'
 import { AlertIcon } from './alerts/AlertIcon'
 import { useFirms, type FireDetection } from './firms/useFirms'
 import { FIRMS_CREDIT, anomalyAge, confLabel, groupAnomalies, type AnomalyGroup } from './firms/anomaly'
@@ -42,6 +42,19 @@ function relTime(ts: number): string {
   return hrs === 1 ? 'לפני שעה' : `לפני ${hrs} שעות`
 }
 
+function LiveClock() {
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(id)
+  }, [])
+  return (
+    <span className="text-[13px] font-medium tabular-nums text-slate-300">
+      {now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+    </span>
+  )
+}
+
 export function MapDashboard() {
   const { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events } = useAlertFeed()
   const firms = useFirms()
@@ -63,7 +76,6 @@ export function MapDashboard() {
 
   const alerting = activeAreas.size > 0
   const warning = earlyAreas.size > 0
-  const st = STATUS_LABEL[status]
   const headDot = alerting ? 'bg-rose-500' : warning ? 'bg-amber-500' : clearedAreas.size > 0 ? 'bg-emerald-500' : 'bg-slate-500'
 
   return (
@@ -91,9 +103,8 @@ export function MapDashboard() {
               <div className="text-lg font-bold tracking-tight text-white">אזעקה</div>
               <div className="text-[11px] text-slate-400">התרעות פיקוד העורף · חי</div>
             </div>
-            <div className="ms-auto flex items-center gap-1.5 text-[11px] text-slate-400">
-              <span className={`h-2 w-2 rounded-full ${st.dot}`} />
-              {st.text}
+            <div className="ms-auto">
+              <LiveClock />
             </div>
           </header>
 
@@ -126,7 +137,7 @@ export function MapDashboard() {
             <FirmsPanel detections={firms.detections} on={firmsOn} onToggle={() => setFirmsOn((v) => !v)} />
           )}
 
-          <SidebarFooter lastAt={lastAt} />
+          <SidebarFooter lastAt={lastAt} status={status} />
         </div>
       </div>
     </div>
@@ -294,7 +305,8 @@ function AnomalyGroupCard({ g }: { g: AnomalyGroup }) {
   )
 }
 
-function SidebarFooter({ lastAt }: { lastAt: number | null }) {
+function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: FeedStatus }) {
+  const st = STATUS_LABEL[status]
   return (
     <footer className="flex flex-col gap-2.5 border-t border-white/10 pt-3">
       <a
@@ -345,8 +357,12 @@ function SidebarFooter({ lastAt }: { lastAt: number | null }) {
         </button>
       </div>
 
-      <div className="text-[10px] text-slate-600">
-        © אזעקה · כל הזכויות שמורות{lastAt ? ` · עדכון: ${new Date(lastAt).toLocaleTimeString('he-IL')}` : ''}
+      <div className="flex items-center justify-between gap-2 text-[10px] text-slate-600">
+        <span>© אזעקה · כל הזכויות שמורות{lastAt ? ` · עדכון: ${new Date(lastAt).toLocaleTimeString('he-IL')}` : ''}</span>
+        <span className="flex shrink-0 items-center gap-1.5 text-slate-400">
+          <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
+          {st.text}
+        </span>
       </div>
     </footer>
   )
