@@ -58,12 +58,13 @@ export function MapDashboard() {
   const notifier = useNotifier(lastLiveAlert, myArea?.name ?? null)
   const personal = usePersonalAlert(myArea?.name ?? null, activeAreas, earlyAreas, clearedAreas, lastLiveAlert)
   const [snapshot, setSnapshot] = useState<FeedEvent | null>(null)
-  const [sheetOpen, setSheetOpen] = useState(true) // mobile bottom-sheet expanded by default; desktop ignores it
+  const [sheetOpen, setSheetOpen] = useState(false) // mobile: feed dropdown collapsed by default (tap the hamburger); desktop ignores it
 
   const alerting = activeAreas.size > 0
   const warning = earlyAreas.size > 0
   const activeRegions = regionsOf([...activeAreas, ...earlyAreas])
   const headDot = alerting ? 'bg-rose-500' : warning ? 'bg-amber-500' : clearedAreas.size > 0 ? 'bg-emerald-500' : 'bg-slate-500'
+  const lowered = !!(myArea && personal) // the personal banner owns the very top; push top-anchored chrome below it
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
@@ -78,18 +79,13 @@ export function MapDashboard() {
       {myArea && personal && <PersonalAlertBanner area={myArea} personal={personal} />}
 
       <div className="pointer-events-none absolute inset-0 p-4">
-        {snapshot && <SnapshotBanner event={snapshot} onClose={() => setSnapshot(null)} lowered={!!(myArea && personal)} />}
-        <div className="pointer-events-auto fixed inset-x-0 bottom-0 z-20 flex max-h-[78vh] flex-col gap-3 rounded-t-2xl border border-white/10 bg-slate-950/90 p-3 shadow-2xl backdrop-blur-md sm:static sm:me-auto sm:max-h-[calc(100vh-2rem)] sm:w-80 sm:max-w-[88vw] sm:rounded-2xl sm:bg-slate-950/85 sm:p-4">
-          <button
-            type="button"
-            onClick={() => setSheetOpen((v) => !v)}
-            aria-label={sheetOpen ? t('sheet_collapse') : t('sheet_expand')}
-            className="mx-auto -mt-1 h-1.5 w-10 shrink-0 rounded-full bg-white/25 transition hover:bg-white/40 sm:hidden"
-          />
-
-          <LangChips />
-
-          <header className="flex shrink-0 items-center gap-3">
+        {snapshot && <SnapshotBanner event={snapshot} onClose={() => setSnapshot(null)} lowered={lowered} />}
+        {/* Mobile: a slim top bar that drops the feed DOWN like a notification shade (tap the hamburger).
+            Desktop (sm:): the familiar floating side card with the body always shown. */}
+        <div
+          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-2xl border-b border-white/10 bg-slate-950/95 shadow-2xl backdrop-blur-md sm:static sm:me-auto sm:w-80 sm:max-w-[88vw] sm:max-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:bg-slate-950/85 ${lowered ? 'top-24' : 'top-0'} sm:top-auto`}
+        >
+          <header className="flex shrink-0 items-center gap-3 p-3 sm:p-4 sm:pb-3">
             <span className="relative flex h-3.5 w-3.5">
               {(alerting || warning) && (
                 <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${headDot} opacity-75`} />
@@ -108,16 +104,19 @@ export function MapDashboard() {
                 onClick={() => setSheetOpen((v) => !v)}
                 aria-label={sheetOpen ? t('sheet_collapse') : t('sheet_expand')}
                 aria-expanded={sheetOpen}
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-300 transition hover:bg-white/10 sm:hidden"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-200 transition hover:bg-white/10 sm:hidden"
               >
-                <svg className={`size-4 transition-transform ${sheetOpen ? '' : 'rotate-180'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <path d="m6 9 6 6 6-6" />
+                <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  {sheetOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
                 </svg>
               </button>
             </div>
           </header>
 
-          <div className={`feed-scroll min-h-0 flex-1 flex-col gap-3 overflow-y-auto ${sheetOpen ? 'flex' : 'hidden'} sm:flex`}>
+          <div
+            className={`feed-scroll flex min-h-0 flex-col gap-3 overflow-y-auto px-3 transition-[max-height,opacity,padding] duration-300 ease-out sm:max-h-none sm:flex-1 sm:px-4 sm:pb-4 sm:pt-0 sm:opacity-100 ${sheetOpen ? 'max-h-[72vh] pb-3 opacity-100' : 'max-h-0 pb-0 opacity-0'}`}
+          >
+          <LangChips />
 
           {notifier.enabled && notifier.perm === 'default' && (
             <button
@@ -175,7 +174,15 @@ export function MapDashboard() {
           ) : (
             <div className="feed-scroll flex max-h-[28rem] min-h-0 flex-col gap-2.5 overflow-y-auto pe-1">
               {events.map((ev) => (
-                <EventCard key={ev.id} ev={ev} active={snapshot?.id === ev.id} onSelect={() => setSnapshot(ev)} />
+                <EventCard
+                  key={ev.id}
+                  ev={ev}
+                  active={snapshot?.id === ev.id}
+                  onSelect={() => {
+                    setSnapshot(ev)
+                    setSheetOpen(false) // mobile: close the dropdown so the map snapshot is visible (no-op on desktop)
+                  }}
+                />
               ))}
             </div>
           )}
@@ -202,7 +209,7 @@ function SnapshotBanner({ event, onClose, lowered = false }: { event: FeedEvent;
   }
   return (
     <div
-      className={`pointer-events-auto absolute left-1/2 z-10 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl border bg-slate-950/90 px-3 py-2 shadow-2xl backdrop-blur-md transition-opacity duration-200 ${lowered ? 'top-24' : 'top-4'} ${sev.border} ${visible ? 'opacity-100' : 'opacity-0'}`}
+      className={`pointer-events-auto absolute left-1/2 z-10 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl border bg-slate-950/90 px-3 py-2 shadow-2xl backdrop-blur-md transition-opacity duration-200 ${lowered ? 'top-40 sm:top-24' : 'top-16 sm:top-4'} ${sev.border} ${visible ? 'opacity-100' : 'opacity-0'}`}
     >
       <span className={`h-2 w-2 shrink-0 rounded-full ${sev.bar}`} />
       <div className="min-w-0 text-[0.75rem] text-slate-200">
