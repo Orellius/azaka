@@ -54,18 +54,19 @@ body {
   background: rgba(148, 163, 184, 0.7);
 }
 
-/* Hebrew city-name pills: subtle when calm, vivid when the city enters an alert tier. */
+/* Area labels on the map: only the currently-alerted areas are labelled (see AreaLabelMarker), so
+   these are always a tier colour and small enough to read a busy barrage without clutter. */
 .city-label {
   position: relative;
   display: inline-block;
   width: max-content;
   box-sizing: border-box;
-  font: 600 12px/1.1 "Rubik", system-ui, sans-serif;
+  font: 600 10px/1.1 "Rubik", system-ui, sans-serif;
   color: #1f2430;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(15, 23, 42, 0.1);
-  padding: 3px 8px;
-  border-radius: 7px;
+  padding: 2px 6px;
+  border-radius: 6px;
   white-space: nowrap;
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
   opacity: 0.78;
@@ -77,9 +78,9 @@ body {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -4px;
-  width: 7px;
-  height: 7px;
+  bottom: -3px;
+  width: 6px;
+  height: 6px;
   background: inherit;
   border-right: inherit;
   border-bottom: inherit;

@@ -5,8 +5,8 @@ import type { Lang } from '../i18n/strings'
 
 // Static content pages (About / Privacy / Terms / Contact) reachable from the sidebar footer. One shell
 // renders content keyed by slug + language so the four pages share layout and the back-to-map link.
-// The copy is accurate to what this app actually does (official-source alert mirror + NASA FIRMS
-// overlay); the legal pages are honest starting text and should get a lawyer's review before launch.
+// The copy is accurate to what this app actually does (official-source alert mirror); the legal pages
+// are honest starting text and should get a lawyer's review before launch.
 // he + en are author-reviewed; ar + ru are machine-drafted and need native review (same as src/i18n).
 // Public surface: <InfoPage slug="about" | "privacy" | "terms" | "contact" />.
 
@@ -29,10 +29,6 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
           ],
         },
         {
-          h: 'שכבת אנומליות תרמיות (NASA FIRMS)',
-          p: ['המפה מציגה אנומליות תרמיות מלוויינים (NASA FIRMS / VIIRS). אנומליה תרמית מעידה על חום, לא על פגיעה, ומתעדכנת באיחור של עד כ-3 שעות. היא לעולם אינה מאשרת פגיעה.'],
-        },
-        {
           h: 'מה אזעקה אינה',
           p: ['השירות אינו תחליף להתרעות הרשמיות ואינו גורם רשמי. תמיד יש לפעול לפי הנחיות פיקוד העורף והאזעקה במרחב שלכם. אזעקה אינה מסמנת אזור כ«בטוח» לפי טיימר קצר, ואינה מפנה למקלט ספציפי (אין מאגר פתוח אמין של מקלטים ציבוריים).'],
         },
@@ -53,7 +49,7 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       sections: [
         { h: 'לא תחליף להתרעה רשמית', p: ['אזעקה היא כלי מידע ואינה תחליף למערכות ההתרעה הרשמיות. ייתכנו עיכובים, שגיאות או חוסר זמינות. בכל מקרה יש לפעול לפי פיקוד העורף ולפי האזעקה הנשמעת במרחב שלכם.'] },
         { h: 'ללא אחריות', p: ['השירות מסופק «כפי שהוא» (AS IS), ללא אחריות מכל סוג. השימוש באחריות המשתמש בלבד, והמפעיל לא יישא באחריות לכל נזק הנובע מהסתמכות על המידע.'] },
-        { h: 'קניין וייחוס', p: ['נתוני ההתרעות שייכים לפיקוד העורף. אנומליות תרמיות באדיבות NASA FIRMS (LANCE/EOSDIS). מפת הרקע © OpenStreetMap © CARTO.'] },
+        { h: 'קניין וייחוס', p: ['נתוני ההתרעות שייכים לפיקוד העורף. מפת הרקע © OpenStreetMap © CARTO.'] },
       ],
     },
     contact: {
@@ -78,10 +74,6 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
           ],
         },
         {
-          h: 'Thermal-anomaly layer (NASA FIRMS)',
-          p: ['The map can show satellite thermal anomalies (NASA FIRMS / VIIRS). A thermal anomaly indicates heat, not an impact, and lags up to ~3 hours. It never confirms a strike.'],
-        },
-        {
           h: 'What Azaka is not',
           p: ['This is not a substitute for the official alerts and is not an official body. Always follow Home Front Command guidance and the siren in your area. Azaka never marks an area “safe” on a short timer, and does not direct you to a specific shelter (there is no reliable open dataset of public shelters).'],
         },
@@ -102,7 +94,7 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       sections: [
         { h: 'Not a substitute for the official alert', p: ['Azaka is an information tool and is not a substitute for the official alerting systems. Delays, errors, or unavailability are possible. Always act according to Home Front Command and the siren sounded in your area.'] },
         { h: 'No warranty', p: ['The service is provided “AS IS”, without warranty of any kind. Use is at your own risk, and the operator is not liable for any damage arising from reliance on the information.'] },
-        { h: 'Ownership and attribution', p: ['Alert data belongs to Home Front Command. Thermal anomalies courtesy of NASA FIRMS (LANCE/EOSDIS). Basemap © OpenStreetMap © CARTO.'] },
+        { h: 'Ownership and attribution', p: ['Alert data belongs to Home Front Command. Basemap © OpenStreetMap © CARTO.'] },
       ],
     },
     contact: {
@@ -127,10 +119,6 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
           ],
         },
         {
-          h: 'طبقة الشذوذات الحرارية (NASA FIRMS)',
-          p: ['يمكن للخريطة عرض شذوذات حرارية من الأقمار الصناعية (NASA FIRMS / VIIRS). يدل الشذوذ الحراري على حرارة لا على إصابة، ويتأخر حتى نحو 3 ساعات. وهو لا يؤكد الإصابة أبدًا.'],
-        },
-        {
           h: 'ما ليست أزاكا',
           p: ['هذه الخدمة ليست بديلاً عن التنبيهات الرسمية وليست جهة رسمية. اتبع دائمًا توجيهات قيادة الجبهة الداخلية والإنذار في منطقتك. لا تضع أزاكا علامة «آمن» اعتمادًا على مؤقّت قصير، ولا توجّهك إلى ملجأ محدد (لا تتوفر بيانات مفتوحة موثوقة للملاجئ العامة).'],
         },
@@ -151,7 +139,7 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       sections: [
         { h: 'ليست بديلاً عن الإنذار الرسمي', p: ['أزاكا أداة معلومات وليست بديلاً عن أنظمة الإنذار الرسمية. قد تحدث تأخيرات أو أخطاء أو عدم توفر. تصرّف دائمًا وفق قيادة الجبهة الداخلية والإنذار الصادر في منطقتك.'] },
         { h: 'بلا ضمان', p: ['تُقدَّم الخدمة «كما هي» دون أي ضمان. الاستخدام على مسؤوليتك، والمشغّل غير مسؤول عن أي ضرر ناتج عن الاعتماد على المعلومات.'] },
-        { h: 'الملكية والإسناد', p: ['بيانات التنبيهات ملك لقيادة الجبهة الداخلية. الشذوذات الحرارية بإذن من NASA FIRMS (LANCE/EOSDIS). خريطة الخلفية © OpenStreetMap © CARTO.'] },
+        { h: 'الملكية والإسناد', p: ['بيانات التنبيهات ملك لقيادة الجبهة الداخلية. خريطة الخلفية © OpenStreetMap © CARTO.'] },
       ],
     },
     contact: {
@@ -176,10 +164,6 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
           ],
         },
         {
-          h: 'Слой тепловых аномалий (NASA FIRMS)',
-          p: ['Карта может показывать спутниковые тепловые аномалии (NASA FIRMS / VIIRS). Тепловая аномалия указывает на тепло, а не на удар, и запаздывает до ~3 часов. Она никогда не подтверждает удар.'],
-        },
-        {
           h: 'Чем Azaka не является',
           p: ['Это не замена официальных оповещений и не официальный орган. Всегда следуйте указаниям Командования тыла и сирене в вашем районе. Azaka не помечает район «безопасным» по короткому таймеру и не направляет к конкретному укрытию (надёжных открытых данных об общественных укрытиях нет).'],
         },
@@ -200,7 +184,7 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       sections: [
         { h: 'Не замена официального оповещения', p: ['Azaka — это информационный инструмент, а не замена официальных систем оповещения. Возможны задержки, ошибки или недоступность. Всегда действуйте согласно Командованию тыла и сирене в вашем районе.'] },
         { h: 'Без гарантий', p: ['Сервис предоставляется «КАК ЕСТЬ», без каких-либо гарантий. Использование на ваш риск; оператор не несёт ответственности за ущерб от опоры на эту информацию.'] },
-        { h: 'Права и атрибуция', p: ['Данные оповещений принадлежат Командованию тыла. Тепловые аномалии — NASA FIRMS (LANCE/EOSDIS). Подложка © OpenStreetMap © CARTO.'] },
+        { h: 'Права и атрибуция', p: ['Данные оповещений принадлежат Командованию тыла. Подложка © OpenStreetMap © CARTO.'] },
       ],
     },
     contact: {

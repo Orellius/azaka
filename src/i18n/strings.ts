@@ -135,24 +135,8 @@ export const STRINGS = {
   snap_label: { he: 'תצוגת היסטוריה', en: 'History view', ar: 'عرض السجل', ru: 'Просмотр истории' },
   snap_close: { he: 'סגור תצוגת היסטוריה', en: 'Close history view', ar: 'إغلاق عرض السجل', ru: 'Закрыть просмотр истории' },
 
-  // FIRMS
-  firms_title: { he: 'אנומליות תרמיות', en: 'Thermal anomalies', ar: 'شذوذات حرارية', ru: 'Тепловые аномалии' },
-  firms_24h: { he: '24 שע׳', en: '24h', ar: '24 س', ru: '24 ч' },
-  firms_toggle: { he: 'הצג אנומליות תרמיות על המפה', en: 'Show thermal anomalies on the map', ar: 'إظهار الشذوذات الحرارية على الخريطة', ru: 'Показать тепловые аномалии на карте' },
-  firms_none: { he: 'אין אנומליות ב-24 השעות האחרונות', en: 'No anomalies in the last 24 hours', ar: 'لا توجد شذوذات في آخر 24 ساعة', ru: 'Аномалий за последние 24 часа нет' },
-  firms_off: { he: 'שכבת האנומליות כבויה', en: 'Anomaly layer is off', ar: 'طبقة الشذوذات متوقفة', ru: 'Слой аномалий выключен' },
-  firms_disclaimer: {
-    he: 'שריפה אפשרית סמוך לאזור · מתעכב עד ~3 שעות, אינו מאשר פגיעה',
-    en: 'Possible fire near the area · lags up to ~3 hours, does not confirm a strike',
-    ar: 'حريق محتمل قرب المنطقة · يتأخر حتى ~3 ساعات، لا يؤكد إصابة',
-    ru: 'Возможный пожар рядом · задержка до ~3 часов, не подтверждает удар',
-  },
-  firms_anomaly: { he: 'אנומליה תרמית', en: 'Thermal anomaly', ar: 'شذوذ حراري', ru: 'Тепловая аномалия' },
-  firms_detections: { he: '{n} זיהויים', en: '{n} detections', ar: '{n} رصد', ru: '{n} обнаружений' },
-
   // Footer / legend / disclaimer
   hist_stats: { he: 'סטטיסטיקה היסטורית', en: 'Historical statistics', ar: 'إحصائيات تاريخية', ru: 'Историческая статистика' },
-  legend_firms: { he: 'אנומליה תרמית (NASA FIRMS)', en: 'Thermal anomaly (NASA FIRMS)', ar: 'شذوذ حراري (NASA FIRMS)', ru: 'Тепловая аномалия (NASA FIRMS)' },
   disclaimer_bold: { he: 'אינו תחליף להתרעה רשמית.', en: 'Not a substitute for the official alert.', ar: 'ليس بديلاً عن الإنذار الرسمي.', ru: 'Не заменяет официальное оповещение.' },
   disclaimer_text: {
     he: 'פעלו תמיד לפי ההנחיות הנשמעות במרחב שלכם.',
@@ -219,16 +203,6 @@ export const STRINGS = {
     ar: 'إرشادات عامة من قيادة الجبهة الداخلية. مواقع الملاجئ العامة غير متوفرة كبيانات مفتوحة موثوقة؛ توجّه إلى أقرب مساحة محمية تعرفها.',
     ru: 'Общие указания Командования тыла. Расположение общественных укрытий недоступно как надёжные открытые данные; идите к ближайшему известному вам защищённому месту.',
   },
-
-  // FIRMS popup details
-  firms_confidence: { he: 'ודאות', en: 'Confidence', ar: 'الثقة', ru: 'Достоверность' },
-  conf_high: { he: 'גבוהה', en: 'High', ar: 'عالية', ru: 'Высокая' },
-  conf_medium: { he: 'בינונית', en: 'Medium', ar: 'متوسطة', ru: 'Средняя' },
-  conf_low: { he: 'נמוכה', en: 'Low', ar: 'منخفضة', ru: 'Низкая' },
-  conf_unknown: { he: 'לא ידועה', en: 'Unknown', ar: 'غير معروفة', ru: 'Неизвестна' },
-  firms_intensity: { he: 'עוצמה (FRP)', en: 'Intensity (FRP)', ar: 'الشدة (FRP)', ru: 'Интенсивность (FRP)' },
-  firms_satellite: { he: 'לוויין', en: 'Satellite', ar: 'قمر صناعي', ru: 'Спутник' },
-  firms_near: { he: 'סמוך ל', en: 'near', ar: 'قرب', ru: 'рядом с' },
 
   // Notifications (browser Notification text)
   notif_in_area: { he: '🚨 התרעה באזור שלך', en: '🚨 Alert in your area', ar: '🚨 إنذار في منطقتك', ru: '🚨 Тревога в вашем районе' },

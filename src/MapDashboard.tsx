@@ -1,6 +1,5 @@
 import { Fragment, useEffect, useState } from 'react'
 import { AlertMap } from './map/AlertMap'
-import { FlameIcon } from './map/FireLayer'
 import { useAlertFeed, type FeedEvent, type FeedStatus } from './alerts/useAlertFeed'
 import { AlertIcon } from './alerts/AlertIcon'
 import { useNotifier } from './notify/useNotifier'
@@ -10,16 +9,12 @@ import { usePersonalAlert } from './myarea/usePersonalAlert'
 import { PersonalAlertBanner } from './myarea/PersonalAlertBanner'
 import { MyAreaControl } from './myarea/MyAreaControl'
 import { WhereToShelter } from './shelter/WhereToShelter'
-import { useFirms, type FireDetection } from './firms/useFirms'
-import { FIRMS_CREDIT, groupAnomalies, type AnomalyGroup } from './firms/anomaly'
 import { openCookieSettings } from './consent/consentStore'
 import { navigate } from './router'
 import { useLang } from './i18n/useLang'
 import { useAreaName, useRegions } from './i18n/areaNames'
 import { LangChips } from './i18n/LangChips'
 import type { StringKey } from './i18n/strings'
-
-const FIRMS_PREF = 'azaka_firms'
 
 // Dashboard shell: full-bleed alert map + a dark-glass command panel. The panel is a tzevaadom-style
 // FEED: one card per alert event, grouping all of its areas. Colour by severity: red active / amber
@@ -62,21 +57,6 @@ export function MapDashboard() {
   const [myArea, setMyArea] = useMyArea()
   const notifier = useNotifier(lastLiveAlert, myArea?.name ?? null)
   const personal = usePersonalAlert(myArea?.name ?? null, activeAreas, earlyAreas, clearedAreas, lastLiveAlert)
-  const firms = useFirms()
-  const [firmsOn, setFirmsOn] = useState(() => {
-    try {
-      return localStorage.getItem(FIRMS_PREF) === 'on' // off by default; opt-in
-    } catch {
-      return false
-    }
-  })
-  useEffect(() => {
-    try {
-      localStorage.setItem(FIRMS_PREF, firmsOn ? 'on' : 'off')
-    } catch {
-      // private mode / storage disabled: the toggle still works for this session
-    }
-  }, [firmsOn])
   const [snapshot, setSnapshot] = useState<FeedEvent | null>(null)
   const [sheetOpen, setSheetOpen] = useState(true) // mobile bottom-sheet expanded by default; desktop ignores it
 
@@ -91,7 +71,6 @@ export function MapDashboard() {
         activeAreas={activeAreas}
         earlyAreas={earlyAreas}
         clearedAreas={clearedAreas}
-        fires={firmsOn ? firms.detections : []}
         snapshot={snapshot ? snapshot.cities : null}
         snapshotColor={snapshot ? SEV_HEX[snapshot.severity] : undefined}
       />
@@ -199,10 +178,6 @@ export function MapDashboard() {
                 <EventCard key={ev.id} ev={ev} active={snapshot?.id === ev.id} onSelect={() => setSnapshot(ev)} />
               ))}
             </div>
-          )}
-
-          {firms.configured && (
-            <FirmsPanel detections={firms.detections} on={firmsOn} onToggle={() => setFirmsOn((v) => !v)} />
           )}
 
           <SidebarFooter lastAt={lastAt} status={status} />
@@ -334,76 +309,6 @@ const FOOTER_LINKS: Array<{ key: StringKey; path: string }> = [
   { key: 'nav_contact', path: '/contact' },
 ]
 
-function FirmsPanel({ detections, on, onToggle }: { detections: FireDetection[]; on: boolean; onToggle: () => void }) {
-  const { t } = useLang()
-  const groups = on ? groupAnomalies(detections) : []
-  return (
-    <section className="flex flex-col gap-2 rounded-xl border border-orange-500/25 bg-orange-500/5 p-2.5">
-      <div className="flex items-center gap-2">
-        <span className="text-orange-500">
-          <FlameIcon className="size-3.5 drop-shadow" />
-        </span>
-        <h2 className="whitespace-nowrap text-[0.6875rem] font-semibold tracking-wide text-orange-200">{t('firms_title')}</h2>
-        <span className="ms-auto whitespace-nowrap text-[0.625rem] text-slate-500">{detections.length} · {t('firms_24h')}</span>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={on}
-          aria-label={t('firms_toggle')}
-          onClick={onToggle}
-          className={`relative h-4 w-7 shrink-0 rounded-full transition ${on ? 'bg-orange-500' : 'bg-slate-600'}`}
-        >
-          <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${on ? 'start-0.5' : 'end-0.5'}`} />
-        </button>
-      </div>
-
-      {on ? (
-        groups.length > 0 ? (
-          <div className="flex max-h-44 flex-col gap-1.5 overflow-y-auto pe-1">
-            {groups.map((g) => (
-              <AnomalyGroupCard key={g.key} g={g} />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-lg bg-white/5 px-2.5 py-2 text-center text-[0.6875rem] text-slate-400">
-            {t('firms_none')}
-          </div>
-        )
-      ) : (
-        <div className="text-[0.625rem] text-slate-500">{t('firms_off')}</div>
-      )}
-
-      {on && (
-        <p className="text-[0.5625rem] leading-relaxed text-slate-500">
-          {t('firms_disclaimer')} · {FIRMS_CREDIT}
-        </p>
-      )}
-    </section>
-  )
-}
-
-function AnomalyGroupCard({ g }: { g: AnomalyGroup }) {
-  const { t, tAgo, tConf } = useLang()
-  return (
-    <div className="flex overflow-hidden rounded-lg border border-orange-500/20 bg-orange-500/5">
-      <div className="w-1 shrink-0 bg-orange-400/80" />
-      <div className="min-w-0 flex-1 px-2.5 py-1.5">
-        <div className="flex items-center gap-1.5">
-          <span className="min-w-0 break-words text-[0.75rem] font-semibold text-orange-100">
-            {t('firms_anomaly')}{g.label ? ` · ${g.label}` : ''}
-          </span>
-          <span className="ms-auto shrink-0 whitespace-nowrap text-[0.625rem] text-slate-500">{tAgo(g.latestTs)}</span>
-        </div>
-        <div className="mt-0.5 text-[0.625rem] text-slate-400">
-          {g.count > 1 ? `${t('firms_detections', { n: g.count })} · ` : ''}
-          {t('firms_confidence')} {tConf(g.topConf)}
-          {g.maxFrp ? ` · ${g.maxFrp} MW` : ''}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: FeedStatus }) {
   const { t } = useLang()
   return (
@@ -427,12 +332,6 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
               <span className="text-[0.625rem] text-slate-300">{t(l.key)}</span>
             </div>
           ))}
-          <div className="flex items-center gap-2">
-            <span className="flex w-6 shrink-0 justify-center text-orange-500">
-              <FlameIcon className="size-3.5 drop-shadow" />
-            </span>
-            <span className="text-[0.625rem] text-slate-300">{t('legend_firms')}</span>
-          </div>
         </div>
       </div>
 

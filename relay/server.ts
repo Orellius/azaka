@@ -5,11 +5,13 @@
 // Dev runs on an Israeli IP; production needs an Israeli egress (GCP me-west1 / IL VPS).
 import { categoryOf, classifyAlert } from '../src/alerts/categories'
 import { availableYears, computeStats, persist, readAll, readYear, recent } from './history'
-import { firmsConfigured, getFires, startFirms } from './firms'
 
 const PORT = Number(Bun.env.PORT ?? 8787)
 const POLL_MS = Number(Bun.env.OREF_POLL_MS ?? 1500)
 const OREF_URL = Bun.env.OREF_URL ?? 'https://www.oref.org.il/warningMessages/alert/Alerts.json'
+// /test/alert lets anyone broadcast a fake siren to every client, a life-safety integrity hole if
+// left open in production. Enabled in dev (NODE_ENV unset), disabled in prod unless explicitly opted in.
+const TEST_ALERTS_ENABLED = Bun.env.ALLOW_TEST_ALERTS === '1' || Bun.env.NODE_ENV !== 'production'
 
 const CORS = { 'Access-Control-Allow-Origin': '*' }
 const OREF_HEADERS = {
@@ -49,7 +51,7 @@ async function pollOref() {
   try {
     const res = await fetch(OREF_URL, { headers: OREF_HEADERS })
     if (!res.ok) return
-    const text = (await res.text()).trim().replace(/^﻿/, '')
+    const text = (await res.text()).trim().replace(/^\uFEFF/, '')
     if (!text || text === '{}') return // no active alert; client TTL expires stale areas
 
     let data: { id?: unknown; cat?: unknown; title?: unknown; data?: unknown }
@@ -101,7 +103,6 @@ async function pollOref() {
 
 setInterval(pollOref, POLL_MS)
 pollOref()
-startFirms()
 
 Bun.serve({
   port: PORT,
@@ -130,14 +131,8 @@ Bun.serve({
       const events = yearParam ? readYear(Number(yearParam)) : readAll()
       return Response.json({ year: yearParam ? Number(yearParam) : null, ...computeStats(events) }, { headers: CORS })
     }
-    if (url.pathname === '/firms') {
-      return Response.json(
-        { configured: firmsConfigured(), detections: getFires(), attribution: 'NASA FIRMS (LANCE/EOSDIS)' },
-        { headers: CORS },
-      )
-    }
     // DEV-ONLY: inject a fake alert to exercise the end-to-end push path without a real siren.
-    if (url.pathname === '/test/alert') {
+    if (url.pathname === '/test/alert' && TEST_ALERTS_ENABLED) {
       // pipe-delimited: real area names contain commas (e.g. "שדרות, איבים"), so do not split on ','
       const cities = (url.searchParams.get('cities') ?? 'תל אביב - מרכז העיר|חולון|רמת גן - מערב').split('|')
       const kindParam = url.searchParams.get('kind')
@@ -175,3 +170,4 @@ Bun.serve({
 })
 
 console.log(`[relay] ws://localhost:${PORT}/ws  polling ${OREF_URL} every ${POLL_MS}ms`)
+console.log(`[relay] /test/alert ${TEST_ALERTS_ENABLED ? 'ENABLED (dev)' : 'disabled (production)'}`)

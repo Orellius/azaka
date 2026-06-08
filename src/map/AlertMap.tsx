@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import maplibregl from 'maplibre-gl'
 import type { ExpressionSpecification, GeoJSONSource } from 'maplibre-gl'
@@ -7,9 +7,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle, ISRAEL_CENTER, ISRAEL_ZOOM } from './mapStyle'
 import { computeThreatZone } from '../threat-zone/computeThreatZone'
 import { convexHull, type Point } from '../threat-zone/convexHull'
-import { buildCityLabels, type CityLabel } from './majorCities'
-import { FireLayer, FirePopup, type PickedFire } from './FireLayer'
-import type { FireDetection } from '../firms/useFirms'
+import { isMajorArea } from './majorCities'
 import { useLang } from '../i18n/useLang'
 import { useAreaName } from '../i18n/areaNames'
 import type { StringKey } from '../i18n/strings'
@@ -27,6 +25,11 @@ const GREEN = '#10b981'
 const SELECT = '#22d3ee'
 const ZOOM_MIN_GAP_MS = 3000
 const USER_HOLD_MS = 8000
+// Map labels follow the alert: only currently-alerted areas are labelled, so the map is clean when
+// calm. At country zoom a wide barrage would clutter, so below MINOR_ZOOM we keep only the bigger
+// localities (isMajorArea) once the alerted set passes CLUTTER_CAP; zoom in to reveal the rest.
+const MINOR_ZOOM = 8.5
+const CLUTTER_CAP = 14
 
 type Tier = 'active' | 'early' | 'cleared' | 'idle'
 type AreaProps = { name?: string; en?: string; countdown?: number | null }
@@ -55,14 +58,12 @@ export function AlertMap({
   activeAreas,
   earlyAreas,
   clearedAreas,
-  fires = [],
   snapshot = null,
   snapshotColor = SELECT,
 }: {
   activeAreas: Set<string>
   earlyAreas: Set<string>
   clearedAreas: Set<string>
-  fires?: FireDetection[]
   snapshot?: string[] | null // a past event's areas to highlight + fit (history snapshot view)
   snapshotColor?: string // highlight colour, matching the event's severity (red / amber / green)
 }) {
@@ -75,10 +76,32 @@ export function AlertMap({
   const userMovedRef = useRef(0)
   const zoomArmedRef = useRef(false)
   const hadSnapshotRef = useRef(false)
+  const zoomedInRef = useRef(false)
   const [map, setMap] = useState<maplibregl.Map | null>(null)
-  const [cities, setCities] = useState<CityLabel[]>([])
+  const [areaPoints, setAreaPoints] = useState<Map<string, { lng: number; lat: number }>>(() => new Map())
+  const [zoomedIn, setZoomedIn] = useState(false)
   const [selected, setSelected] = useState<Selected | null>(null)
-  const [selectedFire, setSelectedFire] = useState<PickedFire | null>(null)
+  const localizeArea = useAreaName()
+
+  // Labels track the live alert: active first, then early. Empty when calm so the map clears.
+  const labelNames = useMemo(() => {
+    const s = new Set<string>()
+    for (const n of activeAreas) s.add(n)
+    for (const n of earlyAreas) s.add(n)
+    return [...s]
+  }, [activeAreas, earlyAreas])
+
+  const visibleLabels = useMemo(() => {
+    if (labelNames.length === 0) return [] as { name: string; lng: number; lat: number }[]
+    const majors = labelNames.filter(isMajorArea)
+    const shown = labelNames.length <= CLUTTER_CAP || zoomedIn || majors.length === 0 ? labelNames : majors
+    const out: { name: string; lng: number; lat: number }[] = []
+    for (const name of shown) {
+      const p = areaPoints.get(name)
+      if (p) out.push({ name, lng: p.lng, lat: p.lat })
+    }
+    return out
+  }, [labelNames, zoomedIn, areaPoints])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -96,6 +119,14 @@ export function AlertMap({
     }
     m.on('dragstart', onUserMove)
     m.on('zoomstart', onUserMove)
+    const onZoom = () => {
+      const zi = m.getZoom() >= MINOR_ZOOM
+      if (zi !== zoomedInRef.current) {
+        zoomedInRef.current = zi
+        setZoomedIn(zi) // re-render labels only when crossing the density threshold, not every frame
+      }
+    }
+    m.on('zoom', onZoom)
 
     m.on('load', async () => {
       const fc = (await (await fetch(AREAS_URL)).json()) as FeatureCollection<Polygon>
@@ -148,19 +179,16 @@ export function AlertMap({
         const f = e.features?.[0]
         if (!f) return
         const p = f.properties as AreaProps
-        setSelectedFire(null) // selecting an area supersedes any open fire popup
         setSelected({ name: String(p.name ?? ''), en: p.en, countdown: p.countdown, lngLat: e.lngLat })
       })
       m.on('click', (e) => {
-        // a fire-marker click is a DOM event that never reaches the canvas, so an empty-canvas click
-        // means the user tapped neither an area nor a marker: clear both popups.
+        // clicking empty canvas (no area under the cursor) closes the area popup
         if (m.queryRenderedFeatures(e.point, { layers: ['areas-fill'] }).length === 0) {
           setSelected(null)
-          setSelectedFire(null)
         }
       })
 
-      setCities(buildCityLabels(points))
+      setAreaPoints(points)
       setMap(m)
       // arm auto-zoom only after the initial state restore (hello) settles, so a refresh never
       // auto-zooms to areas that are merely being re-synced; live alerts after this do zoom.
@@ -256,20 +284,16 @@ export function AlertMap({
 
   return (
     <div ref={containerRef} className="h-full w-full">
-      {map && (
-        <FireLayer
-          map={map}
-          detections={fires}
-          onPick={(f) => {
-            setSelected(null)
-            setSelectedFire(f)
-          }}
-        />
-      )}
-      {map && selectedFire && <FirePopup map={map} fire={selectedFire} onClose={() => setSelectedFire(null)} />}
       {map &&
-        cities.map((c) => (
-          <CityMarker key={c.label.he} map={map} city={c} tier={tierOf(c.names, activeAreas, earlyAreas, clearedAreas)} />
+        visibleLabels.map(({ name, lng, lat }) => (
+          <AreaLabelMarker
+            key={name}
+            map={map}
+            lng={lng}
+            lat={lat}
+            label={localizeArea(name)}
+            tier={activeAreas.has(name) ? 'active' : 'early'}
+          />
         ))}
       {map && selected && (
         <AreaPopup
@@ -326,16 +350,30 @@ function maybeZoomTo(
   )
 }
 
-function CityMarker({ map, city, tier }: { map: maplibregl.Map; city: CityLabel; tier: Tier }) {
-  const { lang } = useLang()
+// One label per currently-alerted area, rendered as an HTML marker (the raster basemap carries no
+// glyphs, so a native symbol layer can't draw text). Smaller than the old always-on pills; colour by
+// tier. The parent decides which to show (zoom density) and unmounts them all when the alert clears.
+function AreaLabelMarker({
+  map,
+  lng,
+  lat,
+  label,
+  tier,
+}: {
+  map: maplibregl.Map
+  lng: number
+  lat: number
+  label: string
+  tier: 'active' | 'early'
+}) {
   const [el] = useState(() => document.createElement('div'))
   useEffect(() => {
-    const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([city.lng, city.lat]).addTo(map)
+    const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([lng, lat]).addTo(map)
     return () => {
       marker.remove()
     }
-  }, [map, el, city.lng, city.lat])
-  return createPortal(<div className={tier === 'idle' ? 'city-label' : `city-label city-label--${tier}`}>{city.label[lang]}</div>, el)
+  }, [map, el, lng, lat])
+  return createPortal(<div className={`city-label city-label--${tier}`}>{label}</div>, el)
 }
 
 function AreaPopup({
