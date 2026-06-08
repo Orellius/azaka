@@ -8,8 +8,8 @@ import type { StringKey } from '../i18n/strings'
 // >11% of public shelters unfit and location != availability). Pointing a civilian at a specific
 // shelter that may be locked or demolished is exactly the failure this app refuses. So instead of a
 // fabricated pin we show the official Home Front Command protected-space hierarchy, which is always
-// correct everywhere. During an alert this is the most important thing on the screen, so it forces
-// open and turns vivid; the rest of the time it stays a calm, collapsible preparedness reference.
+// correct everywhere. Rendered only inside the active-alert stack (beneath the official instruction),
+// so it shows alongside a live alert and stays in its prominent, expanded form (no chevron).
 
 const STEPS: StringKey[] = ['shelter_step_room', 'shelter_step_stairwell', 'shelter_step_interior', 'shelter_step_outdoors', 'shelter_step_driving']
 
@@ -25,9 +25,10 @@ export function WhereToShelter({ alerting }: { alerting: boolean }) {
   const { t } = useLang()
   const [open, setOpen] = useState(alerting) // open automatically when loaded during an alert
 
-  // during an alert this is the primary instruction on screen: vivid + always expanded
+  // primary instruction on screen during an alert, floating over the light map: needs an OPAQUE dark
+  // card (a translucent sky tint washes out and is unreadable over the basemap), not the in-panel look.
   const shell = alerting
-    ? 'border-sky-400/60 bg-sky-400/15 ring-1 ring-sky-400/30 shadow-lg shadow-sky-950/40'
+    ? 'border-sky-400/50 bg-sky-950/95 ring-1 ring-sky-400/25 shadow-2xl backdrop-blur-md'
     : 'border-sky-400/20 bg-sky-400/5'
   const expanded = alerting || open
 

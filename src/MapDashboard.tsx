@@ -81,39 +81,44 @@ export function MapDashboard() {
       <div className="pointer-events-none absolute inset-0 p-4">
         {snapshot && <SnapshotBanner event={snapshot} onClose={() => setSnapshot(null)} lowered={lowered} />}
 
-        {/* Active-alert instruction as a floating notification OVER THE MAP, outside the panel (so it
-            never squeezes the panel cards). Bottom toast on phones (the panel now lives at the top),
-            top + inline-end on desktop (the side opposite the command panel). */}
-        {(alerting || warning) && instruction && (instruction.title || instruction.desc) && (
+        {/* Active-alert STACK over the map, outside the panel: the "what to do now" instruction with
+            the "where to shelter" guidance beneath it. Bottom toast on phones (the panel lives at the
+            top now), top + inline-end (left in RTL, opposite the panel) on desktop. Both appear together
+            during an active/early alert and vanish when everything is green. */}
+        {(alerting || warning) && (
           <div
-            className={`pointer-events-auto fixed inset-x-3 bottom-3 z-20 rounded-xl border border-rose-500/60 bg-rose-950/95 px-3.5 py-3 shadow-2xl backdrop-blur-md sm:inset-x-auto sm:bottom-auto sm:end-4 sm:w-80 sm:max-w-[calc(100vw-24rem)] ${lowered ? 'sm:top-28' : 'sm:top-4'}`}
-            role="alert"
+            className={`pointer-events-auto fixed inset-x-3 bottom-3 z-20 flex max-h-[80vh] flex-col gap-2 overflow-y-auto sm:inset-x-auto sm:bottom-auto sm:end-4 sm:max-h-[calc(100vh-2rem)] sm:w-80 sm:max-w-[calc(100vw-24rem)] ${lowered ? 'sm:top-28' : 'sm:top-4'}`}
           >
-            {instruction.title && <div className="text-[0.9375rem] font-bold text-rose-50">{instruction.title}</div>}
-            {lang !== 'he' && tThreat(instruction.key) && (
-              <div className="text-[0.75rem] font-semibold text-rose-200/90">{tThreat(instruction.key)}</div>
-            )}
-            {instruction.desc && <div className="mt-0.5 text-[0.8125rem] text-rose-100/95">{instruction.desc}</div>}
-            {activeRegions.length > 0 && (
-              <div className="mt-1.5 flex flex-wrap gap-1">
-                {activeRegions.map((r) => (
-                  <span
-                    key={r.id}
-                    className="rounded-md border border-rose-200/30 bg-rose-500/30 px-1.5 py-0.5 text-[0.625rem] font-semibold text-rose-50"
-                  >
-                    {r.name}
-                    {r.count > 1 ? ` · ${r.count}` : ''}
-                  </span>
-                ))}
+            {instruction && (instruction.title || instruction.desc) && (
+              <div className="rounded-xl border border-rose-500/60 bg-rose-950/95 px-3.5 py-3 shadow-2xl backdrop-blur-md" role="alert">
+                {instruction.title && <div className="text-[0.9375rem] font-bold text-rose-50">{instruction.title}</div>}
+                {lang !== 'he' && tThreat(instruction.key) && (
+                  <div className="text-[0.75rem] font-semibold text-rose-200/90">{tThreat(instruction.key)}</div>
+                )}
+                {instruction.desc && <div className="mt-0.5 text-[0.8125rem] text-rose-100/95">{instruction.desc}</div>}
+                {activeRegions.length > 0 && (
+                  <div className="mt-1.5 flex flex-wrap gap-1">
+                    {activeRegions.map((r) => (
+                      <span
+                        key={r.id}
+                        className="rounded-md border border-rose-200/30 bg-rose-500/30 px-1.5 py-0.5 text-[0.625rem] font-semibold text-rose-50"
+                      >
+                        {r.name}
+                        {r.count > 1 ? ` · ${r.count}` : ''}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {instruction.remain === 'tenmin' && (
+                  <div className="mt-1 text-[0.75rem] text-rose-100/80">{tGuide('tenmin')}</div>
+                )}
+                <div className="mt-1 text-[0.6875rem] text-rose-200/80">{t('areas_active', { n: activeAreas.size })}</div>
+                {instruction.remain === 'release' && (
+                  <div className="mt-1.5 text-[0.6875rem] font-semibold text-amber-200">{t('wait_release')}</div>
+                )}
               </div>
             )}
-            {instruction.remain === 'tenmin' && (
-              <div className="mt-1 text-[0.75rem] text-rose-100/80">{tGuide('tenmin')}</div>
-            )}
-            <div className="mt-1 text-[0.6875rem] text-rose-200/80">{t('areas_active', { n: activeAreas.size })}</div>
-            {instruction.remain === 'release' && (
-              <div className="mt-1.5 text-[0.6875rem] font-semibold text-amber-200">{t('wait_release')}</div>
-            )}
+            <WhereToShelter alerting={alerting || warning} />
           </div>
         )}
         {/* Mobile: a slim top bar that drops the feed DOWN like a notification shade (tap the hamburger).
@@ -170,8 +175,6 @@ export function MapDashboard() {
           )}
 
           <MyAreaControl myArea={myArea} onChange={setMyArea} tier={personal?.tier ?? null} />
-
-          <WhereToShelter alerting={alerting || warning} />
 
           {events.length === 0 ? (
             <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-center text-sm text-slate-400">
