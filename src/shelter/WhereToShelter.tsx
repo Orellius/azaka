@@ -32,7 +32,7 @@ export function WhereToShelter({ alerting }: { alerting: boolean }) {
   const expanded = alerting || open
 
   return (
-    <section className={`overflow-hidden rounded-xl border transition ${shell}`}>
+    <section className={`shrink-0 overflow-hidden rounded-xl border transition ${shell}`}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
