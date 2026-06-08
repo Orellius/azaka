@@ -10,7 +10,14 @@ const RELAY_HTTP = WS_URL.replace(/^ws(s?):\/\//, 'http$1://').replace(/\/ws$/, 
 const BACKSTOP_MS = 180 * 60_000 // 3h fail-safe only; NOT a safe-to-leave signal
 const CLEAR_TTL_MS = 25_000
 const RECONNECT_MS = 3_000
-const FEED_TTL_MS = 24 * 60 * 60_000 // the event feed shows the last 24h, then entries drop off
+// The live feed shows TODAY's alerts (since local 00:00). The minute-by-minute prune below advances the
+// cutoff at midnight, so the feed resets to a fresh day on its own; the previous day's alerts persist in
+// the relay's history log and surface on the /historical statistics page (nothing is lost).
+function startOfDay(): number {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  return d.getTime()
+}
 
 export type FeedStatus = 'connecting' | 'live' | 'error'
 export type AlertKind = 'active' | 'early' | 'special'
@@ -43,10 +50,10 @@ const GROUP_WINDOW_MS = 30 * 60_000 // alerts with the same title within this wi
 
 // Merge an event into the feed: if a recent card has the same severity+title (within GROUP_WINDOW_MS),
 // union its areas and bump its time (tzevaadom-style stacking, so one ongoing event is one updating
-// card, not 600 rows); otherwise prepend a new card. Also drops anything older than 24h. Pure, so it is
+// card, not 600 rows); otherwise prepend a new card. Also drops anything before today. Pure, so it is
 // reused for both live events and the history seed.
 function mergeEvent(prev: FeedEvent[], ev: FeedEvent): FeedEvent[] {
-  const cutoff = Date.now() - FEED_TTL_MS
+  const cutoff = startOfDay()
   const fresh = prev.filter((e) => e.ts >= cutoff && e.id !== ev.id)
   const i = fresh.findIndex(
     (e) => e.severity === ev.severity && e.title === ev.title && Math.abs(e.ts - ev.ts) <= GROUP_WINDOW_MS,
@@ -88,15 +95,15 @@ export function useAlertFeed() {
     setEvents((prev) => mergeEvent(prev, ev))
   }, [])
 
-  // seed the feed with the last 24h from the relay history (grouped) so a refresh keeps recent alerts,
-  // and prune entries older than 24h every minute so the feed is always a rolling 24h window
+  // seed the feed with TODAY's alerts from the relay history (grouped) so a refresh keeps the day's
+  // alerts, and prune before-today entries every minute so the feed resets cleanly at local midnight
   useEffect(() => {
     let alive = true
     fetch(`${RELAY_HTTP}/history?limit=300`)
       .then((r) => r.json())
       .then((d: { events?: unknown }) => {
         if (!alive || !Array.isArray(d.events)) return
-        const cutoff = Date.now() - FEED_TTL_MS
+        const cutoff = startOfDay()
         const hist = d.events
           .map(toFeedEvent)
           .filter((e): e is FeedEvent => e !== null && e.ts >= cutoff)
@@ -113,7 +120,7 @@ export function useAlertFeed() {
       })
     const prune = setInterval(() => {
       setEvents((prev) => {
-        const cutoff = Date.now() - FEED_TTL_MS
+        const cutoff = startOfDay()
         const next = prev.filter((e) => e.ts >= cutoff)
         return next.length === prev.length ? prev : next
       })
