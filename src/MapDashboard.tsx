@@ -15,7 +15,7 @@ import { FIRMS_CREDIT, groupAnomalies, type AnomalyGroup } from './firms/anomaly
 import { openCookieSettings } from './consent/consentStore'
 import { navigate } from './router'
 import { useLang } from './i18n/useLang'
-import { useAreaName } from './i18n/areaNames'
+import { useAreaName, useRegions } from './i18n/areaNames'
 import { LangChips } from './i18n/LangChips'
 import type { StringKey } from './i18n/strings'
 
@@ -57,6 +57,7 @@ function LiveClock() {
 
 export function MapDashboard() {
   const { t, tGuide, lang, tThreat } = useLang()
+  const regionsOf = useRegions()
   const { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events, lastLiveAlert } = useAlertFeed()
   const [myArea, setMyArea] = useMyArea()
   const notifier = useNotifier(lastLiveAlert, myArea?.name ?? null)
@@ -81,6 +82,7 @@ export function MapDashboard() {
 
   const alerting = activeAreas.size > 0
   const warning = earlyAreas.size > 0
+  const activeRegions = regionsOf([...activeAreas, ...earlyAreas])
   const headDot = alerting ? 'bg-rose-500' : warning ? 'bg-amber-500' : clearedAreas.size > 0 ? 'bg-emerald-500' : 'bg-slate-500'
 
   return (
@@ -164,6 +166,19 @@ export function MapDashboard() {
                 <div className="text-[12px] font-semibold text-rose-200/90">{tThreat(instruction.key)}</div>
               )}
               {instruction.desc && <div className="mt-0.5 text-[12px] text-rose-100/90">{instruction.desc}</div>}
+              {activeRegions.length > 0 && (
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {activeRegions.map((r) => (
+                    <span
+                      key={r.id}
+                      className="rounded-md border border-rose-200/30 bg-rose-500/25 px-1.5 py-0.5 text-[10px] font-semibold text-rose-50"
+                    >
+                      {r.name}
+                      {r.count > 1 ? ` · ${r.count}` : ''}
+                    </span>
+                  ))}
+                </div>
+              )}
               {instruction.remain === 'tenmin' && (
                 <div className="mt-1 text-[12px] text-rose-100/80">{tGuide('tenmin')}</div>
               )}
@@ -236,12 +251,15 @@ function SnapshotBanner({ event, onClose, lowered = false }: { event: FeedEvent;
 function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; onSelect: () => void }) {
   const { t, lang, tThreat, tAgo } = useLang()
   const localizeArea = useAreaName()
+  const regionsOf = useRegions()
   const c = SEV[ev.severity]
   const [expanded, setExpanded] = useState(false)
   const time = new Date(ev.ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
   const long = ev.cities.length > 12 // collapse long lists; the card stays clickable for the map snapshot
   // translated threat-type aid beside oref's verbatim Hebrew title (shown only for non-Hebrew readers)
   const threat = tThreat(ev.key ?? (ev.severity === 'cleared' ? 'update' : undefined))
+  // named oref regions this event hits (Gaza Envelope, Conflict Line, ...), busiest first
+  const regions = regionsOf(ev.cities)
   return (
     <div
       role="button"
@@ -266,6 +284,19 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
           )}
         </div>
       </div>
+      {regions.length > 0 && (
+        <div className="mt-1.5 flex flex-wrap gap-1">
+          {regions.map((r) => (
+            <span
+              key={r.id}
+              className="rounded-md border border-white/15 bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-slate-200"
+            >
+              {r.name}
+              {r.count > 1 ? ` · ${r.count}` : ''}
+            </span>
+          ))}
+        </div>
+      )}
       <div className="mt-1 text-[10px] text-slate-500">
         {tAgo(ev.ts)} · {time} · {t('areas_n', { n: ev.cities.length })}
       </div>

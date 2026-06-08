@@ -269,7 +269,7 @@ export function AlertMap({
       {map && selectedFire && <FirePopup map={map} fire={selectedFire} onClose={() => setSelectedFire(null)} />}
       {map &&
         cities.map((c) => (
-          <CityMarker key={c.label} map={map} city={c} tier={tierOf(c.names, activeAreas, earlyAreas, clearedAreas)} />
+          <CityMarker key={c.label.he} map={map} city={c} tier={tierOf(c.names, activeAreas, earlyAreas, clearedAreas)} />
         ))}
       {map && selected && (
         <AreaPopup
@@ -327,6 +327,7 @@ function maybeZoomTo(
 }
 
 function CityMarker({ map, city, tier }: { map: maplibregl.Map; city: CityLabel; tier: Tier }) {
+  const { lang } = useLang()
   const [el] = useState(() => document.createElement('div'))
   useEffect(() => {
     const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([city.lng, city.lat]).addTo(map)
@@ -334,7 +335,7 @@ function CityMarker({ map, city, tier }: { map: maplibregl.Map; city: CityLabel;
       marker.remove()
     }
   }, [map, el, city.lng, city.lat])
-  return createPortal(<div className={tier === 'idle' ? 'city-label' : `city-label city-label--${tier}`}>{city.label}</div>, el)
+  return createPortal(<div className={tier === 'idle' ? 'city-label' : `city-label city-label--${tier}`}>{city.label[lang]}</div>, el)
 }
 
 function AreaPopup({
