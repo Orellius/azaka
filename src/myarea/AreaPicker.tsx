@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { MyArea } from './useMyArea'
+import { useLang } from '../i18n/useLang'
 
 // Searchable modal for picking a home area from public/data/cities.json (~1449 entries, 422 KB).
 // Fetched lazily only when the picker opens, so it never weighs on first paint. Results are capped
@@ -10,6 +11,7 @@ type CitiesFile = { cities: Record<string, CityRec> }
 const MAX_RESULTS = 60
 
 export function AreaPicker({ onPick, onClose }: { onPick: (area: MyArea) => void; onClose: () => void }) {
+  const { t } = useLang()
   const [all, setAll] = useState<MyArea[] | null>(null)
   const [error, setError] = useState(false)
   const [q, setQ] = useState('')
@@ -62,7 +64,6 @@ export function AreaPicker({ onPick, onClose }: { onPick: (area: MyArea) => void
 
   return (
     <div
-      dir="rtl"
       className="pointer-events-auto fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
     >
@@ -72,13 +73,13 @@ export function AreaPicker({ onPick, onClose }: { onPick: (area: MyArea) => void
       >
         <div className="flex items-center gap-2 border-b border-white/10 p-3">
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-bold text-white">בחירת האזור שלך</div>
-            <div className="text-[11px] text-slate-400">נשמר במכשיר. נשתמש בו רק כדי להתריע כשהאזור שלך בהתרעה.</div>
+            <div className="text-sm font-bold text-white">{t('picker_title')}</div>
+            <div className="text-[11px] text-slate-400">{t('picker_sub')}</div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="סגירה"
+            aria-label={t('close')}
             className="shrink-0 rounded-lg px-2 py-1 text-slate-400 transition hover:bg-white/10 hover:text-white"
           >
             ✕
@@ -92,7 +93,7 @@ export function AreaPicker({ onPick, onClose }: { onPick: (area: MyArea) => void
             onChange={(e) => setQ(e.target.value)}
             type="search"
             inputMode="search"
-            placeholder="חיפוש עיר או יישוב…"
+            placeholder={t('picker_search')}
             className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[15px] text-white placeholder:text-slate-500 focus:border-sky-400/50 focus:outline-none"
           />
         </div>
@@ -100,12 +101,12 @@ export function AreaPicker({ onPick, onClose }: { onPick: (area: MyArea) => void
         <div className="feed-scroll min-h-0 flex-1 overflow-y-auto px-3 pb-3">
           {error ? (
             <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-center text-[13px] text-rose-200">
-              טעינת רשימת היישובים נכשלה. נסו שוב מאוחר יותר.
+              {t('picker_failed')}
             </div>
           ) : !all ? (
-            <div className="p-4 text-center text-[13px] text-slate-400">טוען רשימת יישובים…</div>
+            <div className="p-4 text-center text-[13px] text-slate-400">{t('picker_loading')}</div>
           ) : results.length === 0 ? (
-            <div className="p-4 text-center text-[13px] text-slate-400">לא נמצאו יישובים תואמים</div>
+            <div className="p-4 text-center text-[13px] text-slate-400">{t('picker_none')}</div>
           ) : (
             <ul className="flex flex-col gap-1">
               {results.map((a) => (
@@ -121,7 +122,7 @@ export function AreaPicker({ onPick, onClose }: { onPick: (area: MyArea) => void
                     </div>
                     {a.countdown != null && (
                       <span className="shrink-0 whitespace-nowrap rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
-                        {a.countdown === 0 ? 'מיידי' : `${a.countdown} שנ׳ למרחב מוגן`}
+                        {a.countdown === 0 ? t('immediate') : t('shelter_secs', { n: a.countdown })}
                       </span>
                     )}
                   </button>

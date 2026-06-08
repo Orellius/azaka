@@ -10,6 +10,8 @@ import { convexHull, type Point } from '../threat-zone/convexHull'
 import { buildCityLabels, type CityLabel } from './majorCities'
 import { FireLayer, FirePopup, type PickedFire } from './FireLayer'
 import type { FireDetection } from '../firms/useFirms'
+import { useLang } from '../i18n/useLang'
+import type { StringKey } from '../i18n/strings'
 
 // MapLibre map of all Pikud HaOref alert areas. The GL layer (polygons, feature-state colours,
 // threat-zone hull, auto-zoom) is imperative because it lives on the WebGL canvas. The HTML overlays
@@ -41,11 +43,11 @@ function tierOf(names: string[], active: Set<string>, early: Set<string>, cleare
   return 'idle'
 }
 
-const TIER_STATUS: Record<Tier, { dot: string; txt: string; label: string }> = {
-  active: { dot: 'bg-rose-500', txt: 'text-rose-300', label: 'בהתרעה פעילה' },
-  early: { dot: 'bg-amber-500', txt: 'text-amber-300', label: 'התרעה מקדימה' },
-  cleared: { dot: 'bg-emerald-500', txt: 'text-emerald-300', label: 'האירוע הסתיים' },
-  idle: { dot: 'bg-slate-500', txt: 'text-slate-400', label: 'אין התרעה כעת' },
+const TIER_STATUS: Record<Tier, { dot: string; txt: string; key: StringKey }> = {
+  active: { dot: 'bg-rose-500', txt: 'text-rose-300', key: 'status_active' },
+  early: { dot: 'bg-amber-500', txt: 'text-amber-300', key: 'status_early' },
+  cleared: { dot: 'bg-emerald-500', txt: 'text-emerald-300', key: 'status_cleared' },
+  idle: { dot: 'bg-slate-500', txt: 'text-slate-400', key: 'status_idle' },
 }
 
 export function AlertMap({
@@ -345,6 +347,7 @@ function AreaPopup({
   tier: Tier
   onClose: () => void
 }) {
+  const { t } = useLang()
   const [el] = useState(() => document.createElement('div'))
   const popupRef = useRef<maplibregl.Popup | null>(null)
   useEffect(() => {
@@ -368,20 +371,20 @@ function AreaPopup({
   const sec = selected.countdown
   const status = TIER_STATUS[tier]
   return createPortal(
-    <div dir="rtl" className="w-44">
+    <div className="w-44">
       <div className="flex items-start gap-2">
         <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${status.dot}`} />
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-bold leading-tight text-white">{selected.name}</div>
           {selected.en && <div className="truncate text-[10px] text-slate-400">{selected.en}</div>}
-          <div className={`mt-0.5 text-[11px] font-medium ${status.txt}`}>{status.label}</div>
+          <div className={`mt-0.5 text-[11px] font-medium ${status.txt}`}>{t(status.key)}</div>
         </div>
       </div>
       {sec != null && (
         <div className="mt-2.5 flex items-center justify-between gap-2 rounded-lg bg-white/5 px-2.5 py-1.5">
-          <span className="text-[10px] text-slate-400">זמן הגעה למרחב מוגן</span>
+          <span className="text-[10px] text-slate-400">{t('map_shelter_time')}</span>
           <span className="whitespace-nowrap text-[13px] font-bold text-white">
-            {sec === 0 ? 'מיידי' : `${sec} שנ׳`}
+            {sec === 0 ? t('immediate') : `${sec} ${t('unit_sec')}`}
           </span>
         </div>
       )}

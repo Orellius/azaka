@@ -2,14 +2,16 @@ import { useState } from 'react'
 import { AreaPicker } from './AreaPicker'
 import type { MyArea } from './useMyArea'
 import type { PersonalTier } from './usePersonalAlert'
+import { useLang } from '../i18n/useLang'
+import type { StringKey } from '../i18n/strings'
 
 // Sidebar control to pick / change / clear the home area. Owns the picker-open state and renders the
 // modal. Presentation + selection only; persistence lives in useMyArea, alert logic in usePersonalAlert.
 
-const STATUS: Record<PersonalTier, { dot: string; txt: string; label: string }> = {
-  active: { dot: 'bg-rose-500', txt: 'text-rose-300', label: 'בהתרעה פעילה' },
-  early: { dot: 'bg-amber-500', txt: 'text-amber-300', label: 'התרעה מקדימה' },
-  cleared: { dot: 'bg-emerald-500', txt: 'text-emerald-300', label: 'האירוע הסתיים' },
+const STATUS: Record<PersonalTier, { dot: string; txt: string; key: StringKey }> = {
+  active: { dot: 'bg-rose-500', txt: 'text-rose-300', key: 'status_active' },
+  early: { dot: 'bg-amber-500', txt: 'text-amber-300', key: 'status_early' },
+  cleared: { dot: 'bg-emerald-500', txt: 'text-emerald-300', key: 'status_cleared' },
 }
 
 function PinIcon({ className }: { className?: string }) {
@@ -30,6 +32,7 @@ export function MyAreaControl({
   onChange: (area: MyArea | null) => void
   tier: PersonalTier | null
 }) {
+  const { t } = useLang()
   const [picking, setPicking] = useState(false)
   const status = tier ? STATUS[tier] : null
 
@@ -42,7 +45,7 @@ export function MyAreaControl({
           <div className="min-w-0 flex-1 leading-tight">
             <div className="truncate text-[13px] font-semibold text-white">{myArea.name}</div>
             <div className={`text-[10px] ${status ? status.txt : 'text-slate-400'}`}>
-              {status ? status.label : 'האזור שלי · אין התרעה כעת'}
+              {status ? t(status.key) : t('myarea_mine_no_alert')}
             </div>
           </div>
           <button
@@ -50,12 +53,12 @@ export function MyAreaControl({
             onClick={() => setPicking(true)}
             className="shrink-0 rounded-lg px-2 py-1 text-[11px] font-medium text-sky-300 transition hover:bg-white/10"
           >
-            שינוי
+            {t('myarea_change')}
           </button>
           <button
             type="button"
             onClick={() => onChange(null)}
-            aria-label="הסרת האזור שלי"
+            aria-label={t('myarea_remove')}
             className="shrink-0 rounded-lg px-1.5 py-1 text-slate-500 transition hover:bg-white/10 hover:text-white"
           >
             ✕
@@ -69,8 +72,8 @@ export function MyAreaControl({
         >
           <PinIcon className="size-4 shrink-0 text-sky-300" />
           <div className="leading-tight">
-            <div className="text-[13px] font-semibold text-sky-100">הגדירו את האזור שלכם</div>
-            <div className="text-[10px] text-sky-200/70">קבלו התרעה אישית כשהאזור שלכם בהתרעה</div>
+            <div className="text-[13px] font-semibold text-sky-100">{t('myarea_set_title')}</div>
+            <div className="text-[10px] text-sky-200/70">{t('myarea_set_sub')}</div>
           </div>
         </button>
       )}
