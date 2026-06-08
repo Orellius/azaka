@@ -9,7 +9,7 @@ import { computeThreatZone } from '../threat-zone/computeThreatZone'
 import { convexHull, type Point } from '../threat-zone/convexHull'
 import { isMajorArea } from './majorCities'
 import { useLang } from '../i18n/useLang'
-import { useAreaName } from '../i18n/areaNames'
+import { useAreaName, useRegionCentroids } from '../i18n/areaNames'
 import type { StringKey } from '../i18n/strings'
 
 // MapLibre map of all Pikud HaOref alert areas. The GL layer (polygons, feature-state colours,
@@ -82,6 +82,7 @@ export function AlertMap({
   const [zoomedIn, setZoomedIn] = useState(false)
   const [selected, setSelected] = useState<Selected | null>(null)
   const localizeArea = useAreaName()
+  const regionLabels = useRegionCentroids(areaPoints)
 
   // Labels track the live alert: active first, then early. Empty when calm so the map clears.
   const labelNames = useMemo(() => {
@@ -285,6 +286,8 @@ export function AlertMap({
   return (
     <div ref={containerRef} className="h-full w-full">
       {map &&
+        regionLabels.map((r) => <RegionLabelMarker key={r.id} map={map} lng={r.lng} lat={r.lat} name={r.name} />)}
+      {map &&
         visibleLabels.map(({ name, lng, lat }) => (
           <AreaLabelMarker
             key={name}
@@ -347,6 +350,25 @@ function maybeZoomTo(
       [maxX, maxY],
     ],
     { padding: 140, maxZoom: 11, duration: 1600 },
+  )
+}
+
+// Static region-name label (orientation skeleton), anchored at the region centroid. Muted + behind
+// the alert pills so it never competes with live data; always visible so a calm or history-snapshot
+// map still reads ("which region is this?").
+function RegionLabelMarker({ map, lng, lat, name }: { map: maplibregl.Map; lng: number; lat: number; name: string }) {
+  const [el] = useState(() => document.createElement('div'))
+  useEffect(() => {
+    const marker = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([lng, lat]).addTo(map)
+    return () => {
+      marker.remove()
+    }
+  }, [map, el, lng, lat])
+  return createPortal(
+    <div className="pointer-events-none select-none whitespace-nowrap rounded bg-white/55 px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-slate-600 shadow-sm">
+      {name}
+    </div>,
+    el,
   )
 }
 

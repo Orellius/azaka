@@ -1,4 +1,4 @@
-import { useEffect, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useSyncExternalStore } from 'react'
 import { useLang } from './useLang'
 import type { Lang } from './strings'
 
@@ -121,4 +121,31 @@ export function useRegions(): (cities: string[]) => RegionHit[] {
     ensureLoaded()
   }, [])
   return (cities: string[]) => regionsFor(cities, lang)
+}
+
+export type RegionLabel = { id: number; name: string; lng: number; lat: number }
+
+// Static region-name labels for the map: one per oref region, anchored at the centroid of its member
+// areas (averaged from the polygon centroids the caller passes in, since cities.json has no coords).
+// These give persistent orientation ("עוטף עזה", "Gaza Envelope", ...) under the alert-driven pills.
+export function useRegionCentroids(areaPoints: Map<string, { lng: number; lat: number }>): RegionLabel[] {
+  const { lang } = useLang()
+  const snap = useSyncExternalStore(subscribe, getSnapshot, getSnapshot) // recompute once cities.json (areaMap) arrives
+  useEffect(() => {
+    ensureLoaded()
+  }, [])
+  return useMemo(() => {
+    if (!snap || !areaMap || areaPoints.size === 0) return [] // snap (nameMap) is set with areaMap; gates until loaded
+    const acc = new Map<number, { sx: number; sy: number; n: number }>()
+    for (const [name, p] of areaPoints) {
+      const id = areaMap.get(name)
+      if (id == null || !REGIONS[id]) continue
+      const a = acc.get(id) ?? { sx: 0, sy: 0, n: 0 }
+      a.sx += p.lng
+      a.sy += p.lat
+      a.n += 1
+      acc.set(id, a)
+    }
+    return [...acc.entries()].map(([id, a]) => ({ id, name: REGIONS[id][lang], lng: a.sx / a.n, lat: a.sy / a.n }))
+  }, [areaPoints, lang, snap])
 }
