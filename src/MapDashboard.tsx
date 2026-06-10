@@ -367,6 +367,7 @@ const LEGEND: Array<{ color: string; key: StringKey }> = [
 ]
 
 const FOOTER_LINKS: Array<{ key: StringKey; path: string }> = [
+  { key: 'nav_cities', path: '/cities' },
   { key: 'nav_about', path: '/about' },
   { key: 'nav_privacy', path: '/privacy' },
   { key: 'nav_terms', path: '/terms' },

@@ -273,6 +273,10 @@ export function InfoPage({ slug }: { slug: InfoSlug }) {
         </div>
 
         <div className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/10 pt-5 text-[0.6875rem] text-slate-500">
+          <button type="button" onClick={() => navigate('/cities')} className="transition hover:text-slate-300">
+            {t('nav_cities')}
+          </button>
+          <span>·</span>
           <button type="button" onClick={() => navigate('/about')} className="transition hover:text-slate-300">
             {t('nav_about')}
           </button>

@@ -3,11 +3,11 @@
 // an Israeli IP), dedups by alert id, and pushes new alerts to every connected browser over our own
 // WebSocket. No third party in the path. Run: bun relay/server.ts (PORT, OREF_POLL_MS, OREF_URL env).
 // Dev runs on an Israeli IP; production needs an Israeli egress (GCP me-west1 / IL VPS).
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join, normalize } from 'node:path'
 import { categoryOf, classifyAlert } from '../src/alerts/categories'
 import { computeAnalytics, recordHit } from './analytics'
-import { availableYears, computeStats, persist, readAll, readYear, recent } from './history'
+import { availableYears, cityHistory, computeStats, findEvent, persist, readAll, readYear, recent } from './history'
 
 const PORT = Number(Bun.env.PORT ?? 8787)
 const POLL_MS = Number(Bun.env.OREF_POLL_MS ?? 1500)
@@ -27,6 +27,23 @@ const OREF_HEADERS = {
   'X-Requested-With': 'XMLHttpRequest',
   'User-Agent': 'Mozilla/5.0 (azaka-relay)',
   Accept: 'application/json, text/plain, */*',
+}
+
+// Known oref area names (cities.json keys == oref alert area names), so /history/city can 404 on a
+// garbage name instead of returning an honest-looking empty record for it. Loaded once, on first use.
+const CITIES_FILE = new URL('../public/data/cities.json', import.meta.url).pathname
+let knownAreas: Set<string> | null = null
+function isKnownArea(name: string): boolean {
+  if (!knownAreas) {
+    try {
+      const data = JSON.parse(readFileSync(CITIES_FILE, 'utf8')) as { cities?: Record<string, unknown> }
+      knownAreas = new Set(Object.keys(data.cities ?? {}))
+    } catch (err) {
+      console.error('[cities]', (err as Error).message)
+      return true // can't read the list: fail open, serve the (possibly empty) history
+    }
+  }
+  return knownAreas.has(name)
 }
 
 const clients = new Set<import('bun').ServerWebSocket<unknown>>()
@@ -133,6 +150,21 @@ Bun.serve({
         events: readYear(year).filter((e) => e.type === 'alert').length,
       }))
       return Response.json({ years }, { headers: CORS })
+    }
+    if (url.pathname === '/history/city') {
+      const name = (url.searchParams.get('name') ?? '').trim()
+      if (!name || name.length > 120) return Response.json({ error: 'bad name' }, { status: 400, headers: CORS })
+      const city = cityHistory(name)
+      if (city.total === 0 && !isKnownArea(name))
+        return Response.json({ error: 'unknown area' }, { status: 404, headers: CORS })
+      return Response.json(city, { headers: CORS })
+    }
+    if (url.pathname === '/history/event') {
+      const id = (url.searchParams.get('id') ?? '').trim()
+      if (!id || id.length > 64) return Response.json({ error: 'bad id' }, { status: 400, headers: CORS })
+      const event = findEvent(id)
+      if (!event) return Response.json({ error: 'not found' }, { status: 404, headers: CORS })
+      return Response.json({ event }, { headers: CORS })
     }
     if (url.pathname === '/history/stats') {
       const yearParam = url.searchParams.get('year')

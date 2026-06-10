@@ -14,6 +14,7 @@ export type HistoryEvent = {
   cat?: string
   key?: string // threat key (missilealert, uav, terrorattack, ...)
   title?: string
+  desc?: string
   cities?: string[]
   ts?: number
   count?: number // firms-daily: distinct thermal anomalies logged for that day
@@ -69,6 +70,47 @@ export function recent(limit: number): HistoryEvent[] {
     .filter((e) => e.type !== 'firms-daily') // keep the recent-events feed to real alerts/clears
     .slice(-limit)
     .reverse()
+}
+
+export type CityHistory = {
+  name: string
+  total: number
+  lastTs: number | null
+  byMonth: Record<string, number> // YYYY-MM -> alert-event count
+  byType: Record<string, number> // threat key -> alert-event count
+  recent: HistoryEvent[] // last 20 alert events naming this area, newest first, verbatim
+}
+
+// Per-area history for the /history/city endpoint (the per-city SEO pages). Only real alerts count;
+// clears and firms-daily rows are excluded so totals match the /history/stats numbers.
+export function cityHistory(name: string): CityHistory {
+  const hits = readAll().filter((e) => e.type === 'alert' && (e.cities ?? []).includes(name))
+  const byMonth: Record<string, number> = {}
+  const byType: Record<string, number> = {}
+  let lastTs: number | null = null
+  for (const e of hits) {
+    if (e.ts) {
+      if (!lastTs || e.ts > lastTs) lastTs = e.ts
+      const d = new Date(e.ts)
+      const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      byMonth[month] = (byMonth[month] ?? 0) + 1
+    }
+    const key = e.key || 'unknown'
+    byType[key] = (byType[key] ?? 0) + 1
+  }
+  return {
+    name,
+    total: hits.length,
+    lastTs,
+    byMonth: Object.fromEntries(Object.entries(byMonth).sort()),
+    byType,
+    recent: hits.slice(-20).reverse(),
+  }
+}
+
+// Single-event lookup for the /history/event permalinks. Ids are oref's own and unique per event.
+export function findEvent(id: string): HistoryEvent | null {
+  return readAll().find((e) => e.id === id) ?? null
 }
 
 function sizeBucket(n: number): string {

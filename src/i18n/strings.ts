@@ -158,6 +158,66 @@ export const STRINGS = {
   nav_contact: { he: 'צור קשר', en: 'Contact', ar: 'اتصل بنا', ru: 'Контакты' },
   nav_cookies: { he: 'הגדרות עוגיות', en: 'Cookie settings', ar: 'إعدادات الكوكيز', ru: 'Настройки cookie' },
   nav_accessibility: { he: 'נגישות', en: 'Accessibility', ar: 'إمكانية الوصول', ru: 'Доступность' },
+  nav_cities: { he: 'ערים', en: 'Cities', ar: 'المدن', ru: 'Города' },
+
+  // City / alert-event / cities-index pages (src/pages)
+  city_meta_title: {
+    he: 'אזעקות ב{city} — היסטוריה והתרעות בזמן אמת | אזעקה',
+    en: 'Red alerts in {city} — history and live alerts | Azaka',
+    ar: 'إنذارات في {city} — السجل والتنبيهات المباشرة | أزاكا',
+    ru: 'Тревоги в {city} — история и оповещения в реальном времени | Azaka',
+  },
+  city_meta_desc: {
+    he: 'היסטוריית אזעקות ב{city}: כמה התרעות נרשמו, מתי האחרונה, סוגי האיומים וזמן הכניסה הרשמי למרחב מוגן. מבוסס על נתוני פיקוד העורף.',
+    en: 'Red-alert history for {city}: how many alerts were recorded, when the last one was, threat types, and the official time to reach shelter. Based on Home Front Command data.',
+    ar: 'سجل الإنذارات في {city}: عدد الإنذارات المسجلة، وموعد آخر إنذار، وأنواع التهديدات، والوقت الرسمي للوصول إلى الملجأ. استنادًا إلى بيانات قيادة الجبهة الداخلية.',
+    ru: 'История тревог в {city}: сколько оповещений зарегистрировано, когда было последнее, типы угроз и официальное время до укрытия. По данным Командования тыла.',
+  },
+  city_total: { he: 'סה״כ התרעות', en: 'Total alerts', ar: 'إجمالي الإنذارات', ru: 'Всего тревог' },
+  city_last: { he: 'התרעה אחרונה', en: 'Last alert', ar: 'آخر إنذار', ru: 'Последняя тревога' },
+  city_recent: { he: 'התרעות אחרונות', en: 'Recent alerts', ar: 'أحدث الإنذارات', ru: 'Недавние тревоги' },
+  city_by_month: { he: 'התרעות לפי חודש', en: 'Alerts by month', ar: 'الإنذارات حسب الشهر', ru: 'Тревоги по месяцам' },
+  city_set_my_area: { he: 'הגדרה כאזור שלי', en: 'Set as my area', ar: 'تعيين كمنطقتي', ru: 'Сделать моим районом' },
+  city_none: {
+    he: 'לא נרשמו התרעות ביישוב זה בלוג שלנו',
+    en: 'No alerts recorded for this locality in our log',
+    ar: 'لم تُسجَّل إنذارات لهذه المنطقة في سجلنا',
+    ru: 'В нашем журнале нет тревог для этого населённого пункта',
+  },
+  city_not_found: { he: 'היישוב לא נמצא', en: 'Locality not found', ar: 'المنطقة غير موجودة', ru: 'Населённый пункт не найден' },
+  alert_event_title: { he: 'פרטי התרעה', en: 'Alert details', ar: 'تفاصيل الإنذار', ru: 'Сведения о тревоге' },
+  alert_not_found: { he: 'ההתרעה לא נמצאה', en: 'Alert not found', ar: 'الإنذار غير موجود', ru: 'Тревога не найдена' },
+  alert_meta_title: {
+    he: '{title} — התרעת פיקוד העורף {date} | אזעקה',
+    en: '{title} — Home Front Command alert {date} | Azaka',
+    ar: '{title} — إنذار قيادة الجبهة الداخلية {date} | أزاكا',
+    ru: '{title} — оповещение Командования тыла {date} | Azaka',
+  },
+  alert_meta_desc: {
+    he: 'התרעה רשמית של פיקוד העורף ב-{n} אזורים: הטקסט המלא כלשונו, רשימת היישובים ושעת ההתרעה.',
+    en: 'Official Home Front Command alert covering {n} areas: the verbatim text, the full locality list, and the alert time.',
+    ar: 'إنذار رسمي من قيادة الجبهة الداخلية شمل {n} منطقة: النص الحرفي وقائمة المناطق ووقت الإنذار.',
+    ru: 'Официальное оповещение Командования тыла для {n} районов: дословный текст, полный список населённых пунктов и время тревоги.',
+  },
+  cities_title: { he: 'כל היישובים והאזורים', en: 'All localities and areas', ar: 'جميع البلدات والمناطق', ru: 'Все населённые пункты' },
+  cities_sub: {
+    he: 'היסטוריית אזעקות לפי יישוב — בחרו יישוב לצפייה בהתרעות שנרשמו בו',
+    en: 'Red-alert history by locality — pick a locality to see its recorded alerts',
+    ar: 'سجل الإنذارات حسب المنطقة — اختر منطقة لعرض إنذاراتها المسجلة',
+    ru: 'История тревог по населённым пунктам — выберите пункт, чтобы увидеть его тревоги',
+  },
+  cities_meta_title: {
+    he: 'אזעקות לפי עיר — היסטוריית התרעות לכל יישוב | אזעקה',
+    en: 'Red alerts by city — alert history for every locality | Azaka',
+    ar: 'الإنذارات حسب المدينة — سجل التنبيهات لكل منطقة | أزاكا',
+    ru: 'Тревоги по городам — история оповещений для каждого пункта | Azaka',
+  },
+  cities_meta_desc: {
+    he: 'רשימת כל היישובים והאזורים בישראל עם היסטוריית אזעקות צבע אדום לכל יישוב, מבוססת על נתוני פיקוד העורף.',
+    en: 'Every locality and area in Israel with its Red-Alert history, based on Home Front Command data.',
+    ar: 'قائمة بجميع البلدات والمناطق في إسرائيل مع سجل إنذارات اللون الأحمر لكل منها، استنادًا إلى بيانات قيادة الجبهة الداخلية.',
+    ru: 'Все населённые пункты и районы Израиля с историей тревог «Цева адом» по данным Командования тыла.',
+  },
 
   // Accessibility widget (src/a11y)
   a11y_title: { he: 'הגדרות נגישות', en: 'Accessibility settings', ar: 'إعدادات إمكانية الوصول', ru: 'Настройки доступности' },
