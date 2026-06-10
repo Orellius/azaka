@@ -3,17 +3,96 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0d12" />
+
+    <title>אזעקות בזמן אמת — מפת צבע אדום והתרעות פיקוד העורף | אזעקה</title>
+    <meta
+      name="description"
+      content="מפה חיה של אזעקות צבע אדום והתרעות פיקוד העורף בזמן אמת: אילו אזורים מותקפים עכשיו, התרעות מקדימות, זמן כניסה למרחב מוגן והנחיות התגוננות רשמיות. בעברית, English, العربية, русский."
+    />
+    <link rel="canonical" href="https://azaka.orellius.ai/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="אזעקה" />
+    <meta property="og:url" content="https://azaka.orellius.ai/" />
+    <meta property="og:title" content="אזעקה — מפת אזעקות צבע אדום בזמן אמת" />
+    <meta
+      property="og:description"
+      content="מפה חיה של התרעות פיקוד העורף: אזעקות צבע אדום, התרעות מקדימות, זמן כניסה למרחב מוגן והנחיות מיגון רשמיות."
+    />
+    <meta property="og:image" content="https://azaka.orellius.ai/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="he_IL" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="ar_IL" />
+    <meta property="og:locale:alternate" content="ru_RU" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="אזעקה — מפת אזעקות צבע אדום בזמן אמת" />
+    <meta
+      name="twitter:description"
+      content="מפה חיה של התרעות פיקוד העורף: אזעקות צבע אדום, התרעות מקדימות והנחיות מיגון רשמיות."
+    />
+    <meta name="twitter:image" content="https://azaka.orellius.ai/og.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://azaka.orellius.ai/#website",
+            "url": "https://azaka.orellius.ai/",
+            "name": "אזעקה — מפת התרעות צבע אדום בזמן אמת",
+            "alternateName": ["Azaka", "Red Alert Live Map"],
+            "inLanguage": ["he", "en", "ar", "ru"]
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://azaka.orellius.ai/#app",
+            "name": "אזעקה — מפת אזעקות חיה",
+            "url": "https://azaka.orellius.ai/",
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "Any",
+            "browserRequirements": "Requires JavaScript",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ILS" },
+            "description": "מפה חיה של התרעות פיקוד העורף (צבע אדום): אזעקות בזמן אמת, התרעות מקדימות והנחיות מיגון רשמיות.",
+            "isBasedOn": "https://www.oref.org.il/"
+          }
+        ]
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>אזעקה · Red Alert Live</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Crawlable pre-hydration content; React replaces it on mount. -->
+      <main style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; background: #0b0d12; color: #e2e8f0; font-family: Rubik, -apple-system, sans-serif; text-align: center; padding: 24px">
+        <h1 style="font-size: 1.6rem; margin: 0">מפת אזעקות צבע אדום בזמן אמת</h1>
+        <p style="max-width: 38rem; margin: 0; color: #9aa4b2; line-height: 1.6">
+          מפה חיה של התרעות פיקוד העורף: אזעקות צבע אדום, התרעות מקדימות על שיגורים וכלי טיס עוינים,
+          זמן כניסה למרחב המוגן והנחיות התגוננות רשמיות — בעברית, English, العربية, русский.
+        </p>
+        <p style="max-width: 38rem; margin: 0; color: #6b7686; font-size: 0.85rem; line-height: 1.6">
+          אתר עצמאי המבוסס על נתוני האמת הרשמיים של פיקוד העורף. בכל מקרה יש לפעול לפי הנחיות פיקוד העורף.
+        </p>
+        <p style="color: #6b7686; font-size: 0.85rem">טוען את המפה…</p>
+      </main>
+    </div>
+    <noscript>
+      <div style="background: #0b0d12; color: #e2e8f0; font-family: sans-serif; text-align: center; padding: 24px">
+        אזעקה — מפת אזעקות צבע אדום והתרעות פיקוד העורף בזמן אמת. להצגת המפה החיה יש להפעיל JavaScript בדפדפן.
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /health
+Disallow: /history$
+Disallow: /history/
+Disallow: /ws
+
+Sitemap: https://azaka.orellius.ai/sitemap.xml

@@ -3,6 +3,8 @@
 // an Israeli IP), dedups by alert id, and pushes new alerts to every connected browser over our own
 // WebSocket. No third party in the path. Run: bun relay/server.ts (PORT, OREF_POLL_MS, OREF_URL env).
 // Dev runs on an Israeli IP; production needs an Israeli egress (GCP me-west1 / IL VPS).
+import { existsSync } from 'node:fs'
+import { join, normalize } from 'node:path'
 import { categoryOf, classifyAlert } from '../src/alerts/categories'
 import { availableYears, computeStats, persist, readAll, readYear, recent } from './history'
 
@@ -12,6 +14,11 @@ const OREF_URL = Bun.env.OREF_URL ?? 'https://www.oref.org.il/warningMessages/al
 // /test/alert lets anyone broadcast a fake siren to every client, a life-safety integrity hole if
 // left open in production. Enabled in dev (NODE_ENV unset), disabled in prod unless explicitly opted in.
 const TEST_ALERTS_ENABLED = Bun.env.ALLOW_TEST_ALERTS === '1' || Bun.env.NODE_ENV !== 'production'
+
+// In production the relay also serves the built frontend, so the app, the websocket, and the
+// history API share one origin behind the Cloudflare tunnel (wss works, no CORS, one hostname).
+const DIST_DIR = new URL('../dist', import.meta.url).pathname
+const HAS_DIST = existsSync(join(DIST_DIR, 'index.html'))
 
 const CORS = { 'Access-Control-Allow-Origin': '*' }
 const OREF_HEADERS = {
@@ -106,7 +113,7 @@ pollOref()
 
 Bun.serve({
   port: PORT,
-  fetch(req, server) {
+  async fetch(req, server) {
     const url = new URL(req.url)
     if (url.pathname === '/ws') {
       if (server.upgrade(req)) return
@@ -157,6 +164,17 @@ Bun.serve({
             : 'היכנסו למרחב המוגן ושהו בו 10 דקות'
       broadcast({ type: 'alert', kind, id: 'test-' + ts, cat, key: c.key, title: c.he, desc, remain: c.remain, cities, ts })
       return Response.json({ injected: cities, kind, cat }, { headers: CORS })
+    }
+    // Static frontend + SPA fallback (History-API routes like /historical resolve to index.html).
+    if (HAS_DIST && (req.method === 'GET' || req.method === 'HEAD')) {
+      const safe = normalize(url.pathname).replaceAll('..', '')
+      const file = Bun.file(join(DIST_DIR, safe))
+      if (safe !== '/' && (await file.exists())) {
+        // Vite assets are content-hashed -> immutable; everything else revalidates
+        const cache = safe.startsWith('/assets/') ? 'public, max-age=31536000, immutable' : 'no-cache'
+        return new Response(file, { headers: { 'Cache-Control': cache } })
+      }
+      return new Response(Bun.file(join(DIST_DIR, 'index.html')), { headers: { 'Cache-Control': 'no-cache' } })
     }
     return new Response('azaka relay', { headers: CORS })
   },
