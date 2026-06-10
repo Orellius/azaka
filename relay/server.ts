@@ -6,6 +6,7 @@
 import { existsSync } from 'node:fs'
 import { join, normalize } from 'node:path'
 import { categoryOf, classifyAlert } from '../src/alerts/categories'
+import { computeAnalytics, recordHit } from './analytics'
 import { availableYears, computeStats, persist, readAll, readYear, recent } from './history'
 
 const PORT = Number(Bun.env.PORT ?? 8787)
@@ -164,6 +165,26 @@ Bun.serve({
             : 'היכנסו למרחב המוגן ושהו בו 10 דקות'
       broadcast({ type: 'alert', kind, id: 'test-' + ts, cat, key: c.key, title: c.he, desc, remain: c.remain, cities, ts })
       return Response.json({ injected: cities, kind, cat }, { headers: CORS })
+    }
+    // First-party pageview beacon (src/analytics/track.ts). Untrusted input: clamp/sanitize at the
+    // boundary, then trust. vid is the consented visitor cookie; absent = anonymous view only.
+    if (url.pathname === '/collect' && req.method === 'POST') {
+      try {
+        const body = JSON.parse(await req.text()) as Record<string, unknown>
+        const vid =
+          typeof body.vid === 'string' && body.vid.length <= 64 && /^[a-f0-9-]+$/i.test(body.vid)
+            ? body.vid
+            : undefined
+        const path = typeof body.path === 'string' ? body.path.slice(0, 200) : undefined
+        const lang = typeof body.lang === 'string' ? body.lang.slice(0, 8) : undefined
+        recordHit({ ts: Date.now(), vid, path, c: req.headers.get('cf-ipcountry') ?? undefined, lang })
+      } catch {
+        // malformed beacon: drop silently, still 204
+      }
+      return new Response(null, { status: 204, headers: CORS })
+    }
+    if (url.pathname === '/analytics/stats') {
+      return Response.json(computeAnalytics(), { headers: CORS })
     }
     // Static frontend + SPA fallback (History-API routes like /historical resolve to index.html).
     if (HAS_DIST && (req.method === 'GET' || req.method === 'HEAD')) {

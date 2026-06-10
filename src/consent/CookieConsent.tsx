@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { readConsent, subscribeCookieOpen, writeConsent, type Consent } from './consentStore'
+import { applyConsent } from '../analytics/track'
 import { useLang } from '../i18n/useLang'
 
-// Cookie consent banner (RTL Hebrew). Persistence + the reopen bus live in ./cookieConsent so this file
+// Cookie consent banner (RTL Hebrew). Persistence + the reopen bus live in ./consentStore so this file
 // only exports a component. Two choices: accept all, or essential-only. The footer "Cookie Settings"
-// link reopens this via openCookieSettings() to let the user change a prior choice.
+// link reopens this via openCookieSettings() to let the user change a prior choice. applyConsent
+// creates/expires the first-party azaka_vid statistics cookie to match the choice.
 export function CookieConsent() {
   const { t } = useLang()
   const [open, setOpen] = useState(() => readConsent() === null)
@@ -15,6 +17,7 @@ export function CookieConsent() {
 
   const choose = (v: Consent) => {
     writeConsent(v)
+    applyConsent(v)
     setOpen(false)
   }
 
@@ -24,22 +27,22 @@ export function CookieConsent() {
       role="dialog"
       aria-label={t('nav_cookies')}
     >
-      <div className="flex w-full max-w-2xl flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/95 p-4 shadow-2xl backdrop-blur-md sm:flex-row sm:items-center">
-        <div className="min-w-0 flex-1 text-[0.75rem] leading-relaxed text-slate-300">
-          <span className="font-semibold text-white">{t('cookie_bold')}</span> {t('cookie_text')}
+      <div className="flex w-full max-w-2xl flex-col gap-3 rounded-lg border border-white/[0.08] bg-surface/95 p-4 shadow-lg shadow-black/50 backdrop-blur-sm sm:flex-row sm:items-center">
+        <div className="min-w-0 flex-1 text-[0.75rem] leading-relaxed text-fg-muted">
+          <span className="font-semibold text-fg">{t('cookie_bold')}</span> {t('cookie_text')}
         </div>
         <div className="flex shrink-0 gap-2">
           <button
             type="button"
             onClick={() => choose('essential')}
-            className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[0.75rem] text-slate-200 transition hover:bg-white/10"
+            className="rounded-md border border-white/[0.08] bg-card px-3 py-2 text-[0.75rem] text-fg transition hover:border-white/[0.14] hover:bg-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
           >
             {t('cookie_essential')}
           </button>
           <button
             type="button"
             onClick={() => choose('all')}
-            className="rounded-lg bg-sky-600 px-4 py-2 text-[0.75rem] font-semibold text-white transition hover:bg-sky-500"
+            className="rounded-md bg-fg px-4 py-2 text-[0.75rem] font-semibold text-black transition hover:bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/60"
           >
             {t('cookie_accept_all')}
           </button>

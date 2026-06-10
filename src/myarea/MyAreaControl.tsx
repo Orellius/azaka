@@ -41,19 +41,19 @@ export function MyAreaControl({
   return (
     <>
       {myArea ? (
-        <div className="flex items-center gap-2 rounded-xl border border-sky-400/20 bg-sky-400/5 px-3 py-2">
-          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${status ? status.dot : 'bg-slate-500'}`} />
-          <PinIcon className="size-4 shrink-0 text-sky-300/80" />
+        <div className="flex items-center gap-2 rounded-md border border-white/[0.08] bg-card px-3 py-2">
+          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${status ? status.dot : 'bg-fg-faint'}`} />
+          <PinIcon className="size-4 shrink-0 text-sky-400" />
           <div className="min-w-0 flex-1 leading-tight">
-            <div className="truncate text-[0.8125rem] font-semibold text-white">{localizeArea(myArea.name)}</div>
-            <div className={`text-[0.625rem] ${status ? status.txt : 'text-slate-400'}`}>
+            <div className="truncate text-[0.8125rem] font-semibold text-fg">{localizeArea(myArea.name)}</div>
+            <div className={`text-[0.625rem] ${status ? status.txt : 'text-fg-muted'}`}>
               {status ? t(status.key) : t('myarea_mine_no_alert')}
             </div>
           </div>
           <button
             type="button"
             onClick={() => setPicking(true)}
-            className="shrink-0 rounded-lg px-2 py-1 text-[0.6875rem] font-medium text-sky-300 transition hover:bg-white/10"
+            className="shrink-0 rounded-md px-2 py-1 text-[0.6875rem] font-medium text-sky-400 transition hover:bg-card-hover hover:text-sky-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
           >
             {t('myarea_change')}
           </button>
@@ -61,7 +61,7 @@ export function MyAreaControl({
             type="button"
             onClick={() => onChange(null)}
             aria-label={t('myarea_remove')}
-            className="shrink-0 rounded-lg px-1.5 py-1 text-slate-500 transition hover:bg-white/10 hover:text-white"
+            className="shrink-0 rounded-md px-1.5 py-1 text-fg-faint transition hover:bg-card-hover hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
           >
             ✕
           </button>
@@ -70,12 +70,12 @@ export function MyAreaControl({
         <button
           type="button"
           onClick={() => setPicking(true)}
-          className="flex items-center gap-2 rounded-xl border border-sky-400/30 bg-sky-400/10 px-3 py-2.5 text-start transition hover:bg-sky-400/20"
+          className="flex items-center gap-2 rounded-md border border-white/[0.08] bg-card px-3 py-2.5 text-start transition hover:border-white/[0.14] hover:bg-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
         >
-          <PinIcon className="size-4 shrink-0 text-sky-300" />
+          <PinIcon className="size-4 shrink-0 text-sky-400" />
           <div className="leading-tight">
-            <div className="text-[0.8125rem] font-semibold text-sky-100">{t('myarea_set_title')}</div>
-            <div className="text-[0.625rem] text-sky-200/70">{t('myarea_set_sub')}</div>
+            <div className="text-[0.8125rem] font-semibold text-fg">{t('myarea_set_title')}</div>
+            <div className="text-[0.625rem] text-fg-muted">{t('myarea_set_sub')}</div>
           </div>
         </button>
       )}

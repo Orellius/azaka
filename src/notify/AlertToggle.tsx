@@ -34,10 +34,8 @@ export function AlertToggle({ enabled, onToggle }: { enabled: boolean; onToggle:
       aria-label={enabled ? t('notif_mute') : t('notif_unmute')}
       title={enabled ? t('alerts_on') : t('alerts_off')}
       onClick={onToggle}
-      className={`flex h-8 w-8 items-center justify-center rounded-lg border transition ${
-        enabled
-          ? 'border-emerald-400/40 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20'
-          : 'border-white/10 bg-white/5 text-slate-500 hover:text-slate-300'
+      className={`flex h-8 w-8 items-center justify-center rounded-md border border-white/[0.08] bg-card transition hover:border-white/[0.14] hover:bg-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 ${
+        enabled ? 'text-emerald-400' : 'text-fg-faint hover:text-fg-muted'
       }`}
     >
       {enabled ? <BellIcon className="size-4" /> : <BellOffIcon className="size-4" />}

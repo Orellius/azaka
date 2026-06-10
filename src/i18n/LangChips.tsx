@@ -17,10 +17,10 @@ export function LangChips() {
             lang={l.code}
             aria-pressed={active}
             onClick={() => setLang(l.code)}
-            className={`rounded-md border px-3 py-1.5 text-[0.75rem] font-medium shadow-sm shadow-black/30 transition ${
+            className={`rounded-md border px-3 py-1.5 text-[0.75rem] font-medium transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 ${
               active
-                ? 'border-cyan-400/60 bg-cyan-400/15 text-cyan-200'
-                : 'border-white/10 bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
+                ? 'border-cyan-400/50 bg-card-hover text-cyan-300'
+                : 'border-white/[0.08] bg-card text-fg-muted hover:border-white/[0.14] hover:bg-card-hover hover:text-fg'
             }`}
           >
             {l.label}

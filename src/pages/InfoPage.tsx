@@ -8,9 +8,9 @@ import type { Lang } from '../i18n/strings'
 // The copy is accurate to what this app actually does (official-source alert mirror); the legal pages
 // are honest starting text and should get a lawyer's review before launch.
 // he + en are author-reviewed; ar + ru are machine-drafted and need native review (same as src/i18n).
-// Public surface: <InfoPage slug="about" | "privacy" | "terms" | "contact" />.
+// Public surface: <InfoPage slug="about" | "privacy" | "terms" | "contact" | "accessibility" />.
 
-export type InfoSlug = 'about' | 'privacy' | 'terms' | 'contact'
+export type InfoSlug = 'about' | 'privacy' | 'terms' | 'contact' | 'accessibility'
 
 type Section = { h: string; p: string[] }
 type Page = { title: string; intro: string; sections: Section[] }
@@ -39,7 +39,7 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       intro: 'אנו שואפים לאסוף מעט ככל האפשר. הדף מתאר אילו נתונים נוגעים לשימוש באתר.',
       sections: [
         { h: 'נתונים שאיננו אוספים', p: ['האתר אינו דורש הרשמה, אינו מבקש פרטים אישיים ואינו בונה פרופיל משתמש. בחירת האזור והשפה נשמרות במכשיר שלכם בלבד.'] },
-        { h: 'עוגיות', p: ['אנו שומרים עוגיית העדפה אחת (azaka_consent) הזוכרת את בחירתך במסך העוגיות. זוהי עוגייה חיונית.', 'אם בעתיד יתווספו עוגיות אנליטיקה, הן ייטענו רק לאחר הסכמתך «אשר הכל», וניתן לבטל בכל עת דרך «הגדרות עוגיות».'] },
+        { h: 'עוגיות', p: ['אנו שומרים עוגיית העדפה אחת (azaka_consent) הזוכרת את בחירתך במסך העוגיות. זוהי עוגייה חיונית.', 'רק לאחר בחירת «אשר הכל» נשמרת גם עוגיית סטטיסטיקה אנונימית מטעמנו (azaka_vid): מזהה אקראי שסופר ביקורים באתר, ללא פרופיל אישי וללא שירותי אנליטיקה של צד שלישי. ניתן לבטל בכל עת דרך «הגדרות עוגיות» והעוגייה תימחק. ללא הסכמה נספרות צפיות במצטבר בלבד, ללא כל מזהה.'] },
         { h: 'שירותי צד שלישי', p: ['מפת הרקע נטענת מ-CARTO/OpenStreetMap והגופנים מ-Google Fonts; ספקים אלה עשויים לרשום נתוני בקשה טכניים (כגון כתובת IP) כחלק מאספקת השירות.'] },
       ],
     },
@@ -56,8 +56,17 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       title: 'צור קשר',
       intro: 'לשאלות, דיווח על תקלה או בקשת הסרה, נשמח לשמוע.',
       sections: [
-        { h: 'דוא״ל', p: ['ניתן לפנות בכתובת המופיעה למטה. (יש להחליף לכתובת הקשר הרשמית לפני העלייה לאוויר.)'] },
+        { h: 'דוא״ל', p: ['ניתן לפנות אלינו בכתובת המופיעה למטה.'] },
         { h: 'דיווח על אי-דיוק', p: ['מצאתם התרעה שגויה או חוסר התאמה למקור הרשמי? כתבו לנו עם השעה והאזור ונבדוק.'] },
+      ],
+    },
+    accessibility: {
+      title: 'הצהרת נגישות',
+      intro: 'אזעקה היא שירות חירום ציבורי, ואנו רואים בהנגשתו לכלל הציבור, כולל אנשים עם מוגבלות, חלק מהמשימה עצמה.',
+      sections: [
+        { h: 'התאמה לתקנות', p: ['האתר שואף לעמוד בתקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע"ג-2013, ובתקן הישראלי ת"י 5568 המבוסס על הנחיות WCAG 2.0 ברמה AA.'] },
+        { h: 'תכונות נגישות באתר', p: ['כפתור הנגישות הצף מאפשר: התאמת גודל טקסט (שלוש דרגות), ניגודיות גבוהה, הדגשת קישורים ועצירת אנימציות. ההעדפות נשמרות במכשיר שלכם.', 'בנוסף: ניווט מלא במקלדת, תוויות לקוראי מסך, תמיכה מלאה בכיווניות (RTL/LTR) וארבע שפות: עברית, אנגלית, ערבית ורוסית.'] },
+        { h: 'שיפור מתמיד ופניות', p: ['הנגשת האתר היא תהליך מתמשך ואנו ממשיכים לשפר. נתקלתם בבעיית נגישות? נשמח לדיווח דרך עמוד «צור קשר» ונטפל בהקדם.', 'ההצהרה עודכנה: 10 ביוני 2026.'] },
       ],
     },
   },
@@ -84,7 +93,7 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       intro: 'We aim to collect as little as possible. This page describes what data is involved in using the site.',
       sections: [
         { h: 'Data we do not collect', p: ['The site requires no sign-up, asks for no personal details, and builds no user profile. Your area and language choices are stored on your device only.'] },
-        { h: 'Cookies', p: ['We store one preference cookie (azaka_consent) that remembers your choice on the cookie screen. It is an essential cookie.', 'If analytics cookies are ever added, they will load only after you choose “Accept all”, and you can opt out any time via “Cookie settings”.'] },
+        { h: 'Cookies', p: ['We store one preference cookie (azaka_consent) that remembers your choice on the cookie screen. It is an essential cookie.', 'Only after you choose “Accept all” do we also set a first-party anonymous-statistics cookie (azaka_vid): a random identifier that counts visits to the site, with no personal profiling and no third-party analytics. You can revoke it any time via “Cookie settings” and the cookie is deleted. Without consent, page views are counted as anonymous totals only, with no identifier.'] },
         { h: 'Third-party services', p: ['The basemap loads from CARTO/OpenStreetMap and the fonts from Google Fonts; these providers may log technical request data (such as your IP address) as part of delivering the service.'] },
       ],
     },
@@ -101,8 +110,17 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       title: 'Contact',
       intro: 'For questions, a bug report, or a removal request, we would like to hear from you.',
       sections: [
-        { h: 'Email', p: ['Reach us at the address below. (Replace with the official contact address before going live.)'] },
+        { h: 'Email', p: ['Reach us at the address below.'] },
         { h: 'Report an inaccuracy', p: ['Found a wrong alert or a mismatch with the official source? Write to us with the time and the area and we will check.'] },
+      ],
+    },
+    accessibility: {
+      title: 'Accessibility statement',
+      intro: 'Azaka is a public emergency surface, and making it usable by everyone, including people with disabilities, is part of the mission itself.',
+      sections: [
+        { h: 'Conformance', p: ['The site aims to conform to the Israeli accessibility regulations (Equal Rights for Persons with Disabilities Regulations (Service Accessibility Adjustments), 5773-2013) and Israeli Standard IS 5568, based on the WCAG 2.0 guidelines at level AA.'] },
+        { h: 'Accessibility features', p: ['The floating accessibility button offers: adjustable text size (three steps), high contrast, link underlining, and reduced motion. Preferences are saved on your device.', 'In addition: full keyboard navigation, screen-reader labels, full RTL/LTR support, and four languages: Hebrew, English, Arabic, and Russian.'] },
+        { h: 'Continuous improvement and feedback', p: ['Accessibility is an ongoing effort and we keep improving. Encountered an accessibility issue? Please report it via the Contact page and we will address it promptly.', 'Statement updated: 10 June 2026.'] },
       ],
     },
   },
@@ -129,7 +147,7 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       intro: 'نهدف إلى جمع أقل قدر ممكن. تصف هذه الصفحة البيانات المتعلقة باستخدام الموقع.',
       sections: [
         { h: 'بيانات لا نجمعها', p: ['لا يتطلب الموقع التسجيل، ولا يطلب تفاصيل شخصية، ولا يبني ملفًا للمستخدم. تُحفظ اختيارات المنطقة واللغة على جهازك فقط.'] },
-        { h: 'ملفات تعريف الارتباط', p: ['نحفظ ملف تفضيل واحدًا (azaka_consent) يتذكر اختيارك في شاشة الكوكيز. وهو ملف أساسي.', 'إذا أُضيفت ملفات تحليلات مستقبلًا، فلن تُحمَّل إلا بعد اختيارك «قبول الكل»، ويمكنك الإلغاء في أي وقت عبر «إعدادات الكوكيز».'] },
+        { h: 'ملفات تعريف الارتباط', p: ['نحفظ ملف تفضيل واحدًا (azaka_consent) يتذكر اختيارك في شاشة الكوكيز. وهو ملف أساسي.', 'فقط بعد اختيار «قبول الكل» نحفظ أيضًا ملف إحصاءات مجهولًا خاصًا بنا (azaka_vid): معرّف عشوائي يَعُدّ زيارات الموقع، دون أي ملف شخصي ودون خدمات تحليلات من طرف ثالث. يمكنك التراجع في أي وقت عبر «إعدادات الكوكيز» وسيُحذف الملف. وبدون الموافقة تُحسب المشاهدات كأرقام إجمالية مجهولة فقط، دون أي معرّف.'] },
         { h: 'خدمات الطرف الثالث', p: ['تُحمَّل خريطة الخلفية من CARTO/OpenStreetMap والخطوط من Google Fonts؛ وقد تسجّل هذه الجهات بيانات طلب تقنية (مثل عنوان IP) كجزء من تقديم الخدمة.'] },
       ],
     },
@@ -146,8 +164,17 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       title: 'اتصل بنا',
       intro: 'للأسئلة أو الإبلاغ عن خلل أو طلب إزالة، يسعدنا تواصلك.',
       sections: [
-        { h: 'البريد الإلكتروني', p: ['تواصل معنا على العنوان أدناه. (استبدله بعنوان الاتصال الرسمي قبل الإطلاق.)'] },
+        { h: 'البريد الإلكتروني', p: ['تواصل معنا على العنوان أدناه.'] },
         { h: 'الإبلاغ عن خطأ', p: ['وجدت تنبيهًا خاطئًا أو عدم تطابق مع المصدر الرسمي؟ راسلنا بالوقت والمنطقة وسنتحقق.'] },
+      ],
+    },
+    accessibility: {
+      title: 'إعلان إمكانية الوصول',
+      intro: 'أزاكا خدمة طوارئ عامة، ونعتبر إتاحتها للجميع، بمن فيهم الأشخاص ذوو الإعاقة، جزءًا من المهمة نفسها.',
+      sections: [
+        { h: 'التوافق مع الأنظمة', p: ['يسعى الموقع إلى التوافق مع أنظمة إمكانية الوصول الإسرائيلية (أنظمة مساواة حقوق الأشخاص ذوي الإعاقة، إتاحة الخدمة، 2013) والمعيار الإسرائيلي 5568 المبني على إرشادات WCAG 2.0 بمستوى AA.'] },
+        { h: 'ميزات إمكانية الوصول', p: ['يتيح زر إمكانية الوصول العائم: تعديل حجم النص (ثلاث درجات)، تباينًا عاليًا، تسطير الروابط، وإيقاف الحركة. تُحفظ التفضيلات على جهازك.', 'إضافة إلى ذلك: تنقّل كامل بلوحة المفاتيح، تسميات لقارئات الشاشة، دعم كامل للاتجاهين RTL/LTR، وأربع لغات: العبرية والإنجليزية والعربية والروسية.'] },
+        { h: 'تحسين مستمر وملاحظات', p: ['إتاحة الموقع عملية مستمرة ونواصل التحسين. واجهت مشكلة في إمكانية الوصول؟ يسعدنا إبلاغنا عبر صفحة «اتصل بنا» وسنعالجها سريعًا.', 'آخر تحديث للإعلان: 10 يونيو 2026.'] },
       ],
     },
   },
@@ -174,7 +201,7 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       intro: 'Мы стремимся собирать как можно меньше. На этой странице описано, какие данные затрагивает использование сайта.',
       sections: [
         { h: 'Данные, которые мы не собираем', p: ['Сайт не требует регистрации, не запрашивает личные данные и не строит профиль пользователя. Выбор района и языка хранятся только на вашем устройстве.'] },
-        { h: 'Cookie', p: ['Мы храним один cookie настроек (azaka_consent), запоминающий ваш выбор на экране cookie. Это необходимый cookie.', 'Если в будущем появятся аналитические cookie, они загрузятся только после выбора «Принять все», и отказаться можно в любой момент через «Настройки cookie».'] },
+        { h: 'Cookie', p: ['Мы храним один cookie настроек (azaka_consent), запоминающий ваш выбор на экране cookie. Это необходимый cookie.', 'Только после выбора «Принять все» мы также устанавливаем собственный cookie анонимной статистики (azaka_vid): случайный идентификатор, который считает посещения сайта, без личного профилирования и без сторонней аналитики. Отозвать согласие можно в любой момент через «Настройки cookie», и cookie будет удалён. Без согласия просмотры считаются только как анонимные суммарные числа, без идентификатора.'] },
         { h: 'Сторонние сервисы', p: ['Подложка карты загружается с CARTO/OpenStreetMap, а шрифты — с Google Fonts; эти провайдеры могут записывать технические данные запроса (например, ваш IP-адрес) в рамках предоставления сервиса.'] },
       ],
     },
@@ -191,8 +218,17 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
       title: 'Контакты',
       intro: 'По вопросам, сообщениям об ошибке или запросам на удаление — будем рады услышать вас.',
       sections: [
-        { h: 'Эл. почта', p: ['Напишите нам по адресу ниже. (Замените на официальный контактный адрес перед запуском.)'] },
+        { h: 'Эл. почта', p: ['Напишите нам по адресу ниже.'] },
         { h: 'Сообщить о неточности', p: ['Нашли неверное оповещение или несоответствие официальному источнику? Напишите нам время и район — мы проверим.'] },
+      ],
+    },
+    accessibility: {
+      title: 'Заявление о доступности',
+      intro: 'Azaka является публичным сервисом экстренного оповещения, и его доступность для всех, включая людей с инвалидностью, мы считаем частью самой задачи.',
+      sections: [
+        { h: 'Соответствие нормам', p: ['Сайт стремится соответствовать израильским нормам доступности (Правила равноправия людей с инвалидностью (доступность услуг), 2013) и израильскому стандарту IS 5568, основанному на руководствах WCAG 2.0 уровня AA.'] },
+        { h: 'Функции доступности', p: ['Плавающая кнопка доступности позволяет: менять размер текста (три ступени), включать высокую контрастность, подчёркивание ссылок и остановку анимаций. Настройки сохраняются на вашем устройстве.', 'Кроме того: полная навигация с клавиатуры, метки для программ чтения с экрана, полная поддержка RTL/LTR и четыре языка: иврит, английский, арабский, русский.'] },
+        { h: 'Постоянное улучшение и обратная связь', p: ['Доступность сайта остаётся непрерывным процессом, и мы продолжаем её улучшать. Столкнулись с проблемой доступности? Сообщите нам через страницу «Контакты», и мы оперативно её устраним.', 'Заявление обновлено: 10 июня 2026.'] },
       ],
     },
   },
@@ -228,10 +264,10 @@ export function InfoPage({ slug }: { slug: InfoSlug }) {
 
           {slug === 'contact' && (
             <a
-              href="mailto:contact@example.com"
-              className="w-fit rounded-lg bg-sky-600 px-4 py-2 text-[0.8125rem] font-semibold text-white transition hover:bg-sky-500"
+              href="mailto:support@orellius.ai"
+              className="w-fit rounded-lg bg-fg px-4 py-2 text-[0.8125rem] font-semibold text-surface transition hover:opacity-90"
             >
-              contact@example.com
+              support@orellius.ai
             </a>
           )}
         </div>
@@ -253,12 +289,19 @@ export function InfoPage({ slug }: { slug: InfoSlug }) {
             {t('nav_contact')}
           </button>
           <span>·</span>
+          <button type="button" onClick={() => navigate('/accessibility')} className="transition hover:text-slate-300">
+            {t('nav_accessibility')}
+          </button>
+          <span>·</span>
           <button type="button" onClick={openCookieSettings} className="transition hover:text-slate-300">
             {t('nav_cookies')}
           </button>
         </div>
         <div className="mt-3 text-[0.6875rem] text-slate-600">
-          {t('info_updated')} · {t('rights')}
+          {t('info_updated')} · {t('rights')} ·{' '}
+          <a href="https://orellius.ai" target="_blank" rel="noopener" className="transition hover:text-slate-400">
+            Orel Ohayon{/* allow-personal: public footer credit explicitly requested by Orel */}
+          </a>
         </div>
       </div>
     </div>

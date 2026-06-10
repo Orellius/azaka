@@ -157,6 +157,16 @@ export const STRINGS = {
   nav_terms: { he: 'תנאי שימוש', en: 'Terms', ar: 'الشروط', ru: 'Условия' },
   nav_contact: { he: 'צור קשר', en: 'Contact', ar: 'اتصل بنا', ru: 'Контакты' },
   nav_cookies: { he: 'הגדרות עוגיות', en: 'Cookie settings', ar: 'إعدادات الكوكيز', ru: 'Настройки cookie' },
+  nav_accessibility: { he: 'נגישות', en: 'Accessibility', ar: 'إمكانية الوصول', ru: 'Доступность' },
+
+  // Accessibility widget (src/a11y)
+  a11y_title: { he: 'הגדרות נגישות', en: 'Accessibility settings', ar: 'إعدادات إمكانية الوصول', ru: 'Настройки доступности' },
+  a11y_text_size: { he: 'גודל טקסט', en: 'Text size', ar: 'حجم النص', ru: 'Размер текста' },
+  a11y_contrast: { he: 'ניגודיות גבוהה', en: 'High contrast', ar: 'تباين عالٍ', ru: 'Высокая контрастность' },
+  a11y_links: { he: 'הדגשת קישורים', en: 'Underline links', ar: 'تسطير الروابط', ru: 'Подчёркивание ссылок' },
+  a11y_motion: { he: 'עצירת אנימציות', en: 'Stop animations', ar: 'إيقاف الحركة', ru: 'Остановить анимации' },
+  a11y_reset: { he: 'איפוס', en: 'Reset', ar: 'إعادة تعيين', ru: 'Сбросить' },
+  a11y_statement: { he: 'הצהרת נגישות', en: 'Accessibility statement', ar: 'إعلان إمكانية الوصول', ru: 'Заявление о доступности' },
 
   // Map popup
   map_shelter_time: { he: 'זמן הגעה למרחב מוגן', en: 'Time to reach shelter', ar: 'وقت الوصول إلى الملجأ', ru: 'Время до укрытия' },

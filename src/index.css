@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* Vercel-style dark chrome tokens: near-black layered surfaces, hairline borders, strict gray text
+   hierarchy. Severity colors (rose/amber/emerald) stay semantic Tailwind classes and are NOT tokens. */
+@theme {
+  --color-surface: #0a0a0a;
+  --color-card: #111111;
+  --color-card-hover: #161616;
+  --color-fg: #ededed;
+  --color-fg-muted: #a1a1a1;
+  --color-fg-faint: #666666;
+}
+
 :root {
   color-scheme: dark;
 }
@@ -29,6 +40,34 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Accessibility widget (src/a11y): a11yStore toggles these classes on <html>. Text sizes override the
+   responsive clamp() above; the whole UI is rem-based so everything scales together. High contrast
+   lifts the muted grays to near-white with !important; deliberately NO css filter on html/body, which
+   would break the position:fixed map overlays. */
+html.a11y-text-1 {
+  font-size: 112.5%;
+}
+html.a11y-text-2 {
+  font-size: 125%;
+}
+html.a11y-links a,
+html.a11y-links button {
+  text-decoration: underline !important;
+}
+html.a11y-motion *,
+html.a11y-motion *::before,
+html.a11y-motion *::after {
+  animation: none !important;
+  transition: none !important;
+}
+html.a11y-contrast .text-fg-muted,
+html.a11y-contrast .text-fg-faint,
+html.a11y-contrast .text-slate-400,
+html.a11y-contrast .text-slate-500,
+html.a11y-contrast .text-slate-600 {
+  color: #f5f5f5 !important;
+}
+
 /* MapLibre attribution: keep it, but quiet it against the dark chrome */
 .maplibregl-ctrl-attrib {
   font-size: 10px;
@@ -41,17 +80,17 @@ body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
 }
 .feed-scroll::-webkit-scrollbar {
   width: 7px;
 }
 .feed-scroll::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.45);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 4px;
 }
 .feed-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.7);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 /* Area labels on the map: only the currently-alerted areas are labelled (see AreaLabelMarker), so

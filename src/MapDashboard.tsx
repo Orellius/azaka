@@ -23,11 +23,12 @@ import type { StringKey } from './i18n/strings'
 // never translated. All state comes from useAlertFeed.
 const STATUS_DOT: Record<string, string> = { live: 'bg-emerald-400', connecting: 'bg-amber-400', error: 'bg-rose-500' }
 const STATUS_KEY: Record<string, StringKey> = { live: 'status_live', connecting: 'status_connecting', error: 'status_error' }
-const SEV: Record<FeedEvent['severity'], { bar: string; txt: string; border: string }> = {
-  active: { bar: 'bg-rose-500', txt: 'text-rose-400', border: 'border-rose-500/50' },
-  special: { bar: 'bg-rose-500', txt: 'text-rose-400', border: 'border-rose-500/50' },
-  early: { bar: 'bg-amber-500', txt: 'text-amber-400', border: 'border-amber-500/50' },
-  cleared: { bar: 'bg-emerald-500', txt: 'text-emerald-400', border: 'border-emerald-500/50' },
+// severity colors are SEMANTIC and stay; containers are neutral surfaces with a colored start-border
+const SEV: Record<FeedEvent['severity'], { bar: string; txt: string; border: string; accent: string }> = {
+  active: { bar: 'bg-rose-500', txt: 'text-rose-400', border: 'border-rose-500/50', accent: 'border-s-rose-500' },
+  special: { bar: 'bg-rose-500', txt: 'text-rose-400', border: 'border-rose-500/50', accent: 'border-s-rose-500' },
+  early: { bar: 'bg-amber-500', txt: 'text-amber-400', border: 'border-amber-500/50', accent: 'border-s-amber-500' },
+  cleared: { bar: 'bg-emerald-500', txt: 'text-emerald-400', border: 'border-emerald-500/50', accent: 'border-s-emerald-500' },
 }
 // hex equivalents for the MapLibre snapshot highlight (paint props need hex, not Tailwind classes)
 const SEV_HEX: Record<FeedEvent['severity'], string> = {
@@ -44,7 +45,7 @@ function LiveClock() {
     return () => clearInterval(id)
   }, [])
   return (
-    <span className="text-[0.8125rem] font-medium tabular-nums text-slate-300">
+    <span className="text-[0.8125rem] font-medium tabular-nums text-fg-muted">
       {now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
     </span>
   )
@@ -63,7 +64,7 @@ export function MapDashboard() {
   const alerting = activeAreas.size > 0
   const warning = earlyAreas.size > 0
   const activeRegions = regionsOf([...activeAreas, ...earlyAreas])
-  const headDot = alerting ? 'bg-rose-500' : warning ? 'bg-amber-500' : clearedAreas.size > 0 ? 'bg-emerald-500' : 'bg-slate-500'
+  const headDot = alerting ? 'bg-rose-500' : warning ? 'bg-amber-500' : clearedAreas.size > 0 ? 'bg-emerald-500' : 'bg-fg-faint'
   const lowered = !!(myArea && personal) // the personal banner owns the very top; push top-anchored chrome below it
 
   return (
@@ -75,6 +76,17 @@ export function MapDashboard() {
         snapshot={snapshot ? snapshot.cities : null}
         snapshotColor={snapshot ? SEV_HEX[snapshot.severity] : undefined}
       />
+
+      {/* Brand chip over the map; yields its corner to the alert instruction stack during an event */}
+      {!(alerting || warning) && (
+        <a
+          href="/"
+          className="absolute top-3 end-3 z-10 flex items-center gap-2 rounded-lg border border-white/[0.08] bg-surface/90 px-2.5 py-1.5 shadow-lg shadow-black/30"
+        >
+          <img src="/favicon.svg" alt="" className="h-6 w-6" />
+          <span className="text-[0.875rem] font-semibold leading-none text-fg">אזעקה</span>
+        </a>
+      )}
 
       {myArea && personal && <PersonalAlertBanner area={myArea} personal={personal} />}
 
@@ -124,7 +136,7 @@ export function MapDashboard() {
         {/* Mobile: a slim top bar that drops the feed DOWN like a notification shade (tap the hamburger).
             Desktop (sm:): the familiar floating side card with the body always shown. */}
         <div
-          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-2xl border-b border-white/10 bg-slate-950/95 shadow-2xl backdrop-blur-md sm:static sm:me-auto sm:w-80 sm:max-w-[88vw] sm:max-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:bg-slate-950/85 ${lowered ? 'top-24' : 'top-0'} sm:top-auto`}
+          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 sm:static sm:me-auto sm:w-80 sm:max-w-[88vw] sm:max-h-[calc(100vh-2rem)] sm:rounded-lg sm:border ${lowered ? 'top-24' : 'top-0'} sm:top-auto`}
         >
           <header className="flex shrink-0 items-center gap-3 p-3 sm:p-4 sm:pb-3">
             <span className="relative flex h-3.5 w-3.5">
@@ -134,8 +146,8 @@ export function MapDashboard() {
               <span className={`relative inline-flex h-3.5 w-3.5 rounded-full ${headDot}`} />
             </span>
             <div className="leading-tight">
-              <div className="text-lg font-bold tracking-tight text-white">{t('brand')}</div>
-              <div className="text-[0.6875rem] text-slate-400">{t('brand_sub')}</div>
+              <div className="text-lg font-semibold tracking-tight text-fg">{t('brand')}</div>
+              <div className="text-[0.6875rem] text-fg-muted">{t('brand_sub')}</div>
             </div>
             <div className="ms-auto flex items-center gap-2">
               <LiveClock />
@@ -145,7 +157,7 @@ export function MapDashboard() {
                 onClick={() => setSheetOpen((v) => !v)}
                 aria-label={sheetOpen ? t('sheet_collapse') : t('sheet_expand')}
                 aria-expanded={sheetOpen}
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-200 transition hover:bg-white/10 sm:hidden"
+                className="flex h-8 w-8 items-center justify-center rounded-md border border-white/[0.08] bg-card text-fg transition hover:border-white/[0.14] hover:bg-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 sm:hidden"
               >
                 <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   {sheetOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
@@ -163,13 +175,13 @@ export function MapDashboard() {
             <button
               type="button"
               onClick={() => void notifier.requestPermission()}
-              className="rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-1.5 text-start text-[0.6875rem] font-medium text-sky-200 transition hover:bg-sky-400/20"
+              className="rounded-md border border-white/[0.08] bg-card px-3 py-1.5 text-start text-[0.6875rem] font-medium text-sky-300 transition hover:border-white/[0.14] hover:bg-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
             >
               {t('notif_enable')}
             </button>
           )}
           {notifier.enabled && notifier.perm === 'denied' && (
-            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[0.625rem] text-slate-400">
+            <div className="rounded-md border border-white/[0.08] bg-card px-3 py-1.5 text-[0.625rem] text-fg-muted">
               {t('notif_denied')}
             </div>
           )}
@@ -177,7 +189,7 @@ export function MapDashboard() {
           <MyAreaControl myArea={myArea} onChange={setMyArea} tier={personal?.tier ?? null} />
 
           {events.length === 0 ? (
-            <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-center text-sm text-slate-400">
+            <div className="rounded-md border border-white/[0.08] bg-card px-3 py-3 text-center text-sm text-fg-muted">
               {t('feed_empty')}
             </div>
           ) : (
@@ -218,10 +230,10 @@ function SnapshotBanner({ event, onClose, lowered = false }: { event: FeedEvent;
   }
   return (
     <div
-      className={`pointer-events-auto absolute left-1/2 z-10 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl border bg-slate-950/90 px-3 py-2 shadow-2xl backdrop-blur-md transition-opacity duration-200 ${lowered ? 'top-40 sm:top-24' : 'top-16 sm:top-4'} ${sev.border} ${visible ? 'opacity-100' : 'opacity-0'}`}
+      className={`pointer-events-auto absolute left-1/2 z-10 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-lg border bg-surface px-3 py-2 shadow-lg shadow-black/50 transition-opacity duration-200 ${lowered ? 'top-40 sm:top-24' : 'top-16 sm:top-4'} ${sev.border} ${visible ? 'opacity-100' : 'opacity-0'}`}
     >
       <span className={`h-2 w-2 shrink-0 rounded-full ${sev.bar}`} />
-      <div className="min-w-0 text-[0.75rem] text-slate-200">
+      <div className="min-w-0 text-[0.75rem] tabular-nums text-fg">
         <span className={`font-semibold ${sev.txt}`}>{t('snap_label')}</span>
         {' · '}
         {event.severity === 'cleared' ? t('status_cleared') : event.title || t('alert_generic')} · {t('areas_n', { n: event.cities.length })} ·{' '}
@@ -231,7 +243,7 @@ function SnapshotBanner({ event, onClose, lowered = false }: { event: FeedEvent;
         type="button"
         onClick={close}
         aria-label={t('snap_close')}
-        className="shrink-0 text-slate-400 transition hover:text-white"
+        className="shrink-0 rounded-md text-fg-faint transition hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
       >
         ✕
       </button>
@@ -262,7 +274,7 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
           onSelect()
         }
       }}
-      className={`w-full shrink-0 cursor-pointer rounded-xl border bg-white/5 px-3 py-2.5 text-start transition hover:bg-white/10 ${active ? 'border-cyan-400/70 ring-1 ring-cyan-400/40' : 'border-white/10'}`}
+      className={`w-full shrink-0 cursor-pointer rounded-md border border-s-2 bg-card px-3 py-2.5 text-start transition hover:bg-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 ${c.accent} ${active ? 'border-cyan-400/70 ring-1 ring-cyan-400/40' : 'border-white/[0.08]'}`}
     >
       <div className="flex items-center gap-2">
         <AlertIcon ev={ev} className={`size-4 shrink-0 ${c.txt}`} />
@@ -271,7 +283,7 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
             {ev.severity === 'cleared' ? t('status_cleared') : ev.title || t('alert_generic')}
           </div>
           {lang !== 'he' && ev.severity !== 'cleared' && threat && threat !== ev.title && (
-            <div className="text-[0.625rem] font-medium text-slate-400">{threat}</div>
+            <div className="text-[0.625rem] font-medium text-fg-muted">{threat}</div>
           )}
         </div>
       </div>
@@ -280,7 +292,7 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
           {regions.map((r) => (
             <span
               key={r.id}
-              className="rounded-md border border-white/15 bg-white/5 px-1.5 py-0.5 text-[0.625rem] font-medium text-slate-200"
+              className="rounded border border-white/[0.08] bg-card-hover px-1.5 py-0.5 text-[0.625rem] font-medium text-fg-muted"
             >
               {r.name}
               {r.count > 1 ? ` · ${r.count}` : ''}
@@ -288,11 +300,11 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
           ))}
         </div>
       )}
-      <div className="mt-1 text-[0.625rem] text-slate-500">
+      <div className="mt-1 text-[0.625rem] tabular-nums text-fg-faint">
         {tAgo(ev.ts)} · {time} · {t('areas_n', { n: ev.cities.length })}
       </div>
         <div
-          className={`mt-1.5 break-words text-[0.6875rem] leading-relaxed text-slate-300 ${long && !expanded ? 'line-clamp-3' : ''}`}
+          className={`mt-1.5 break-words text-[0.6875rem] leading-relaxed text-fg-muted ${long && !expanded ? 'line-clamp-3' : ''}`}
         >
           {ev.cities.map(localizeArea).join(', ')}
         </div>
@@ -303,7 +315,7 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
               e.stopPropagation()
               setExpanded((v) => !v)
             }}
-            className="mt-1.5 text-[0.625rem] font-medium text-cyan-400/90 transition hover:text-cyan-300"
+            className="mt-1.5 rounded text-[0.625rem] font-medium text-cyan-400/90 transition hover:text-cyan-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
           >
             {expanded ? t('show_less') : t('show_all', { n: ev.cities.length })}
           </button>
@@ -323,6 +335,7 @@ const FOOTER_LINKS: Array<{ key: StringKey; path: string }> = [
   { key: 'nav_privacy', path: '/privacy' },
   { key: 'nav_terms', path: '/terms' },
   { key: 'nav_contact', path: '/contact' },
+  { key: 'nav_accessibility', path: '/accessibility' },
 ]
 
 function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: FeedStatus }) {
@@ -335,48 +348,65 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
           e.preventDefault()
           navigate('/historical')
         }}
-        className="text-[0.6875rem] font-medium text-sky-400 transition hover:text-sky-300"
+        className="rounded text-[0.6875rem] font-medium text-sky-400 transition hover:text-sky-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
       >
         {t('hist_stats')}
       </a>
 
-      <div className="rounded-xl border border-white/10 bg-white/5 p-2.5">
+      <div className="rounded-md border border-white/[0.08] bg-card p-2.5">
         <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
           {LEGEND.map((l) => (
             <div key={l.key} className="flex items-center gap-2">
-              <span className={`h-2.5 w-6 shrink-0 rounded-full ${l.color}`} />
-              <span className="text-[0.625rem] text-slate-300">{t(l.key)}</span>
+              <span className={`h-2 w-2 shrink-0 rounded-full ${l.color}`} />
+              <span className="text-[0.625rem] text-fg-muted">{t(l.key)}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-2.5 py-2 text-[0.625rem] leading-relaxed text-amber-100/90">
+      {/* life-safety disclaimer: stays amber + high-salience by design, only the radius follows the system */}
+      <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2.5 py-2 text-[0.625rem] leading-relaxed text-amber-100/90">
         <span className="font-bold text-amber-200">{t('disclaimer_bold')}</span> {t('disclaimer_text')}
         <span className="mt-1 block text-amber-100/60">{t('disclaimer_source')}</span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.625rem] text-slate-500">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.625rem] text-fg-faint">
         {FOOTER_LINKS.map((link, i) => (
           <Fragment key={link.path}>
             {i > 0 && <span aria-hidden>·</span>}
-            <button type="button" onClick={() => navigate(link.path)} className="transition hover:text-slate-300">
+            <button
+              type="button"
+              onClick={() => navigate(link.path)}
+              className="rounded transition hover:text-fg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+            >
               {t(link.key)}
             </button>
           </Fragment>
         ))}
         <span aria-hidden>·</span>
-        <button type="button" onClick={openCookieSettings} className="transition hover:text-slate-300">
+        <button
+          type="button"
+          onClick={openCookieSettings}
+          className="rounded transition hover:text-fg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+        >
           {t('nav_cookies')}
         </button>
       </div>
 
-      <div className="flex items-center justify-between gap-2 text-[0.625rem] text-slate-600">
-        <span>
-          {t('rights')}
+      <div className="flex items-center justify-between gap-2 text-[0.625rem] text-fg-faint">
+        <span className="tabular-nums">
+          {t('rights')} ·{' '}
+          <a
+            href="https://orellius.ai"
+            target="_blank"
+            rel="noopener"
+            className="rounded transition hover:text-fg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+          >
+            orellius.ai · Orel Ohayon{/* allow-personal: public footer credit explicitly requested by Orel */}
+          </a>
           {lastAt ? ` · ${t('updated', { time: new Date(lastAt).toLocaleTimeString('he-IL') })}` : ''}
         </span>
-        <span className="flex shrink-0 items-center gap-1.5 text-slate-400">
+        <span className="flex shrink-0 items-center gap-1.5 text-fg-muted">
           <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[status]}`} />
           {t(STATUS_KEY[status])}
         </span>
