@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
+import { getLang } from './i18n/useLang'
+import { withLocale } from './i18n/locale'
 
-// Minimal History-API router (real paths, not hash fragments). Two routes today: "/" (live map) and
-// "/historical" (stats). navigate() pushes a path and notifies listeners; useRoute() tracks it. A
-// public/_redirects rule serves index.html for these paths on a static host.
+// Minimal History-API router (real paths, not hash fragments). navigate() takes a locale-LESS route
+// ('/cities'), re-applies the current locale prefix (withLocale, so internal links keep the visitor's
+// /en /ar /ru), pushes it and notifies listeners; useRoute() returns the raw pathname — consumers
+// strip the prefix with stripLocale. A public/_redirects rule serves index.html for every path.
 export function navigate(path: string) {
-  if (path === window.location.pathname) return
-  window.history.pushState({}, '', path)
+  const target = withLocale(path, getLang())
+  if (target === window.location.pathname) return
+  window.history.pushState({}, '', target)
   window.dispatchEvent(new PopStateEvent('popstate'))
 }
 

@@ -9,8 +9,10 @@ import { EmbedWidget } from './pages/EmbedWidget'
 import { CookieConsent } from './consent/CookieConsent'
 import { AccessibilityWidget } from './a11y/AccessibilityWidget'
 import { loadAndApply } from './a11y/a11yStore'
+import { NotFoundPage } from './pages/NotFoundPage'
 import { trackPageview } from './analytics/track'
 import { useRoute } from './router'
+import { stripLocale } from './i18n/locale'
 
 loadAndApply() // re-apply saved accessibility prefs before first paint
 
@@ -46,7 +48,10 @@ function decodeSegment(path: string, prefix: string): string | null {
 }
 
 function App() {
-  const path = useRoute()
+  // Routes match on the locale-stripped path: /en/cities and /cities render the same page, the
+  // /en /ar /ru prefix only selects the language (handled by useLang). he is the unprefixed root.
+  const rawPath = useRoute()
+  const { route: path } = stripLocale(rawPath)
   const info = INFO_ROUTES[path]
   const cityName = decodeSegment(path, '/city/')
   const alertId = decodeSegment(path, '/alert/')
@@ -80,10 +85,13 @@ function App() {
         <CityPage key={cityName} name={cityName} />
       ) : alertId ? (
         <AlertEventPage key={alertId} id={alertId} />
-      ) : (
+      ) : path === '/' ? (
         <Suspense fallback={<LoadingFallback />}>
           <MapDashboard />
         </Suspense>
+      ) : (
+        // any other path used to soft-404 into the map with HTTP 200; render a real (noindex) 404 view
+        <NotFoundPage />
       )}
       <CookieConsent />
       <AccessibilityWidget />

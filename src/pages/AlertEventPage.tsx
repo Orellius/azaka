@@ -41,11 +41,13 @@ export function AlertEventPage({ id }: { id: string }) {
   const [load, setLoad] = useState<Load>({ s: 'loading' })
 
   const ev = load.s === 'ok' ? load.event : null
+  // unknown alert id still answers HTTP 200 (static host), so noindex keeps it out of the index
   usePageMeta(
     ev
       ? t('alert_meta_title', { title: ev.title || t('alert_generic'), date: ev.ts ? fmtDateTime(ev.ts) : '' })
       : `${t('alert_event_title')} | ${t('brand')}`,
     ev ? t('alert_meta_desc', { n: ev.cities?.length ?? 0 }) : t('alert_meta_desc', { n: '' }),
+    { noindex: load.s === 'notfound' },
   )
 
   useEffect(() => {

@@ -1,11 +1,17 @@
 // Generates public/sitemap.xml: the static routes plus /cities plus a /city/<name> entry for every
-// oref area in public/data/cities.json (URL-encoded Hebrew, matching the SPA routes). Runs as the
+// oref area in public/data/cities.json (URL-encoded Hebrew, matching the SPA routes). Every entry is
+// emitted once per locale (he unprefixed, /en /ar /ru prefixed — mirror src/i18n/locale.ts) with
+// xhtml:link hreflang alternates on each url element: sitemap-delivered hreflang is officially
+// supported by Google and, unlike the JS-managed link tags, doesn't depend on rendering. Runs as the
 // package.json "prebuild" so every Vercel build ships a sitemap that matches the data file.
 // Run manually: node scripts/build-sitemap.mjs
 import { readFileSync, writeFileSync } from 'node:fs'
 
 const ORIGIN = 'https://azaka.orellius.ai'
 const today = new Date().toISOString().slice(0, 10)
+
+const LOCALES = ['he', 'en', 'ar', 'ru']
+const localePath = (lang, path) => (lang === 'he' ? path : `/${lang}${path === '/' ? '' : path}`)
 
 const STATIC = [
   { path: '/', changefreq: 'hourly', priority: '1.0' },
@@ -26,11 +32,21 @@ const cityEntries = Object.keys(cities)
   .sort((a, b) => a.localeCompare(b, 'he'))
   .map((name) => ({ path: `/city/${encodeURIComponent(name)}`, changefreq: 'daily', priority: '0.6' }))
 
-const entry = ({ path, changefreq, priority }) =>
-  `  <url>\n    <loc>${ORIGIN}${path}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
+const alternates = (path) =>
+  [
+    ...LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${ORIGIN}${localePath(l, path)}"/>`),
+    `    <xhtml:link rel="alternate" hreflang="x-default" href="${ORIGIN}${path}"/>`,
+  ].join('\n')
 
-const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...STATIC, ...cityEntries].map(entry).join('\n')}\n</urlset>\n`
+const entry = ({ path, changefreq, priority }, lang) =>
+  `  <url>\n    <loc>${ORIGIN}${localePath(lang, path)}</loc>\n${alternates(path)}\n    <lastmod>${today}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
+
+const entries = [...STATIC, ...cityEntries].flatMap((e) => LOCALES.map((lang) => entry(e, lang)))
+
+const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${entries.join('\n')}\n</urlset>\n`
 
 const out = new URL('../public/sitemap.xml', import.meta.url)
 writeFileSync(out, xml)
-console.log(`[sitemap] wrote ${STATIC.length + cityEntries.length} URLs (${cityEntries.length} cities) to public/sitemap.xml`)
+console.log(
+  `[sitemap] wrote ${entries.length} URLs (${STATIC.length + cityEntries.length} routes x ${LOCALES.length} locales, ${cityEntries.length} cities) to public/sitemap.xml`,
+)

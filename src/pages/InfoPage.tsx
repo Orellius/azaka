@@ -1,6 +1,7 @@
 import { navigate } from '../router'
 import { openCookieSettings } from '../consent/consentStore'
 import { useLang } from '../i18n/useLang'
+import { usePageMeta } from '../seo/usePageMeta'
 import type { Lang } from '../i18n/strings'
 
 // Static content pages (About / Privacy / Terms / Contact) reachable from the sidebar footer. One shell
@@ -237,6 +238,7 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
 export function InfoPage({ slug }: { slug: InfoSlug }) {
   const { t, lang } = useLang()
   const page = PAGES[lang][slug]
+  usePageMeta(`${page.title} | ${t('brand')}`, page.intro)
   return (
     <div className="feed-scroll min-h-screen w-screen overflow-y-auto bg-slate-950 text-slate-200">
       <div className="mx-auto w-full max-w-2xl px-5 py-10">

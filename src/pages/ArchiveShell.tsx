@@ -1,17 +1,20 @@
 import type { ReactNode } from 'react'
 import { navigate } from '../router'
 import { useLang } from '../i18n/useLang'
+import { withLocale } from '../i18n/locale'
 
 // Shared chrome for the indexable archive pages (/cities, /city/<name>, /alert/<id>): scrollable dark
 // shell, back-to-map link, the amber unofficial-tool disclaimer, and a crawlable bottom nav of real
 // anchors. Kept separate so the three pages stay content-only. NOT for InfoPage (it has its own shell).
 // Public surface: <ArchiveShell>{content}</ArchiveShell> + <SpaLink href>{label}</SpaLink>.
 
-// Real <a href> (crawlers follow it) that performs an SPA navigation when clicked in-app.
+// Real <a href> (crawlers follow it) that performs an SPA navigation when clicked in-app. The
+// rendered href carries the current locale prefix so crawlers discover /en /ar /ru pages too.
 export function SpaLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
+  const { lang } = useLang()
   return (
     <a
-      href={href}
+      href={withLocale(href, lang)}
       className={className}
       onClick={(e) => {
         e.preventDefault()

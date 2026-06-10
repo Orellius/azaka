@@ -42,7 +42,8 @@ export function CityPage({ name }: { name: string }) {
   const [load, setLoad] = useState<Load>({ s: 'loading' })
   const [rec, setRec] = useState<CityRec | null>(null)
 
-  usePageMeta(t('city_meta_title', { city: name }), t('city_meta_desc', { city: name }))
+  // relay-unknown city name still answers HTTP 200 (static host), so noindex keeps it out of the index
+  usePageMeta(t('city_meta_title', { city: name }), t('city_meta_desc', { city: name }), { noindex: load.s === 'notfound' })
 
   useEffect(() => {
     let alive = true

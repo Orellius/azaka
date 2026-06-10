@@ -14,6 +14,7 @@ import { navigate } from './router'
 import { useLang } from './i18n/useLang'
 import { useAreaName, useRegions } from './i18n/areaNames'
 import { LangChips } from './i18n/LangChips'
+import { usePageMeta } from './seo/usePageMeta'
 import type { StringKey } from './i18n/strings'
 
 // Dashboard shell: full-bleed alert map + a dark-glass command panel. The panel is a tzevaadom-style
@@ -53,6 +54,7 @@ function LiveClock() {
 
 export function MapDashboard() {
   const { t, tGuide, lang, tThreat } = useLang()
+  usePageMeta(t('home_meta_title'), t('home_meta_desc')) // per-locale title + canonical/hreflang for / and /en /ar /ru
   const regionsOf = useRegions()
   const { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events, lastLiveAlert } = useAlertFeed()
   const [myArea, setMyArea] = useMyArea()

@@ -4,6 +4,7 @@ import { useHistoryStats, type HistoryEvent } from './useHistoryStats'
 import { navigate } from '../router'
 import { useLang } from '../i18n/useLang'
 import { useAreaName } from '../i18n/areaNames'
+import { usePageMeta } from '../seo/usePageMeta'
 
 // Historical statistics dashboard, in the spirit of tzevaadom's /historical page. All figures come
 // server-aggregated from the relay's year-partitioned log; pick a year or view all. UI is translated
@@ -31,6 +32,7 @@ function fmtRange(from: number | null, to: number | null, t: T): string {
 
 export function HistoricalView() {
   const { t, tThreat } = useLang()
+  usePageMeta(t('hist_meta_title'), t('hist_meta_desc'))
   const localizeArea = useAreaName()
   const { years, year, setYear, stats, recent, loading, error } = useHistoryStats()
 
