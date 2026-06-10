@@ -6,6 +6,8 @@ import { CityPage } from './pages/CityPage'
 import { AlertEventPage } from './pages/AlertEventPage'
 import { CitiesIndexPage } from './pages/CitiesIndexPage'
 import { ApiPage } from './pages/ApiPage'
+import { PlatformsPage } from './pages/PlatformsPage'
+import { EmbedWidget } from './pages/EmbedWidget'
 import { CookieConsent } from './consent/CookieConsent'
 import { AccessibilityWidget } from './a11y/AccessibilityWidget'
 import { loadAndApply } from './a11y/a11yStore'
@@ -39,8 +41,10 @@ function App() {
   const cityName = decodeSegment(path, '/city/')
   const alertId = decodeSegment(path, '/alert/')
   useEffect(() => {
-    trackPageview(path)
+    trackPageview(path) // no-op on /embed (trackPageview guards it: no beacon, no cookie)
   }, [path])
+  // /embed is an iframe widget, not a page: no map, no cookie banner, no a11y widget, no chrome
+  if (path === '/embed') return <EmbedWidget />
   return (
     <>
       {info ? (
@@ -51,6 +55,8 @@ function App() {
         <CitiesIndexPage />
       ) : path === '/api' ? (
         <ApiPage />
+      ) : path === '/platforms' ? (
+        <PlatformsPage />
       ) : cityName ? (
         <CityPage key={cityName} name={cityName} />
       ) : alertId ? (

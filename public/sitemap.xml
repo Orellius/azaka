@@ -25,6 +25,12 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://azaka.orellius.ai/platforms</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://azaka.orellius.ai/about</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>

@@ -160,6 +160,74 @@ export const STRINGS = {
   nav_accessibility: { he: 'נגישות', en: 'Accessibility', ar: 'إمكانية الوصول', ru: 'Доступность' },
   nav_cities: { he: 'ערים', en: 'Cities', ar: 'المدن', ru: 'Города' },
   nav_api: { he: 'API', en: 'API', ar: 'API', ru: 'API' },
+  nav_platforms: { he: 'פלטפורמות', en: 'Platforms', ar: 'المنصات', ru: 'Платформы' },
+
+  // Platforms page (/platforms)
+  platforms_title: { he: 'כל הפלטפורמות', en: 'All platforms', ar: 'جميع المنصات', ru: 'Все платформы' },
+  platforms_sub: {
+    he: 'התרעות פיקוד העורף בכל מקום שנוח לכם: אתר, טלגרם, API חופשי וווידג׳ט להטמעה',
+    en: 'Home Front Command alerts wherever suits you: website, Telegram, a free API, and an embeddable widget',
+    ar: 'تنبيهات قيادة الجبهة الداخلية أينما يناسبك: الموقع، تيليجرام، واجهة API مجانية وودجت قابل للتضمين',
+    ru: 'Оповещения Командования тыла там, где вам удобно: сайт, Telegram, бесплатный API и встраиваемый виджет',
+  },
+  platforms_meta_title: {
+    he: 'פלטפורמות — אתר, טלגרם, API וווידג׳ט | אזעקה',
+    en: 'Platforms — website, Telegram, API, and widget | Azaka',
+    ar: 'المنصات — الموقع وتيليجرام وواجهة API والودجت | أزاكا',
+    ru: 'Платформы — сайт, Telegram, API и виджет | Azaka',
+  },
+  platforms_meta_desc: {
+    he: 'כל הדרכים לקבל את התרעות פיקוד העורף של אזעקה: מפה חיה, ערוץ ובוט טלגרם, API חופשי למפתחים וווידג׳ט להטמעה באתרים.',
+    en: 'Every way to get Azaka’s Home Front Command alerts: live map, Telegram channel and bot, a free developer API, and an embeddable widget for websites.',
+    ar: 'كل الطرق لتلقي تنبيهات قيادة الجبهة الداخلية من أزاكا: خريطة مباشرة، قناة وبوت تيليجرام، واجهة API مجانية للمطورين وودجت للتضمين في المواقع.',
+    ru: 'Все способы получать оповещения Командования тыла от Azaka: живая карта, канал и бот в Telegram, бесплатный API для разработчиков и встраиваемый виджет.',
+  },
+  plat_site_name: { he: 'האתר', en: 'The website', ar: 'الموقع', ru: 'Сайт' },
+  plat_site_desc: {
+    he: 'מפה חיה של כל ההתרעות בזמן אמת, עם אזור אישי וסטטיסטיקה היסטורית',
+    en: 'A live map of every alert in real time, with a personal area and historical statistics',
+    ar: 'خريطة مباشرة لكل التنبيهات في الوقت الفعلي، مع منطقة شخصية وإحصائيات تاريخية',
+    ru: 'Живая карта всех тревог в реальном времени, с личным районом и исторической статистикой',
+  },
+  plat_tg_channel_name: { he: 'ערוץ טלגרם', en: 'Telegram channel', ar: 'قناة تيليجرام', ru: 'Telegram-канал' },
+  plat_tg_channel_desc: {
+    he: 'כל ההתרעות בכל הארץ, ישירות לטלגרם',
+    en: 'Every alert, country-wide, straight to Telegram',
+    ar: 'كل التنبيهات في جميع أنحاء البلاد، مباشرة إلى تيليجرام',
+    ru: 'Все тревоги по всей стране — прямо в Telegram',
+  },
+  plat_tg_bot_name: { he: 'בוט טלגרם', en: 'Telegram bot', ar: 'بوت تيليجرام', ru: 'Telegram-бот' },
+  plat_tg_bot_desc: {
+    he: 'התרעות אישיות לעיר שלכם בהודעה פרטית (‎/add שם עיר)',
+    en: 'Personal alerts for your city by direct message (/add city name)',
+    ar: 'تنبيهات شخصية لمدينتك برسالة خاصة (‎/add اسم المدينة)',
+    ru: 'Личные оповещения для вашего города в личные сообщения (/add название города)',
+  },
+  plat_api_name: { he: 'API חופשי', en: 'Free API', ar: 'واجهة API مجانية', ru: 'Бесплатный API' },
+  plat_api_desc: {
+    he: 'פיד בזמן אמת והיסטוריה מלאה למפתחים — חינם, ללא מפתח',
+    en: 'Real-time feed and full history for developers — free, no key',
+    ar: 'تغذية في الوقت الفعلي وسجل كامل للمطورين — مجانًا وبدون مفتاح',
+    ru: 'Поток в реальном времени и полная история для разработчиков — бесплатно, без ключа',
+  },
+  plat_embed_name: { he: 'ווידג׳ט להטמעה', en: 'Embeddable widget', ar: 'ودجت للتضمين', ru: 'Встраиваемый виджет' },
+  plat_embed_desc: {
+    he: 'פאנל התרעות חי לאתרי חדשות וקהילות — מדביקים שורה אחת וזה עובד',
+    en: 'A live alert panel for news and community sites — paste one line and it works',
+    ar: 'لوحة تنبيهات مباشرة لمواقع الأخبار والمجتمعات — الصق سطرًا واحدًا وستعمل',
+    ru: 'Живая панель тревог для новостных и общественных сайтов — вставьте одну строку, и всё работает',
+  },
+  plat_push_name: { he: 'התרעות דחיפה (Web Push)', en: 'Web push notifications', ar: 'إشعارات الدفع (Web Push)', ru: 'Web-push уведомления' },
+  plat_push_desc: {
+    he: 'התרעות לדפדפן גם כשהאתר סגור — בפיתוח',
+    en: 'Browser alerts even when the site is closed — in development',
+    ar: 'تنبيهات للمتصفح حتى عندما يكون الموقع مغلقًا — قيد التطوير',
+    ru: 'Оповещения в браузере, даже когда сайт закрыт — в разработке',
+  },
+  plat_push_soon: { he: 'בקרוב', en: 'Coming soon', ar: 'قريبًا', ru: 'Скоро' },
+  embed_copy: { he: 'העתקה', en: 'Copy', ar: 'نسخ', ru: 'Копировать' },
+  embed_copied: { he: 'הועתק!', en: 'Copied!', ar: 'تم النسخ!', ru: 'Скопировано!' },
+  embed_preview: { he: 'תצוגה מקדימה חיה', en: 'Live preview', ar: 'معاينة مباشرة', ru: 'Живой предпросмотр' },
 
   // City / alert-event / cities-index pages (src/pages)
   city_meta_title: {

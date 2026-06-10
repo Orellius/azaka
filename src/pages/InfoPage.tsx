@@ -281,6 +281,10 @@ export function InfoPage({ slug }: { slug: InfoSlug }) {
             {t('nav_api')}
           </button>
           <span>·</span>
+          <button type="button" onClick={() => navigate('/platforms')} className="transition hover:text-slate-300">
+            {t('nav_platforms')}
+          </button>
+          <span>·</span>
           <button type="button" onClick={() => navigate('/about')} className="transition hover:text-slate-300">
             {t('nav_about')}
           </button>
