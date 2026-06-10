@@ -159,6 +159,7 @@ export const STRINGS = {
   nav_cookies: { he: 'הגדרות עוגיות', en: 'Cookie settings', ar: 'إعدادات الكوكيز', ru: 'Настройки cookie' },
   nav_accessibility: { he: 'נגישות', en: 'Accessibility', ar: 'إمكانية الوصول', ru: 'Доступность' },
   nav_cities: { he: 'ערים', en: 'Cities', ar: 'المدن', ru: 'Города' },
+  nav_api: { he: 'API', en: 'API', ar: 'API', ru: 'API' },
 
   // City / alert-event / cities-index pages (src/pages)
   city_meta_title: {

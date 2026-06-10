@@ -14,6 +14,9 @@ dist-ssr
 
 # relay runtime history log (grows; regenerated at runtime)
 relay/data/
+# explicit: telegram bot secret + subscriber store must never be committed (covered by relay/data/ too)
+relay/data/telegram.token
+relay/data/telegram-subs.json
 
 # Editor directories and files
 .vscode/*

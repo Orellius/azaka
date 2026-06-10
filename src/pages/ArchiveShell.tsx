@@ -23,10 +23,11 @@ export function SpaLink({ href, className, children }: { href: string; className
   )
 }
 
-const NAV: Array<{ href: string; key: 'hist_live_map' | 'nav_cities' | 'hist_stats' | 'nav_about' }> = [
+const NAV: Array<{ href: string; key: 'hist_live_map' | 'nav_cities' | 'hist_stats' | 'nav_api' | 'nav_about' }> = [
   { href: '/', key: 'hist_live_map' },
   { href: '/cities', key: 'nav_cities' },
   { href: '/historical', key: 'hist_stats' },
+  { href: '/api', key: 'nav_api' },
   { href: '/about', key: 'nav_about' },
 ]
 

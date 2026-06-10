@@ -5,6 +5,7 @@ import { InfoPage, type InfoSlug } from './pages/InfoPage'
 import { CityPage } from './pages/CityPage'
 import { AlertEventPage } from './pages/AlertEventPage'
 import { CitiesIndexPage } from './pages/CitiesIndexPage'
+import { ApiPage } from './pages/ApiPage'
 import { CookieConsent } from './consent/CookieConsent'
 import { AccessibilityWidget } from './a11y/AccessibilityWidget'
 import { loadAndApply } from './a11y/a11yStore'
@@ -48,6 +49,8 @@ function App() {
         <HistoricalView />
       ) : path === '/cities' ? (
         <CitiesIndexPage />
+      ) : path === '/api' ? (
+        <ApiPage />
       ) : cityName ? (
         <CityPage key={cityName} name={cityName} />
       ) : alertId ? (

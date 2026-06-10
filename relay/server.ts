@@ -8,6 +8,7 @@ import { join, normalize } from 'node:path'
 import { categoryOf, classifyAlert } from '../src/alerts/categories'
 import { computeAnalytics, recordHit } from './analytics'
 import { availableYears, cityHistory, computeStats, findEvent, persist, readAll, readYear, recent } from './history'
+import { telegramInit, telegramNotify } from './telegram'
 
 const PORT = Number(Bun.env.PORT ?? 8787)
 const POLL_MS = Number(Bun.env.OREF_POLL_MS ?? 1500)
@@ -103,8 +104,9 @@ async function pollOref() {
     // explicit all-clear ("האירוע הסתיים")
     if (cls.severity === 'cleared') {
       for (const c of cities) activeAreas.delete(c)
-      const ev = { type: 'clear', id, cat, cities, ts }
+      const ev = { type: 'clear' as const, id, cat, cities, ts }
       broadcast(ev)
+      telegramNotify(ev)
       persist(ev)
       console.log(`[clear] ${stamp} id=${id} "${title}" ${cities.length} areas`)
       return
@@ -117,8 +119,9 @@ async function pollOref() {
     // real threat: early = pre-alert; special = terror/nonconv/quake/etc; else active. Verbatim text passed through.
     const kind = cls.severity === 'early' ? 'early' : cls.severity === 'special' ? 'special' : 'active'
     for (const c of cities) activeAreas.set(c, ts)
-    const ev = { type: 'alert', kind, id, cat, key: cls.key, title, desc, remain: cls.remain, cities, ts }
+    const ev = { type: 'alert' as const, kind, id, cat, key: cls.key, title, desc, remain: cls.remain, cities, ts }
     broadcast(ev)
+    telegramNotify(ev)
     persist(ev)
     console.log(`[${kind}] ${stamp} id=${id} cat=${cat} (${cls.key}) "${title}" ${cities.length} areas`)
   } catch (err) {
@@ -128,6 +131,7 @@ async function pollOref() {
 
 setInterval(pollOref, POLL_MS)
 pollOref()
+telegramInit()
 
 Bun.serve({
   port: PORT,
