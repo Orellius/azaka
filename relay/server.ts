@@ -47,6 +47,65 @@ function isKnownArea(name: string): boolean {
   return knownAreas.has(name)
 }
 
+// 5s micro-cache over the /history* routes: each response is a pure function of the on-disk log,
+// and a burst of clients right after an alert would otherwise re-read + re-aggregate a full year
+// log per request. Keyed by pathname+search; capped so arbitrary ?name=/?id= values can't grow it.
+const HISTORY_MEMO_MS = 5_000
+const HISTORY_MEMO_CAP = 500
+const historyMemo = new Map<string, { body: string; status: number; builtAt: number }>()
+
+function buildHistory(url: URL): { status: number; payload: unknown } | null {
+  switch (url.pathname) {
+    case '/history': {
+      const limit = Number(url.searchParams.get('limit') ?? 200)
+      return { status: 200, payload: { events: recent(limit) } }
+    }
+    case '/history/years': {
+      const years = availableYears().map((year) => ({
+        year,
+        events: readYear(year).filter((e) => e.type === 'alert').length,
+      }))
+      return { status: 200, payload: { years } }
+    }
+    case '/history/city': {
+      const name = (url.searchParams.get('name') ?? '').trim()
+      if (!name || name.length > 120) return { status: 400, payload: { error: 'bad name' } }
+      const city = cityHistory(name)
+      if (city.total === 0 && !isKnownArea(name)) return { status: 404, payload: { error: 'unknown area' } }
+      return { status: 200, payload: city }
+    }
+    case '/history/event': {
+      const id = (url.searchParams.get('id') ?? '').trim()
+      if (!id || id.length > 64) return { status: 400, payload: { error: 'bad id' } }
+      const event = findEvent(id)
+      if (!event) return { status: 404, payload: { error: 'not found' } }
+      return { status: 200, payload: { event } }
+    }
+    case '/history/stats': {
+      const yearParam = url.searchParams.get('year')
+      const events = yearParam ? readYear(Number(yearParam)) : readAll()
+      return { status: 200, payload: { year: yearParam ? Number(yearParam) : null, ...computeStats(events) } }
+    }
+  }
+  return null
+}
+
+function historyResponse(url: URL, now = Date.now()): Response | null {
+  const key = url.pathname + url.search
+  const headers = { ...CORS, 'Content-Type': 'application/json' }
+  const hit = historyMemo.get(key)
+  if (hit && now - hit.builtAt < HISTORY_MEMO_MS) return new Response(hit.body, { status: hit.status, headers })
+  const built = buildHistory(url)
+  if (!built) return null
+  const body = JSON.stringify(built.payload)
+  if (historyMemo.size >= HISTORY_MEMO_CAP) {
+    for (const [k, v] of historyMemo) if (now - v.builtAt >= HISTORY_MEMO_MS) historyMemo.delete(k)
+    if (historyMemo.size >= HISTORY_MEMO_CAP) historyMemo.clear() // all fresh: drop everything rather than grow
+  }
+  historyMemo.set(key, { body, status: built.status, builtAt: now })
+  return new Response(body, { status: built.status, headers })
+}
+
 const clients = new Set<import('bun').ServerWebSocket<unknown>>()
 let lastId: string | null = null
 const ACTIVE_WINDOW_MS = 15 * 60_000
@@ -144,36 +203,9 @@ Bun.serve({
     if (url.pathname === '/health') {
       return Response.json({ ok: true, clients: clients.size, lastId, activeAreas: currentActive() }, { headers: CORS })
     }
-    if (url.pathname === '/history') {
-      const limit = Number(url.searchParams.get('limit') ?? 200)
-      return Response.json({ events: recent(limit) }, { headers: CORS })
-    }
-    if (url.pathname === '/history/years') {
-      const years = availableYears().map((year) => ({
-        year,
-        events: readYear(year).filter((e) => e.type === 'alert').length,
-      }))
-      return Response.json({ years }, { headers: CORS })
-    }
-    if (url.pathname === '/history/city') {
-      const name = (url.searchParams.get('name') ?? '').trim()
-      if (!name || name.length > 120) return Response.json({ error: 'bad name' }, { status: 400, headers: CORS })
-      const city = cityHistory(name)
-      if (city.total === 0 && !isKnownArea(name))
-        return Response.json({ error: 'unknown area' }, { status: 404, headers: CORS })
-      return Response.json(city, { headers: CORS })
-    }
-    if (url.pathname === '/history/event') {
-      const id = (url.searchParams.get('id') ?? '').trim()
-      if (!id || id.length > 64) return Response.json({ error: 'bad id' }, { status: 400, headers: CORS })
-      const event = findEvent(id)
-      if (!event) return Response.json({ error: 'not found' }, { status: 404, headers: CORS })
-      return Response.json({ event }, { headers: CORS })
-    }
-    if (url.pathname === '/history/stats') {
-      const yearParam = url.searchParams.get('year')
-      const events = yearParam ? readYear(Number(yearParam)) : readAll()
-      return Response.json({ year: yearParam ? Number(yearParam) : null, ...computeStats(events) }, { headers: CORS })
+    if (url.pathname.startsWith('/history')) {
+      const memoized = historyResponse(url)
+      if (memoized) return memoized
     }
     // DEV-ONLY: inject a fake alert to exercise the end-to-end push path without a real siren.
     if (url.pathname === '/test/alert' && TEST_ALERTS_ENABLED) {
