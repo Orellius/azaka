@@ -231,8 +231,13 @@ export function MapDashboard() {
             <path d="M9 6l6 6-6 6" />
           </svg>
         </button>
+        {/* Desktop column: panel + footer strip share the width/side; the panel flexes to fill
+            whatever the one-line strip leaves. 3.5rem bottom math (vs 2rem elsewhere) keeps the
+            strip clear of the map's compact attribution bar in RTL, where both sit at the same
+            corner. `contents` keeps the mobile fixed-positioned sheet out of this layout entirely. */}
+        <div className="contents sm:me-auto sm:flex sm:h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-3.5rem)] sm:w-80 sm:max-w-[88vw] sm:flex-col sm:gap-2 xl:w-96">
         <div
-          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 transition-[transform,opacity] duration-300 ease-out sm:relative sm:me-auto sm:w-80 sm:max-w-[88vw] sm:h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] sm:rounded-lg sm:border xl:w-96 ${lowered ? 'top-24' : 'top-0'} sm:top-auto ${panelOpen ? '' : 'sm:pointer-events-none sm:-translate-x-[110%] sm:opacity-0 rtl:sm:translate-x-[110%]'}`}
+          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 transition-[transform,opacity] duration-300 ease-out sm:relative sm:min-h-0 sm:flex-1 sm:rounded-lg sm:border ${lowered ? 'top-24' : 'top-0'} sm:top-auto ${panelOpen ? '' : 'sm:pointer-events-none sm:-translate-x-[110%] sm:opacity-0 rtl:sm:translate-x-[110%]'}`}
         >
           <button
             type="button"
@@ -325,6 +330,8 @@ export function MapDashboard() {
             <SidebarFooter lastAt={lastAt} status={status} />
           </div>
           </div>
+        </div>
+        <FooterStrip status={status} open={panelOpen} />
         </div>
       </div>
     </div>
@@ -489,49 +496,102 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
         <span className="mt-1 block text-amber-100/60">{t('disclaimer_source')}</span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.625rem] text-fg-muted">
-        {/* separator glued to its link in one nowrap span, so a wrap never strands a dot on its own line */}
-        {FOOTER_LINKS.map((link) => (
-          <span key={link.path} className="flex items-center gap-x-2 whitespace-nowrap">
-            <button
-              type="button"
-              onClick={() => navigate(link.path)}
-              className="rounded transition hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
-            >
-              {t(link.key)}
-            </button>
-            <span aria-hidden className="text-fg-faint">
-              ·
-            </span>
-          </span>
-        ))}
-        <button
-          type="button"
-          onClick={openCookieSettings}
-          className="rounded transition hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
-        >
-          {t('nav_cookies')}
-        </button>
-      </div>
+      {/* mobile only: links + credit/status stay at the bottom of the notification-shade sheet;
+          on desktop these rows live in the floating FooterStrip below the panel instead */}
+      <div className="flex flex-col gap-2 sm:hidden">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.625rem] text-fg-muted">
+          <FooterLinks />
+        </div>
 
-      <div className="flex items-center justify-between gap-2 text-[0.625rem] text-fg-faint">
-        <span className="tabular-nums">
-          {t('rights')} ·{' '}
-          <a
-            href="https://orellius.ai"
-            target="_blank"
-            rel="noopener"
-            className="rounded transition hover:text-fg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
-          >
-            orellius.ai · Orel Ohayon{/* allow-personal: public footer credit explicitly requested by Orel */}
-          </a>
-          {lastAt ? ` · ${t('updated', { time: new Date(lastAt).toLocaleTimeString('he-IL') })}` : ''}
-        </span>
-        <span className="flex shrink-0 items-center gap-1.5 text-fg-muted">
-          <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[status]}`} />
-          {t(STATUS_KEY[status])}
-        </span>
+        <div className="flex items-center justify-between gap-2 text-[0.625rem] text-fg-faint">
+          <span className="tabular-nums">
+            {t('rights')} ·{' '}
+            <CreditLink />
+            {lastAt ? ` · ${t('updated', { time: new Date(lastAt).toLocaleTimeString('he-IL') })}` : ''}
+          </span>
+          <StatusChip status={status} />
+        </div>
       </div>
     </footer>
+  )
+}
+
+// Page links + cookie settings as bare flex items: the parent supplies the flex-wrap row, so the
+// same markup flows inline inside the one-line desktop strip and as its own row in the mobile sheet.
+function FooterLinks() {
+  const { t } = useLang()
+  return (
+    <>
+      {/* separator glued to its link in one nowrap span, so a wrap never strands a dot on its own line */}
+      {FOOTER_LINKS.map((link) => (
+        <span key={link.path} className="flex items-center gap-x-2 whitespace-nowrap">
+          <button
+            type="button"
+            onClick={() => navigate(link.path)}
+            className="rounded transition hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+          >
+            {t(link.key)}
+          </button>
+          <span aria-hidden className="text-fg-faint">
+            ·
+          </span>
+        </span>
+      ))}
+      <button
+        type="button"
+        onClick={openCookieSettings}
+        className="rounded transition hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+      >
+        {t('nav_cookies')}
+      </button>
+    </>
+  )
+}
+
+function CreditLink() {
+  return (
+    <a
+      href="https://orellius.ai"
+      target="_blank"
+      rel="noopener"
+      className="rounded transition hover:text-fg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+    >
+      orellius.ai · Orel Ohayon{/* allow-personal: public footer credit explicitly requested by Orel */}
+    </a>
+  )
+}
+
+function StatusChip({ status }: { status: FeedStatus }) {
+  const { t } = useLang()
+  return (
+    <span className="flex shrink-0 items-center gap-1.5 text-fg-muted">
+      <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[status]}`} />
+      {t(STATUS_KEY[status])}
+    </span>
+  )
+}
+
+// Desktop-only floating strip directly under the panel (its flex-column sibling): page links ·
+// rights/credit · updated+status. Slides/fades with the drawer using the panel's exact transition.
+// One line when it fits; flex-wrap lets wide locales wrap to two lines rather than truncate.
+function FooterStrip({ status, open }: { status: FeedStatus; open: boolean }) {
+  const { t } = useLang()
+  return (
+    <div
+      className={`hidden shrink-0 flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-white/[0.08] bg-surface px-3 py-2 text-[0.625rem] text-fg-muted shadow-lg shadow-black/50 transition-[transform,opacity] duration-300 ease-out sm:flex ${open ? 'pointer-events-auto' : 'pointer-events-none -translate-x-[110%] opacity-0 rtl:translate-x-[110%]'}`}
+    >
+      <FooterLinks />
+      <span aria-hidden className="text-fg-faint">
+        ·
+      </span>
+      {/* short © brand here (the full rights sentence stays in the mobile sheet); "updated HH:MM"
+          is dropped from the strip — it crowded the single line past two wraps at w-80 */}
+      <span className="whitespace-nowrap text-fg-faint">
+        © {t('brand')} · <CreditLink />
+      </span>
+      <span className="ms-auto">
+        <StatusChip status={status} />
+      </span>
+    </div>
   )
 }
