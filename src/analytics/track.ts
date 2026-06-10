@@ -25,8 +25,9 @@ export function applyConsent(v: Consent) {
 }
 
 export function trackPageview(path: string) {
-  // the /embed widget runs inside third-party iframes: it must set no cookies and send no beacon
-  if (path === '/embed') return
+  // /embed runs inside third-party iframes; /snapshot is the relay's headless render target:
+  // neither may set cookies nor send a beacon
+  if (path === '/embed' || path === '/snapshot') return
   const hit: { path: string; lang: string; vid?: string } = {
     path,
     lang: document.documentElement.lang || 'he',

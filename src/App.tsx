@@ -8,6 +8,7 @@ import { CitiesIndexPage } from './pages/CitiesIndexPage'
 import { ApiPage } from './pages/ApiPage'
 import { PlatformsPage } from './pages/PlatformsPage'
 import { EmbedWidget } from './pages/EmbedWidget'
+import { SnapshotPage } from './pages/SnapshotPage'
 import { CookieConsent } from './consent/CookieConsent'
 import { AccessibilityWidget } from './a11y/AccessibilityWidget'
 import { loadAndApply } from './a11y/a11yStore'
@@ -41,10 +42,12 @@ function App() {
   const cityName = decodeSegment(path, '/city/')
   const alertId = decodeSegment(path, '/alert/')
   useEffect(() => {
-    trackPageview(path) // no-op on /embed (trackPageview guards it: no beacon, no cookie)
+    trackPageview(path) // no-op on /embed + /snapshot (trackPageview guards them: no beacon, no cookie)
   }, [path])
   // /embed is an iframe widget, not a page: no map, no cookie banner, no a11y widget, no chrome
   if (path === '/embed') return <EmbedWidget />
+  // /snapshot is the relay's headless map-render target: map only, no chrome, no analytics
+  if (path === '/snapshot') return <SnapshotPage />
   return (
     <>
       {info ? (

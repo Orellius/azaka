@@ -60,12 +60,14 @@ export function AlertMap({
   clearedAreas,
   snapshot = null,
   snapshotColor = SELECT,
+  onMapReady,
 }: {
   activeAreas: Set<string>
   earlyAreas: Set<string>
   clearedAreas: Set<string>
   snapshot?: string[] | null // a past event's areas to highlight + fit (history snapshot view)
   snapshotColor?: string // highlight colour, matching the event's severity (red / amber / green)
+  onMapReady?: (m: maplibregl.Map) => void // /snapshot render target listens for 'idle' to signal readiness
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
@@ -78,6 +80,10 @@ export function AlertMap({
   const hadSnapshotRef = useRef(false)
   const zoomedInRef = useRef(false)
   const [map, setMap] = useState<maplibregl.Map | null>(null)
+  const onMapReadyRef = useRef(onMapReady)
+  useEffect(() => {
+    onMapReadyRef.current = onMapReady
+  }, [onMapReady])
   const [areaPoints, setAreaPoints] = useState<Map<string, { lng: number; lat: number }>>(() => new Map())
   const [zoomedIn, setZoomedIn] = useState(false)
   const [selected, setSelected] = useState<Selected | null>(null)
@@ -191,6 +197,7 @@ export function AlertMap({
 
       setAreaPoints(points)
       setMap(m)
+      onMapReadyRef.current?.(m)
       // arm auto-zoom only after the initial state restore (hello) settles, so a refresh never
       // auto-zooms to areas that are merely being re-synced; live alerts after this do zoom.
       setTimeout(() => {
