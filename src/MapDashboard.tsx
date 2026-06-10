@@ -47,10 +47,10 @@ function LiveClock() {
   }, [])
   return (
     <span className="flex flex-col items-end leading-tight">
-      <span className="text-[0.8125rem] font-medium tabular-nums text-fg-muted">
+      <span className="text-[0.8125rem] font-bold tabular-nums text-fg">
         {now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
       </span>
-      <span className="text-[0.5625rem] tabular-nums text-fg-faint">
+      <span className="text-[0.5625rem] font-semibold tabular-nums text-fg">
         {now.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' })}
       </span>
     </span>
@@ -207,12 +207,35 @@ export function MapDashboard() {
         )}
         {/* Mobile: a slim top bar that drops the feed DOWN like a notification shade (tap the hamburger).
             Desktop (sm:): the familiar floating side card with the body always shown. */}
-        {/* Desktop drawer: panel + an attached edge handle that stays put when collapsed, so the same
-            control opens and closes it (the handle floats at the screen edge while the panel is hidden) */}
-        <div className="pointer-events-none sm:relative sm:me-auto">
+        {/* Desktop drawer: the collapse handle is a child of the panel, glued to its map-facing edge;
+            when collapsed, a twin handle sits flush at the same screen edge to reopen it */}
+        {!panelOpen && (
+          <button
+            type="button"
+            onClick={() => setPanelOpen(true)}
+            aria-label={t('sheet_expand')}
+            aria-expanded={false}
+            className="pointer-events-auto fixed start-0 top-20 z-20 hidden h-14 w-7 items-center justify-center rounded-e-lg border border-s-0 border-white/[0.08] bg-surface text-fg-muted shadow-lg shadow-black/30 transition hover:bg-card-hover hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 sm:flex"
+          >
+            <svg className="size-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+        )}
         <div
-          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 sm:static sm:w-80 sm:max-w-[88vw] sm:h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] sm:rounded-lg sm:border xl:w-96 ${lowered ? 'top-24' : 'top-0'} sm:top-auto ${panelOpen ? '' : 'sm:hidden'}`}
+          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 sm:static sm:relative sm:me-auto sm:w-80 sm:max-w-[88vw] sm:h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] sm:rounded-lg sm:border xl:w-96 ${lowered ? 'top-24' : 'top-0'} sm:top-auto ${panelOpen ? '' : 'sm:hidden'}`}
         >
+          <button
+            type="button"
+            onClick={() => setPanelOpen(false)}
+            aria-label={t('sheet_collapse')}
+            aria-expanded
+            className="absolute start-full top-14 hidden h-14 w-7 items-center justify-center rounded-e-lg border border-s-0 border-white/[0.08] bg-surface text-fg-muted shadow-lg shadow-black/30 transition hover:bg-card-hover hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 sm:flex"
+          >
+            <svg className="size-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M15 6l-6 6 6 6" />
+            </svg>
+          </button>
           <header className="flex shrink-0 items-center gap-3 p-3 sm:p-4 sm:pb-3">
             <span className="relative flex h-3.5 w-3.5">
               {(alerting || warning) && (
@@ -287,18 +310,6 @@ export function MapDashboard() {
             <SidebarFooter lastAt={lastAt} status={status} />
           </div>
           </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => setPanelOpen((v) => !v)}
-          aria-label={panelOpen ? t('sheet_collapse') : t('sheet_expand')}
-          aria-expanded={panelOpen}
-          className="pointer-events-auto hidden h-14 w-7 items-center justify-center rounded-e-lg border border-s-0 border-white/[0.08] bg-surface text-fg-muted shadow-lg shadow-black/30 transition hover:bg-card-hover hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 sm:absolute sm:start-full sm:top-14 sm:flex"
-        >
-          <svg className="size-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d={panelOpen ? 'M15 6l-6 6 6 6' : 'M9 6l6 6-6 6'} />
-          </svg>
-        </button>
         </div>
       </div>
     </div>
@@ -390,10 +401,13 @@ function EventCard({ ev, active, onSelect }: { ev: FeedEvent; active: boolean; o
         </div>
       )}
       <div className="mt-1 text-[0.625rem] tabular-nums text-fg-faint">
-        {tAgo(ev.ts)} · {time} · {t('areas_n', { n: ev.cities.length })}
+        <span className="font-medium text-fg">
+          {tAgo(ev.ts)} · {time}
+        </span>{' '}
+        · {t('areas_n', { n: ev.cities.length })}
       </div>
         <div
-          className={`mt-1.5 break-words text-[0.6875rem] leading-relaxed text-fg-muted ${long && !expanded ? 'line-clamp-3' : ''}`}
+          className={`mt-1.5 break-words text-[0.6875rem] font-medium leading-relaxed text-fg ${long && !expanded ? 'line-clamp-3' : ''}`}
         >
           {ev.cities.map(localizeArea).join(', ')}
         </div>
@@ -460,24 +474,26 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
         <span className="mt-1 block text-amber-100/60">{t('disclaimer_source')}</span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.625rem] text-fg-faint">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.625rem] text-fg-muted">
         {/* separator glued to its link in one nowrap span, so a wrap never strands a dot on its own line */}
         {FOOTER_LINKS.map((link) => (
           <span key={link.path} className="flex items-center gap-x-2 whitespace-nowrap">
             <button
               type="button"
               onClick={() => navigate(link.path)}
-              className="rounded transition hover:text-fg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+              className="rounded transition hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
             >
               {t(link.key)}
             </button>
-            <span aria-hidden>·</span>
+            <span aria-hidden className="text-fg-faint">
+              ·
+            </span>
           </span>
         ))}
         <button
           type="button"
           onClick={openCookieSettings}
-          className="rounded transition hover:text-fg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+          className="rounded transition hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
         >
           {t('nav_cookies')}
         </button>
