@@ -209,21 +209,21 @@ export function MapDashboard() {
             Desktop (sm:): the familiar floating side card with the body always shown. */}
         {/* Desktop drawer: the collapse handle is a child of the panel, glued to its map-facing edge;
             when collapsed, a twin handle sits flush at the same screen edge to reopen it */}
-        {!panelOpen && (
-          <button
-            type="button"
-            onClick={() => setPanelOpen(true)}
-            aria-label={t('sheet_expand')}
-            aria-expanded={false}
-            className="pointer-events-auto fixed start-0 top-20 z-20 hidden h-14 w-7 items-center justify-center rounded-e-lg border border-s-0 border-white/[0.08] bg-surface text-fg-muted shadow-lg shadow-black/30 transition hover:bg-card-hover hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 sm:flex"
-          >
-            <svg className="size-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M9 6l6 6-6 6" />
-            </svg>
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => setPanelOpen(true)}
+          aria-label={t('sheet_expand')}
+          aria-expanded={false}
+          aria-hidden={panelOpen}
+          tabIndex={panelOpen ? -1 : 0}
+          className={`fixed start-0 top-[4.5rem] z-20 hidden h-14 w-7 items-center justify-center rounded-e-lg border border-s-0 border-white/[0.08] bg-surface text-fg-muted shadow-lg shadow-black/30 transition-opacity duration-200 hover:bg-card-hover hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 sm:flex ${panelOpen ? 'pointer-events-none opacity-0' : 'pointer-events-auto opacity-100 delay-200'}`}
+        >
+          <svg className="size-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+        </button>
         <div
-          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 sm:relative sm:me-auto sm:w-80 sm:max-w-[88vw] sm:h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] sm:rounded-lg sm:border xl:w-96 ${lowered ? 'top-24' : 'top-0'} sm:top-auto ${panelOpen ? '' : 'sm:hidden'}`}
+          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 transition-[transform,opacity] duration-300 ease-out sm:relative sm:me-auto sm:w-80 sm:max-w-[88vw] sm:h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] sm:rounded-lg sm:border xl:w-96 ${lowered ? 'top-24' : 'top-0'} sm:top-auto ${panelOpen ? '' : 'sm:pointer-events-none sm:-translate-x-[110%] sm:opacity-0 rtl:sm:translate-x-[110%]'}`}
         >
           <button
             type="button"
