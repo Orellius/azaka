@@ -137,18 +137,18 @@ export const STRINGS = {
 
   // Footer / legend / disclaimer
   hist_stats: { he: 'סטטיסטיקה היסטורית', en: 'Historical statistics', ar: 'إحصائيات تاريخية', ru: 'Историческая статистика' },
-  disclaimer_bold: { he: 'אינו תחליף להתרעה רשמית.', en: 'Not a substitute for the official alert.', ar: 'ليس بديلاً عن الإنذار الرسمي.', ru: 'Не заменяет официальное оповещение.' },
+  disclaimer_bold: { he: 'כלי אזרחי לא רשמי.', en: 'Unofficial citizen tool.', ar: 'أداة مدنية غير رسمية.', ru: 'Неофициальный гражданский инструмент.' },
   disclaimer_text: {
-    he: 'פעלו תמיד לפי ההנחיות הנשמעות במרחב שלכם.',
-    en: 'Always follow the instructions sounded in your area.',
-    ar: 'اتبع دائمًا التعليمات الصادرة في منطقتك.',
-    ru: 'Всегда следуйте указаниям, звучащим в вашем районе.',
+    he: 'אינו תחליף להתרעות הרשמיות של פיקוד העורף. הסתמכו תמיד על הצפירה במרחב, על האפליקציה הרשמית של פיקוד העורף ועל הנחיותיו.',
+    en: 'Not a substitute for official Home Front Command (Pikud HaOref) alerts. Always rely on the physical siren, the official Pikud HaOref app, and Home Front Command instructions.',
+    ar: 'ليست بديلاً عن التنبيهات الرسمية لقيادة الجبهة الداخلية. اعتمدوا دائمًا على صفارة الإنذار، وتطبيق قيادة الجبهة الداخلية الرسمي، وتعليماتها.',
+    ru: 'Не заменяет официальные оповещения Командования тыла (Пикуд ха-Ореф). Всегда полагайтесь на сирену, официальное приложение Пикуд ха-Ореф и указания Командования тыла.',
   },
   disclaimer_source: {
-    he: 'מקור: פיקוד העורף (oref.org.il) דרך ממסר עצמאי.',
-    en: 'Source: Home Front Command (oref.org.il) via an independent relay.',
-    ar: 'المصدر: قيادة الجبهة الداخلية (oref.org.il) عبر مُرحِّل مستقل.',
-    ru: 'Источник: Командование тыла (oref.org.il) через независимый ретранслятор.',
+    he: 'אזעקה משקפת פיד ציבורי של פיקוד העורף (oref.org.il) ללא התחייבות לזמינות, ועלולה לטעות, לאחר או לא להיות זמינה.',
+    en: 'Azaka mirrors a public Home Front Command feed (oref.org.il) with no SLA and can be wrong, late, or offline.',
+    ar: 'تعكس أزاكا تغذية عامة لقيادة الجبهة الداخلية (oref.org.il) دون ضمان توفر، وقد تكون خاطئة أو متأخرة أو غير متاحة.',
+    ru: 'Azaka отражает публичную ленту Командования тыла (oref.org.il) без SLA и может ошибаться, опаздывать или быть недоступной.',
   },
   rights: { he: '© אזעקה · כל הזכויות שמורות', en: '© Azaka · all rights reserved', ar: '© أزاكا · جميع الحقوق محفوظة', ru: '© Azaka · все права защищены' },
   updated: { he: 'עדכון: {time}', en: 'Updated: {time}', ar: 'تحديث: {time}', ru: 'Обновлено: {time}' },
