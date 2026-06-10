@@ -67,7 +67,12 @@ export function MapDashboard() {
   const personal = usePersonalAlert(myArea?.name ?? null, activeAreas, earlyAreas, clearedAreas, lastLiveAlert)
   const [snapshot, setSnapshot] = useState<FeedEvent | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false) // mobile: feed dropdown collapsed by default (tap the hamburger); desktop ignores it
-  const [panelOpen, setPanelOpen] = useState(true) // desktop: sidebar expanded by default; edge drawer-handle toggles it
+  // desktop drawer: open by default, edge handle toggles it; the choice persists across visits
+  const [panelOpen, setPanelOpenState] = useState(() => localStorage.getItem('azaka_panel') !== 'closed')
+  const setPanelOpen = (v: boolean) => {
+    setPanelOpenState(v)
+    localStorage.setItem('azaka_panel', v ? 'open' : 'closed')
+  }
   const [stackOpen, setStackOpen] = useState(false) // mobile: alert stack starts as a compact peek bar so the painted map stays visible
 
   const alerting = activeAreas.size > 0
