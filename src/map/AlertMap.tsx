@@ -4,7 +4,8 @@ import maplibregl from 'maplibre-gl'
 import type { ExpressionSpecification, GeoJSONSource } from 'maplibre-gl'
 import type { Feature, FeatureCollection, Polygon } from 'geojson'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { mapStyle, ISRAEL_CENTER, ISRAEL_ZOOM } from './mapStyle'
+import { mapStyle, cartoFallbackStyle, OFM_VECTOR_SOURCE_ID, ISRAEL_CENTER, ISRAEL_ZOOM } from './mapStyle'
+import { inflateAreas, type SlimAreas } from './areasSlim'
 import { computeThreatZone } from '../threat-zone/computeThreatZone'
 import { convexHull, type Point } from '../threat-zone/convexHull'
 import { isMajorArea } from './majorCities'
@@ -17,7 +18,8 @@ import type { StringKey } from '../i18n/strings'
 // (city pills, area popup) are REAL React via createPortal: MapLibre owns the positioned container,
 // React renders the component into it. Tiers: red active / amber early / green cleared. Any sub-area
 // is click-selectable. Public surface: <AlertMap activeAreas earlyAreas clearedAreas />.
-const AREAS_URL = '/data/areas.geojson'
+const AREAS_URL = '/data/areas.slim.json'
+const OFM_FAIL_WINDOW_MS = 8000 // vector-source errors after this are transient, not "basemap is down"
 const EMPTY: FeatureCollection<Polygon> = { type: 'FeatureCollection', features: [] }
 const RED = '#ff2532'
 const AMBER = '#f59e0b'
@@ -80,6 +82,8 @@ export function AlertMap({
   const hadSnapshotRef = useRef(false)
   const zoomedInRef = useRef(false)
   const [map, setMap] = useState<maplibregl.Map | null>(null)
+  // 'ofm' = vendored OpenFreeMap vector (no labels); 'carto' = raster fallback. One-shot: never flips back.
+  const [base, setBase] = useState<'ofm' | 'carto'>('ofm')
   const onMapReadyRef = useRef(onMapReady)
   useEffect(() => {
     onMapReadyRef.current = onMapReady
@@ -113,14 +117,27 @@ export function AlertMap({
   useEffect(() => {
     if (!containerRef.current) return
     let cancelled = false
+    // a rebuilt map (CARTO fallback) starts with no feature-state, so force a full repaint diff
+    prevRef.current = { active: new Set(), early: new Set(), cleared: new Set() }
     const m = new maplibregl.Map({
       container: containerRef.current,
-      style: mapStyle,
+      style: base === 'carto' ? cartoFallbackStyle : mapStyle,
       center: ISRAEL_CENTER,
       zoom: ISRAEL_ZOOM,
       attributionControl: { compact: true },
     })
     mapRef.current = m
+    if (base === 'ofm') {
+      // The style JSON is bundled, so the only live failure mode is the OFM vector source
+      // (TileJSON or tiles). If it errors while the map is young, rebuild once on the CARTO
+      // raster style; base never flips back, so this cannot flap.
+      const deadline = Date.now() + OFM_FAIL_WINDOW_MS
+      m.on('error', (e) => {
+        if ((e as { sourceId?: string }).sourceId !== OFM_VECTOR_SOURCE_ID || Date.now() > deadline) return
+        console.warn('[map] OpenFreeMap vector basemap failed to load; falling back to CARTO raster', e.error)
+        setBase('carto')
+      })
+    }
     const onUserMove = (e: { originalEvent?: unknown }) => {
       if (e.originalEvent) userMovedRef.current = Date.now()
     }
@@ -136,7 +153,7 @@ export function AlertMap({
     m.on('zoom', onZoom)
 
     m.on('load', async () => {
-      const fc = (await (await fetch(AREAS_URL)).json()) as FeatureCollection<Polygon>
+      const fc = inflateAreas((await (await fetch(AREAS_URL)).json()) as SlimAreas)
       if (cancelled) return // map was torn down (StrictMode remount / unmount) before data arrived
       const points = new Map<string, { lng: number; lat: number }>()
       for (const f of fc.features) {
@@ -211,7 +228,7 @@ export function AlertMap({
       mapRef.current = null
       setMap(null)
     }
-  }, [])
+  }, [base])
 
   // GL state: feature-state colours + threat-zone hull + auto-zoom to freshly-alerted areas
   useEffect(() => {
@@ -379,9 +396,10 @@ function RegionLabelMarker({ map, lng, lat, name }: { map: maplibregl.Map; lng: 
   )
 }
 
-// One label per currently-alerted area, rendered as an HTML marker (the raster basemap carries no
-// glyphs, so a native symbol layer can't draw text). Smaller than the old always-on pills; colour by
-// tier. The parent decides which to show (zoom density) and unmounts them all when the alert clears.
+// One label per currently-alerted area, rendered as an HTML marker (base-map labels are stripped
+// from the vendored style, and the CARTO raster fallback carries no glyphs at all — HTML markers
+// work identically on both). Smaller than the old always-on pills; colour by tier. The parent
+// decides which to show (zoom density) and unmounts them all when the alert clears.
 function AreaLabelMarker({
   map,
   lng,

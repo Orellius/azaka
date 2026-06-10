@@ -1,10 +1,14 @@
-// Build public/data/areas.geojson from the two upstream datasets.
+// Build public/data/areas.geojson + areas.slim.json from the two upstream datasets.
 // Inputs:  scripts/source/area_to_polygon.json  (oref_alert metadata: he-name -> [[lat,lng],...])
 //          public/data/cities.json              (tzevaadom: he-name -> {id,en,ar,area,countdown,lat,lng})
-// Output:  public/data/areas.geojson            (FeatureCollection<Polygon>, props joined from both)
+// Outputs: public/data/areas.geojson            (FeatureCollection<Polygon>, props joined from both;
+//                                                kept because /api docs promise it as a public endpoint)
+//          public/data/areas.slim.json          (what the app actually fetches: same data, rings as
+//                                                flat delta-encoded ints at 1e-4 deg, closing point
+//                                                dropped; inflated by src/map/areasSlim.ts)
 // Why a build step: upstream uses [lat,lng] vertex order and a flat name->ring map; MapLibre needs
 //   GeoJSON [lng,lat] rings with feature properties. We pay that conversion once, at build, not per boot.
-// Run:     bun scripts/build-areas.mjs
+// Run:     bun scripts/build-areas.mjs   (then: bun scripts/check-areas-slim.ts to verify fidelity)
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
@@ -14,12 +18,13 @@ const polygons = JSON.parse(readFileSync(join(root, 'scripts/source/area_to_poly
 const cities = JSON.parse(readFileSync(join(root, 'public/data/cities.json'), 'utf8')).cities
 
 // SAFETY: these polygons decide which areas paint red during an alert, so simplification is
-// deliberately conservative. DP_EPSILON caps vertex deviation at ~11m (1e-4 deg); quantization to
-// 5 decimals adds ~1m. Both are far below any visible coverage change at alert-viewing zooms.
+// deliberately conservative. DP_EPSILON caps vertex deviation at ~11m (1e-4 deg); geojson keeps
+// 5-decimal quantization (~1m). The slim file quantizes to 4 decimals (~11m grid, approved
+// 2026-06-10) — total worst-case deviation stays far below any visible coverage change at
+// alert-viewing zooms (gate: bbox drift < 0.0012 deg, checked by scripts/check-areas-slim.ts).
 const DP_EPSILON = 1e-4
-const QUANT = 1e5 // 5 decimal places
-
-const q = (v) => Math.round(v * QUANT) / QUANT
+const QUANT_GEOJSON = 1e5 // 5 decimal places
+const QUANT_SLIM = 1e4 // 4 decimal places
 
 // Perpendicular distance from point p to the segment a-b, in degrees.
 function perpDist(p, a, b) {
@@ -58,11 +63,11 @@ function douglasPeucker(points, epsilon) {
   return points.filter((_, i) => keep[i])
 }
 
-// Simplify + quantize a closed ring. Falls back to the quantized-only ring if DP would
-// degenerate it (< 4 points incl. closure), so no area can lose its polygon.
-function slimRing(closedRing) {
-  const simplified = douglasPeucker(closedRing, DP_EPSILON)
-  const base = simplified.length >= 4 ? simplified : closedRing
+// Quantize a (DP-simplified) closed ring at the given scale. Falls back to the quantized-only
+// original ring if dedupe would degenerate it (< 4 points incl. closure), so no area can lose
+// its polygon.
+function quantizeRing(base, originalRing, quant) {
+  const q = (v) => Math.round(v * quant) / quant
   const out = []
   for (const [x, y] of base) {
     const pt = [q(x), q(y)]
@@ -76,12 +81,28 @@ function slimRing(closedRing) {
   if (first[0] !== last[0] || first[1] !== last[1]) out.push([first[0], first[1]])
   if (out.length < 4) {
     // degenerate after quantization: keep the original ring, quantized but un-deduped beyond closure
-    return closedRing.map(([x, y]) => [q(x), q(y)])
+    return originalRing.map(([x, y]) => [q(x), q(y)])
   }
   return out
 }
 
+// Flat delta-encoded ints at 1/quant degrees; the closing point is dropped (inflate re-adds it).
+function deltaEncodeRing(quantizedRing, quant) {
+  const flat = []
+  let px = 0
+  let py = 0
+  for (let i = 0; i < quantizedRing.length - 1; i++) {
+    const xi = Math.round(quantizedRing[i][0] * quant)
+    const yi = Math.round(quantizedRing[i][1] * quant)
+    flat.push(xi - px, yi - py)
+    px = xi
+    py = yi
+  }
+  return flat
+}
+
 const features = []
+const slim = { v: 1, scale: QUANT_SLIM, props: {}, polys: {} }
 let missingCity = 0
 for (const [name, ring] of Object.entries(polygons)) {
   if (!Array.isArray(ring) || ring.length < 3) continue
@@ -92,23 +113,31 @@ for (const [name, ring] of Object.entries(polygons)) {
   const rawFirst = raw[0]
   const rawLast = raw[raw.length - 1]
   if (rawFirst[0] !== rawLast[0] || rawFirst[1] !== rawLast[1]) raw.push(rawFirst)
-  const coords = slimRing(raw)
+  const simplified = douglasPeucker(raw, DP_EPSILON)
+  const base = simplified.length >= 4 ? simplified : raw
+  const props = {
+    name,
+    en: city?.en ?? name,
+    countdown: city?.countdown ?? null,
+    area: city?.area ?? null,
+    lat: city?.lat ?? null,
+    lng: city?.lng ?? null,
+  }
   features.push({
     type: 'Feature',
-    properties: {
-      name,
-      en: city?.en ?? name,
-      countdown: city?.countdown ?? null,
-      area: city?.area ?? null,
-      lat: city?.lat ?? null,
-      lng: city?.lng ?? null,
-    },
-    geometry: { type: 'Polygon', coordinates: [coords] },
+    properties: props,
+    geometry: { type: 'Polygon', coordinates: [quantizeRing(base, raw, QUANT_GEOJSON)] },
   })
+  const { name: _name, ...slimProps } = props
+  slim.props[name] = slimProps
+  slim.polys[name] = [deltaEncodeRing(quantizeRing(base, raw, QUANT_SLIM), QUANT_SLIM)]
 }
 
 const fc = { type: 'FeatureCollection', features }
 const out = join(root, 'public/data/areas.geojson')
 writeFileSync(out, JSON.stringify(fc))
-const bytes = readFileSync(out).length
-console.log(`areas.geojson: ${features.length} polygons, ${(bytes / 1e6).toFixed(2)}MB, ${missingCity} without a cities.json match`)
+const outSlim = join(root, 'public/data/areas.slim.json')
+writeFileSync(outSlim, JSON.stringify(slim))
+const kb = (p) => `${(readFileSync(p).length / 1e3).toFixed(0)}KB`
+console.log(`areas.geojson: ${features.length} polygons, ${kb(out)}, ${missingCity} without a cities.json match`)
+console.log(`areas.slim.json: ${kb(outSlim)}`)
