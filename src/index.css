@@ -73,8 +73,10 @@ html.a11y-contrast .text-slate-600 {
   opacity: 0.6;
 }
 
-/* Visible, touch-draggable scrollbar for the command panel + feeds. macOS auto-hides the default
-   overlay scrollbar, which reads as "not scrollable"; this keeps a thin thumb always visible. */
+/* Cross-platform scrollbar for every custom scroll container (.feed-scroll: command panel, feeds,
+   alert stack, page roots). macOS auto-hides the default overlay scrollbar, which reads as "not
+   scrollable"; Windows ships a chunky 17px bar with arrow buttons. Unified: thin always-visible
+   rounded thumb, no track, no arrow buttons. */
 .feed-scroll {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -82,14 +84,24 @@ html.a11y-contrast .text-slate-600 {
   scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
 }
 .feed-scroll::-webkit-scrollbar {
-  width: 7px;
+  width: 8px;
+  height: 8px;
+}
+.feed-scroll::-webkit-scrollbar-track {
+  background: transparent;
 }
 .feed-scroll::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.25);
-  border-radius: 4px;
+  border-radius: 9999px;
 }
 .feed-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.4);
+}
+.feed-scroll::-webkit-scrollbar-button {
+  display: none;
+}
+.feed-scroll::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /* Area labels on the map: only the currently-alerted areas are labelled (see AreaLabelMarker), so

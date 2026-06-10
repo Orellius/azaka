@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { readConsent, subscribeCookieOpen, writeConsent, type Consent } from './consentStore'
+import { useEffect, useState, useSyncExternalStore } from 'react'
+import { isAlertingNow, readConsent, subscribeAlerting, subscribeCookieOpen, writeConsent, type Consent } from './consentStore'
 import { applyConsent } from '../analytics/track'
 import { useLang } from '../i18n/useLang'
 
@@ -10,10 +10,13 @@ import { useLang } from '../i18n/useLang'
 export function CookieConsent() {
   const { t } = useLang()
   const [open, setOpen] = useState(() => readConsent() === null)
+  const alerting = useSyncExternalStore(subscribeAlerting, isAlertingNow)
 
   useEffect(() => subscribeCookieOpen(() => setOpen(true)), [])
 
-  if (!open) return null
+  // suppressed during a live alert so it never stacks over the instruction/shelter cards (z-50 wins);
+  // `open` is untouched, so the banner returns on its own once the event ends
+  if (!open || alerting) return null
 
   const choose = (v: Consent) => {
     writeConsent(v)

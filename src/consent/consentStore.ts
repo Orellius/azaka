@@ -23,6 +23,29 @@ export function openCookieSettings() {
   openListeners.forEach((fn) => fn())
 }
 
+// SAFETY: while an alert is live the cookie banner must never cover the instruction stack on the map
+// (consent can wait, safety can't). MapDashboard publishes the alerting state here; CookieConsent
+// subscribes and stays hidden until the event ends. Module-level so no second websocket is opened.
+let alertingNow = false
+const alertingListeners = new Set<() => void>()
+
+export function setAlertingNow(v: boolean) {
+  if (v === alertingNow) return
+  alertingNow = v
+  alertingListeners.forEach((fn) => fn())
+}
+
+export function isAlertingNow(): boolean {
+  return alertingNow
+}
+
+export function subscribeAlerting(fn: () => void): () => void {
+  alertingListeners.add(fn)
+  return () => {
+    alertingListeners.delete(fn)
+  }
+}
+
 export function subscribeCookieOpen(fn: () => void): () => void {
   openListeners.add(fn)
   return () => {

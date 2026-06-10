@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AlertMap } from './map/AlertMap'
 import { useAlertFeed, type FeedEvent, type FeedStatus } from './alerts/useAlertFeed'
 import { AlertIcon } from './alerts/AlertIcon'
@@ -9,7 +9,7 @@ import { usePersonalAlert } from './myarea/usePersonalAlert'
 import { PersonalAlertBanner } from './myarea/PersonalAlertBanner'
 import { MyAreaControl } from './myarea/MyAreaControl'
 import { WhereToShelter } from './shelter/WhereToShelter'
-import { openCookieSettings } from './consent/consentStore'
+import { openCookieSettings, setAlertingNow } from './consent/consentStore'
 import { navigate } from './router'
 import { useLang } from './i18n/useLang'
 import { useAreaName, useRegions } from './i18n/areaNames'
@@ -61,9 +61,25 @@ export function MapDashboard() {
   const [snapshot, setSnapshot] = useState<FeedEvent | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false) // mobile: feed dropdown collapsed by default (tap the hamburger); desktop ignores it
   const [panelOpen, setPanelOpen] = useState(true) // desktop: sidebar expanded by default, collapsible to a chip
+  const [stackOpen, setStackOpen] = useState(false) // mobile: alert stack starts as a compact peek bar so the painted map stays visible
 
   const alerting = activeAreas.size > 0
   const warning = earlyAreas.size > 0
+  // render-phase reset (no setState-in-effect): every new event starts with the stack compact and the
+  // feed sheet closed, so the map's painted areas are what the user sees first on a phone
+  const [wasAlerting, setWasAlerting] = useState(false)
+  if ((alerting || warning) !== wasAlerting) {
+    setWasAlerting(alerting || warning)
+    if (alerting || warning) {
+      setStackOpen(false)
+      setSheetOpen(false)
+    }
+  }
+  // cookie banner suppression while an alert is live (consent can wait, safety can't)
+  useEffect(() => {
+    setAlertingNow(alerting || warning)
+    return () => setAlertingNow(false)
+  }, [alerting, warning])
   const activeRegions = regionsOf([...activeAreas, ...earlyAreas])
   const headDot = alerting ? 'bg-rose-500' : warning ? 'bg-amber-500' : clearedAreas.size > 0 ? 'bg-emerald-500' : 'bg-fg-faint'
   const lowered = !!(myArea && personal) // the personal banner owns the very top; push top-anchored chrome below it
@@ -105,10 +121,51 @@ export function MapDashboard() {
             the "where to shelter" guidance beneath it. Bottom toast on phones (the panel lives at the
             top now), top + inline-end (left in RTL, opposite the panel) on desktop. Both appear together
             during an active/early alert and vanish when everything is green. */}
+        {(alerting || warning) && !stackOpen && (
+          /* Mobile peek bar: the verbatim oref title stays visible (safety: never hidden), one line of
+             the official instruction, one tap away from the full stack. Desktop always shows the stack. */
+          <button
+            type="button"
+            onClick={() => setStackOpen(true)}
+            aria-expanded={false}
+            role="alert"
+            className="pointer-events-auto fixed inset-x-3 bottom-3 z-20 rounded-xl border border-rose-500/60 bg-rose-950/95 px-3.5 py-2.5 text-start shadow-2xl backdrop-blur-md sm:hidden"
+          >
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-400" />
+              </span>
+              <span className="min-w-0 flex-1 truncate text-[0.9375rem] font-bold text-rose-50">
+                {instruction?.title || t('shelter_where_title')}
+              </span>
+              <svg className="size-4 shrink-0 text-rose-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="m18 15-6-6-6 6" />
+              </svg>
+            </div>
+            <div className="mt-0.5 flex items-center gap-2 text-[0.75rem] text-rose-100/90">
+              <span className="min-w-0 flex-1 truncate">
+                {instruction?.desc || t('areas_active', { n: activeAreas.size })}
+              </span>
+              <span className="shrink-0 font-semibold text-rose-200">{t('stack_expand')}</span>
+            </div>
+          </button>
+        )}
         {(alerting || warning) && (
           <div
-            className={`pointer-events-auto fixed inset-x-3 bottom-3 z-20 flex max-h-[80vh] flex-col gap-2 overflow-y-auto sm:inset-x-auto sm:bottom-auto sm:end-4 sm:max-h-[calc(100vh-2rem)] sm:w-80 sm:max-w-[calc(100vw-24rem)] ${lowered ? 'sm:top-28' : 'sm:top-4'}`}
+            className={`feed-scroll pointer-events-auto fixed inset-x-3 bottom-3 z-20 max-h-[60vh] flex-col gap-2 overflow-y-auto sm:flex sm:inset-x-auto sm:bottom-auto sm:end-4 sm:max-h-[calc(100vh-2rem)] sm:w-80 sm:max-w-[calc(100vw-23rem)] xl:max-w-[calc(100vw-27rem)] ${lowered ? 'sm:top-28' : 'sm:top-4'} ${stackOpen ? 'flex' : 'hidden'}`}
           >
+            <button
+              type="button"
+              onClick={() => setStackOpen(false)}
+              aria-expanded
+              className="pointer-events-auto flex items-center gap-1.5 self-end rounded-full border border-white/20 bg-surface/90 px-3 py-1 text-[0.6875rem] font-medium text-fg shadow-lg backdrop-blur-sm sm:hidden"
+            >
+              {t('stack_collapse')}
+              <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
             {instruction && (instruction.title || instruction.desc) && (
               <div className="rounded-xl border border-rose-500/60 bg-rose-950/95 px-3.5 py-3 shadow-2xl backdrop-blur-md" role="alert">
                 {instruction.title && <div className="text-[0.9375rem] font-bold text-rose-50">{instruction.title}</div>}
@@ -159,7 +216,7 @@ export function MapDashboard() {
           </button>
         )}
         <div
-          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 sm:static sm:me-auto sm:w-96 sm:max-w-[88vw] sm:h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] sm:rounded-lg sm:border ${lowered ? 'top-24' : 'top-0'} sm:top-auto ${panelOpen ? '' : 'sm:hidden'}`}
+          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 sm:static sm:me-auto sm:w-80 sm:max-w-[88vw] sm:h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] sm:rounded-lg sm:border xl:w-96 ${lowered ? 'top-24' : 'top-0'} sm:top-auto ${panelOpen ? '' : 'sm:hidden'}`}
         >
           <header className="flex shrink-0 items-center gap-3 p-3 sm:p-4 sm:pb-3">
             <span className="relative flex h-3.5 w-3.5">
@@ -410,9 +467,9 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
       </div>
 
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.625rem] text-fg-faint">
-        {FOOTER_LINKS.map((link, i) => (
-          <Fragment key={link.path}>
-            {i > 0 && <span aria-hidden>·</span>}
+        {/* separator glued to its link in one nowrap span, so a wrap never strands a dot on its own line */}
+        {FOOTER_LINKS.map((link) => (
+          <span key={link.path} className="flex items-center gap-x-2 whitespace-nowrap">
             <button
               type="button"
               onClick={() => navigate(link.path)}
@@ -420,9 +477,9 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
             >
               {t(link.key)}
             </button>
-          </Fragment>
+            <span aria-hidden>·</span>
+          </span>
         ))}
-        <span aria-hidden>·</span>
         <button
           type="button"
           onClick={openCookieSettings}

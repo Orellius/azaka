@@ -304,6 +304,10 @@ export const STRINGS = {
   sheet_collapse: { he: 'כיווץ הפאנל', en: 'Collapse panel', ar: 'طيّ اللوحة', ru: 'Свернуть панель' },
   sheet_expand: { he: 'הרחבת הפאנל', en: 'Expand panel', ar: 'توسيع اللوحة', ru: 'Развернуть панель' },
 
+  // mobile alert-stack peek state (compact bar over the map; tap for the full instruction + shelter steps)
+  stack_expand: { he: 'להנחיות המלאות', en: 'Full instructions', ar: 'التعليمات الكاملة', ru: 'Полные инструкции' },
+  stack_collapse: { he: 'הקטנה', en: 'Minimize', ar: 'تصغير', ru: 'Свернуть' },
+
   // Where to shelter (official Home Front Command protected-space guidance; honest, no specific pins)
   shelter_where_title: { he: 'לאן נכנסים?', en: 'Where to take shelter', ar: 'إلى أين تحتمي؟', ru: 'Куда укрыться' },
   shelter_step_room: {

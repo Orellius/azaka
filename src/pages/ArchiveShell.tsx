@@ -35,7 +35,7 @@ const NAV: Array<{ href: string; key: 'hist_live_map' | 'nav_cities' | 'hist_sta
 export function ArchiveShell({ children }: { children: ReactNode }) {
   const { t } = useLang()
   return (
-    <div className="h-screen w-screen overflow-y-auto bg-slate-950 text-slate-200">
+    <div className="feed-scroll h-screen w-screen overflow-y-auto bg-slate-950 text-slate-200">
       <div className="mx-auto w-full max-w-2xl px-5 py-10">
         <SpaLink href="/" className="mb-6 inline-block text-[0.8125rem] font-medium text-sky-400 transition hover:text-sky-300">
           {t('info_back')}

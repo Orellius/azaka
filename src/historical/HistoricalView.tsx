@@ -44,7 +44,7 @@ export function HistoricalView() {
   const dayValues = stats ? Object.values(stats.byDay) : []
 
   return (
-    <div className="h-screen w-screen overflow-y-auto bg-slate-950 text-slate-100">
+    <div className="feed-scroll h-screen w-screen overflow-y-auto bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-5xl px-5 py-6">
         <header className="mb-6 flex flex-wrap items-center gap-3">
           <button
@@ -101,7 +101,7 @@ export function HistoricalView() {
                 <BarList rows={sizeRows} color="#f59e0b" />
               </Panel>
               <Panel title={t('hist_panel_cities')} className="md:col-span-2">
-                <div className="max-h-72 overflow-y-auto pe-1">{cityRows.length ? <BarList rows={cityRows} /> : <Empty />}</div>
+                <div className="feed-scroll max-h-72 overflow-y-auto pe-1">{cityRows.length ? <BarList rows={cityRows} /> : <Empty />}</div>
               </Panel>
             </div>
 

@@ -50,7 +50,7 @@ export function EmbedWidget() {
         <span className="min-w-0 truncate text-[0.6875rem] text-fg-muted">{t('brand_sub')}</span>
       </header>
 
-      <main className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
+      <main className="feed-scroll flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
         {alerting && liveEvents.length > 0 ? (
           liveEvents.map((ev) => {
             const c = SEV[ev.severity]
