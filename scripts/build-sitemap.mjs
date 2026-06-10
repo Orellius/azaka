@@ -19,6 +19,7 @@ const STATIC = [
   { path: '/cities', changefreq: 'daily', priority: '0.7' },
   { path: '/api', changefreq: 'monthly', priority: '0.5' },
   { path: '/platforms', changefreq: 'monthly', priority: '0.5' }, // NOT /embed (widget, not a page); NOT /snapshot (headless render target, noindex)
+  { path: '/menu', changefreq: 'monthly', priority: '0.4' },
 
   { path: '/about', changefreq: 'monthly', priority: '0.5' },
   { path: '/privacy', changefreq: 'yearly', priority: '0.2' },

@@ -221,6 +221,50 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://azaka.orellius.ai/menu</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://azaka.orellius.ai/menu"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://azaka.orellius.ai/en/menu"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://azaka.orellius.ai/ar/menu"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://azaka.orellius.ai/ru/menu"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://azaka.orellius.ai/menu"/>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://azaka.orellius.ai/en/menu</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://azaka.orellius.ai/menu"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://azaka.orellius.ai/en/menu"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://azaka.orellius.ai/ar/menu"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://azaka.orellius.ai/ru/menu"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://azaka.orellius.ai/menu"/>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://azaka.orellius.ai/ar/menu</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://azaka.orellius.ai/menu"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://azaka.orellius.ai/en/menu"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://azaka.orellius.ai/ar/menu"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://azaka.orellius.ai/ru/menu"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://azaka.orellius.ai/menu"/>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://azaka.orellius.ai/ru/menu</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://azaka.orellius.ai/menu"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://azaka.orellius.ai/en/menu"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://azaka.orellius.ai/ar/menu"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://azaka.orellius.ai/ru/menu"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://azaka.orellius.ai/menu"/>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://azaka.orellius.ai/about</loc>
     <xhtml:link rel="alternate" hreflang="he" href="https://azaka.orellius.ai/about"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://azaka.orellius.ai/en/about"/>

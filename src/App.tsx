@@ -5,6 +5,7 @@ import { AlertEventPage } from './pages/AlertEventPage'
 import { CitiesIndexPage } from './pages/CitiesIndexPage'
 import { ApiPage } from './pages/ApiPage'
 import { PlatformsPage } from './pages/PlatformsPage'
+import { MenuPage } from './pages/MenuPage'
 import { EmbedWidget } from './pages/EmbedWidget'
 import { CookieConsent } from './consent/CookieConsent'
 import { AccessibilityWidget } from './a11y/AccessibilityWidget'
@@ -81,6 +82,8 @@ function App() {
         <ApiPage />
       ) : path === '/platforms' ? (
         <PlatformsPage />
+      ) : path === '/menu' ? (
+        <MenuPage />
       ) : cityName ? (
         <CityPage key={cityName} name={cityName} />
       ) : alertId ? (

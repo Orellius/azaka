@@ -169,6 +169,23 @@ export const STRINGS = {
   nav_cities: { he: 'ערים', en: 'Cities', ar: 'المدن', ru: 'Города' },
   nav_api: { he: 'API', en: 'API', ar: 'API', ru: 'API' },
   nav_platforms: { he: 'פלטפורמות', en: 'Platforms', ar: 'المنصات', ru: 'Платформы' },
+  nav_menu: { he: 'תפריט', en: 'Menu', ar: 'القائمة', ru: 'Меню' },
+  menu_live: { he: 'מפה ומידע חי', en: 'Map & live data', ar: 'الخريطة والبيانات المباشرة', ru: 'Карта и данные в реальном времени' },
+  menu_map: { he: 'מפה חיה', en: 'Live map', ar: 'خريطة مباشرة', ru: 'Живая карта' },
+  menu_platforms: { he: 'פלטפורמות ומפתחים', en: 'Platforms & developers', ar: 'المنصات والمطورون', ru: 'Платформы и разработчики' },
+  menu_info: { he: 'מידע ומדיניות', en: 'Information & policies', ar: 'معلومات وسياسات', ru: 'Информация и политики' },
+  menu_meta_title: {
+    he: 'תפריט האתר — כל העמודים | אזעקה',
+    en: 'Site menu — all pages | Azaka',
+    ar: 'قائمة الموقع — كل الصفحات | أزاكا',
+    ru: 'Меню сайта — все страницы | Azaka',
+  },
+  menu_meta_desc: {
+    he: 'כל עמודי אזעקה במקום אחד: מפה חיה, ערים, סטטיסטיקה, פלטפורמות, API, נגישות ומדיניות.',
+    en: 'All Azaka pages in one place: live map, cities, statistics, platforms, API, accessibility and policies.',
+    ar: 'كل صفحات أزاكا في مكان واحد: الخريطة المباشرة، المدن، الإحصاءات، المنصات، API، إمكانية الوصول والسياسات.',
+    ru: 'Все страницы Azaka в одном месте: живая карта, города, статистика, платформы, API, доступность и политики.',
+  },
 
   // Platforms page (/platforms)
   platforms_title: { he: 'כל הפלטפורמות', en: 'All platforms', ar: 'جميع المنصات', ru: 'Все платформы' },

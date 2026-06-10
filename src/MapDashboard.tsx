@@ -231,10 +231,10 @@ export function MapDashboard() {
             <path d="M9 6l6 6-6 6" />
           </svg>
         </button>
-        {/* Desktop column: panel + footer strip share the width/side; the panel flexes to fill
-            whatever the one-line strip leaves. 3.5rem bottom math (vs 2rem elsewhere) keeps the
-            strip clear of the map's compact attribution bar in RTL, where both sit at the same
-            corner. `contents` keeps the mobile fixed-positioned sheet out of this layout entirely. */}
+        {/* Desktop column: the panel fills it; a tiny status/credit chip sits under it. 3.5rem
+            bottom math (vs 2rem elsewhere) keeps the chip clear of the map's compact attribution
+            button in RTL, where both sit at the same corner. `contents` keeps the mobile
+            fixed-positioned sheet out of this layout entirely. */}
         <div className="contents sm:me-auto sm:flex sm:h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-3.5rem)] sm:w-80 sm:max-w-[88vw] sm:flex-col sm:gap-2 xl:w-96">
         <div
           className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 transition-[transform,opacity] duration-300 ease-out sm:relative sm:min-h-0 sm:flex-1 sm:rounded-lg sm:border ${lowered ? 'top-24' : 'top-0'} sm:top-auto ${panelOpen ? '' : 'sm:pointer-events-none sm:-translate-x-[110%] sm:opacity-0 rtl:sm:translate-x-[110%]'}`}
@@ -331,7 +331,7 @@ export function MapDashboard() {
           </div>
           </div>
         </div>
-        <FooterStrip status={status} open={panelOpen} />
+        <StatusCreditChip status={status} />
         </div>
       </div>
     </div>
@@ -497,7 +497,7 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
       </div>
 
       {/* mobile only: links + credit/status stay at the bottom of the notification-shade sheet;
-          on desktop these rows live in the floating FooterStrip below the panel instead */}
+          on desktop rights/status live in the floating StatusCreditChip below the panel instead */}
       <div className="flex flex-col gap-2 sm:hidden">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.625rem] text-fg-muted">
           <FooterLinks />
@@ -517,7 +517,7 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
 }
 
 // Page links + cookie settings as bare flex items: the parent supplies the flex-wrap row, so the
-// same markup flows inline inside the one-line desktop strip and as its own row in the mobile sheet.
+// same markup flows as the desktop panel row and as its own row in the mobile sheet.
 function FooterLinks() {
   const { t } = useLang()
   return (
@@ -571,26 +571,29 @@ function StatusChip({ status }: { status: FeedStatus }) {
   )
 }
 
-// Desktop-only floating strip directly under the panel (its flex-column sibling): page links ·
-// rights/credit · updated+status. Slides/fades with the drawer using the panel's exact transition.
-// One line when it fits; flex-wrap lets wide locales wrap to two lines rather than truncate.
-function FooterStrip({ status, open }: { status: FeedStatus; open: boolean }) {
+// Desktop-only compact chip docked beside MapLibre's compact attribution control (physical
+// bottom-right in both directions): menu link · status · © credit. Deliberately does NOT slide
+// with the drawer — connection status matters most when the panel is hidden.
+function StatusCreditChip({ status }: { status: FeedStatus }) {
   const { t } = useLang()
   return (
-    <div
-      className={`hidden shrink-0 flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-white/[0.08] bg-surface px-3 py-2 text-[0.625rem] text-fg-muted shadow-lg shadow-black/50 transition-[transform,opacity] duration-300 ease-out sm:flex ${open ? 'pointer-events-auto' : 'pointer-events-none -translate-x-[110%] opacity-0 rtl:translate-x-[110%]'}`}
-    >
-      <FooterLinks />
+    <div className="pointer-events-auto absolute bottom-2.5 right-12 z-10 hidden w-fit shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border border-white/[0.08] bg-surface/90 px-3 py-1.5 text-[0.625rem] shadow-lg shadow-black/30 sm:flex">
+      <button
+        type="button"
+        onClick={() => navigate('/menu')}
+        className="rounded font-medium text-fg-muted transition hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+      >
+        {t('nav_menu')}
+      </button>
       <span aria-hidden className="text-fg-faint">
         ·
       </span>
-      {/* short © brand here (the full rights sentence stays in the mobile sheet); "updated HH:MM"
-          is dropped from the strip — it crowded the single line past two wraps at w-80 */}
-      <span className="whitespace-nowrap text-fg-faint">
-        © {t('brand')} · <CreditLink />
+      <StatusChip status={status} />
+      <span aria-hidden className="text-fg-faint">
+        ·
       </span>
-      <span className="ms-auto">
-        <StatusChip status={status} />
+      <span className="text-fg-faint">
+        © {t('brand')} · <CreditLink />
       </span>
     </div>
   )
