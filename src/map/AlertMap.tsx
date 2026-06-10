@@ -125,7 +125,7 @@ export function AlertMap({
       // Default view FITS the whole country (Eilat to Metula) on any viewport — a fixed
       // center+zoom cannot do that across screen sizes.
       bounds: ISRAEL_BOUNDS,
-      fitBoundsOptions: { padding: 40 },
+      fitBoundsOptions: { padding: 80 },
       // Israel-only POV: pan/zoom stays within the country + a margin (hull/labels near the
       // borders still render); zooming out past the country view is clamped by the bounds.
       maxBounds: [
@@ -279,7 +279,7 @@ export function AlertMap({
       src.setData(EMPTY)
       if (hadSnapshotRef.current) {
         // left a history snapshot: zoom back out to the default country view
-        m.fitBounds(ISRAEL_BOUNDS, { padding: 40, duration: 900 })
+        m.fitBounds(ISRAEL_BOUNDS, { padding: 80, duration: 900 })
         hadSnapshotRef.current = false
       }
       return
