@@ -4,7 +4,7 @@ import maplibregl from 'maplibre-gl'
 import type { ExpressionSpecification, GeoJSONSource } from 'maplibre-gl'
 import type { Feature, FeatureCollection, Polygon } from 'geojson'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { mapStyle, cartoFallbackStyle, OFM_VECTOR_SOURCE_ID, ISRAEL_CENTER, ISRAEL_ZOOM } from './mapStyle'
+import { mapStyle, cartoFallbackStyle, OFM_VECTOR_SOURCE_ID, ISRAEL_BOUNDS } from './mapStyle'
 import { inflateAreas, type SlimAreas } from './areasSlim'
 import { computeThreatZone } from '../threat-zone/computeThreatZone'
 import { convexHull, type Point } from '../threat-zone/convexHull'
@@ -122,15 +122,17 @@ export function AlertMap({
     const m = new maplibregl.Map({
       container: containerRef.current,
       style: base === 'carto' ? cartoFallbackStyle : mapStyle,
-      center: ISRAEL_CENTER,
-      zoom: ISRAEL_ZOOM,
+      // Default view FITS the whole country (Eilat to Metula) on any viewport — a fixed
+      // center+zoom cannot do that across screen sizes.
+      bounds: ISRAEL_BOUNDS,
+      fitBoundsOptions: { padding: 40 },
       // Israel-only POV: pan/zoom stays within the country + a margin (hull/labels near the
       // borders still render); zooming out past the country view is clamped by the bounds.
       maxBounds: [
         [32.6, 28.9],
         [37.6, 33.9],
       ],
-      minZoom: 5.8,
+      minZoom: 5.4,
       attributionControl: { compact: true },
     })
     mapRef.current = m
@@ -277,7 +279,7 @@ export function AlertMap({
       src.setData(EMPTY)
       if (hadSnapshotRef.current) {
         // left a history snapshot: zoom back out to the default country view
-        m.flyTo({ center: ISRAEL_CENTER, zoom: ISRAEL_ZOOM, duration: 900 })
+        m.fitBounds(ISRAEL_BOUNDS, { padding: 40, duration: 900 })
         hadSnapshotRef.current = false
       }
       return

@@ -6,7 +6,8 @@ import ofmPositronNoLabels from './ofm-positron-nolabels.json'
 // only runtime failure mode is the 'openmaptiles' source (TileJSON/tiles) — AlertMap watches for
 // that and falls back one-shot to the CARTO raster style below. Attribution comes from each
 // source's own metadata (OFM TileJSON: OpenFreeMap / OpenMapTiles / OSM; CARTO: inline).
-export const ISRAEL_CENTER: [number, number] = [34.95, 31.9]
+export const ISRAEL_CENTER: [number, number] = [34.95, 31.4]
+export const ISRAEL_BOUNDS: [[number, number], [number, number]] = [[34.2, 29.4], [35.95, 33.4]]
 export const ISRAEL_ZOOM = 6.8
 
 // The vector source whose failure means "no basemap" (watched by AlertMap's fallback).
