@@ -124,6 +124,13 @@ export function AlertMap({
       style: base === 'carto' ? cartoFallbackStyle : mapStyle,
       center: ISRAEL_CENTER,
       zoom: ISRAEL_ZOOM,
+      // Israel-only POV: pan/zoom stays within the country + a margin (hull/labels near the
+      // borders still render); zooming out past the country view is clamped by the bounds.
+      maxBounds: [
+        [32.6, 28.9],
+        [37.6, 33.9],
+      ],
+      minZoom: 5.8,
       attributionControl: { compact: true },
     })
     mapRef.current = m
