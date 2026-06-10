@@ -16,10 +16,10 @@ const OREF_URL = Bun.env.OREF_URL ?? 'https://www.oref.org.il/warningMessages/al
 // left open in production. Enabled in dev (NODE_ENV unset), disabled in prod unless explicitly opted in.
 const TEST_ALERTS_ENABLED = Bun.env.ALLOW_TEST_ALERTS === '1' || Bun.env.NODE_ENV !== 'production'
 
-// In production the relay also serves the built frontend, so the app, the websocket, and the
-// history API share one origin behind the Cloudflare tunnel (wss works, no CORS, one hostname).
+// The frontend lives on Vercel; the relay is API-only (ws/history/analytics) behind the tunnel at
+// azaka-relay.orellius.ai. SERVE_STATIC=1 re-enables serving dist/ for single-origin setups.
 const DIST_DIR = new URL('../dist', import.meta.url).pathname
-const HAS_DIST = existsSync(join(DIST_DIR, 'index.html'))
+const HAS_DIST = Bun.env.SERVE_STATIC === '1' && existsSync(join(DIST_DIR, 'index.html'))
 
 const CORS = { 'Access-Control-Allow-Origin': '*' }
 const OREF_HEADERS = {
