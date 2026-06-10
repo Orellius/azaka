@@ -54,7 +54,7 @@ export function AccessibilityWidget() {
 
   return (
     <div
-      className="fixed bottom-16 start-3 z-40"
+      className="fixed bottom-16 end-3 z-40"
       onKeyDown={(e) => {
         if (e.key === 'Escape') setOpen(false)
       }}
