@@ -153,8 +153,8 @@ export function MapDashboard() {
           >
             <span className={`inline-flex h-3 w-3 rounded-full ${headDot}`} />
             <span className="text-[0.875rem] font-semibold text-fg">{t('brand')}</span>
-            <svg className="size-4 text-fg-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M9 6l6 6-6 6" />
+            <svg className="size-4 text-fg-muted rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M15 6l-6 6 6 6" />
             </svg>
           </button>
         )}
@@ -182,8 +182,8 @@ export function MapDashboard() {
                 aria-expanded
                 className="hidden h-8 w-8 items-center justify-center rounded-md border border-white/[0.08] bg-card text-fg-muted transition hover:border-white/[0.14] hover:bg-card-hover hover:text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 sm:flex"
               >
-                <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <path d="M15 6l-6 6 6 6" />
+                <svg className="size-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M9 6l6 6-6 6" />
                 </svg>
               </button>
               <button
@@ -201,7 +201,7 @@ export function MapDashboard() {
           </header>
 
           <div
-            className={`feed-scroll flex min-h-0 flex-col gap-3 overflow-y-auto px-3 transition-[max-height,opacity,padding] duration-300 ease-out sm:max-h-none sm:flex-1 sm:px-4 sm:pb-4 sm:pt-0 sm:opacity-100 ${sheetOpen ? 'max-h-[72vh] pb-3 opacity-100' : 'max-h-0 pb-0 opacity-0'}`}
+            className={`feed-scroll flex min-h-0 flex-col gap-3 overflow-y-auto px-3 transition-[max-height,opacity,padding] duration-300 ease-out sm:max-h-none sm:flex-1 sm:overflow-hidden sm:px-4 sm:pb-4 sm:pt-0 sm:opacity-100 ${sheetOpen ? 'max-h-[72vh] pb-3 opacity-100' : 'max-h-0 pb-0 opacity-0'}`}
           >
           <LangChips />
 
@@ -227,7 +227,7 @@ export function MapDashboard() {
               {t('feed_empty')}
             </div>
           ) : (
-            <div className="feed-scroll flex max-h-[28rem] min-h-0 flex-col gap-2.5 overflow-y-auto pe-1">
+            <div className="feed-scroll flex max-h-[28rem] min-h-0 flex-col gap-2.5 overflow-y-auto pe-1 sm:max-h-none sm:flex-1">
               {events.map((ev) => (
                 <EventCard
                   key={ev.id}
@@ -242,7 +242,9 @@ export function MapDashboard() {
             </div>
           )}
 
-          <SidebarFooter lastAt={lastAt} status={status} />
+          <div className="sm:mt-auto">
+            <SidebarFooter lastAt={lastAt} status={status} />
+          </div>
           </div>
         </div>
       </div>
