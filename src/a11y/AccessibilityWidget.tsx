@@ -5,8 +5,8 @@ import { useLang } from '../i18n/useLang'
 
 // Floating accessibility widget (IS 5568 / WCAG 2.0 AA aid): text-size cycle, high contrast,
 // underline links, stop animations, reset, and a link to the /accessibility statement page.
-// Logical positioning (start/bottom) so it sits correctly in both RTL and LTR; z-40 keeps it
-// UNDER the cookie banner (z-50) and bottom-16 keeps it clear of the map attribution strip.
+// PHYSICAL bottom-left in every locale by product decision — the map attribution sits bottom-right
+// and the side panel never reaches that corner; z-40 keeps it UNDER the cookie banner (z-50).
 // Prefs persist via a11yStore; the CSS lives in index.css under the a11y-* classes.
 
 const TEXT_STEPS = ['100%', '112%', '125%'] as const
@@ -54,7 +54,7 @@ export function AccessibilityWidget() {
 
   return (
     <div
-      className="fixed bottom-16 end-3 z-40"
+      className="fixed bottom-3 left-3 z-40"
       onKeyDown={(e) => {
         if (e.key === 'Escape') setOpen(false)
       }}
@@ -63,7 +63,7 @@ export function AccessibilityWidget() {
         <div
           role="group"
           aria-label={t('a11y_title')}
-          className="absolute bottom-full start-0 mb-2 flex w-60 flex-col gap-0.5 rounded-lg border border-white/[0.08] bg-surface p-2 shadow-lg shadow-black/50"
+          className="absolute bottom-full left-0 mb-2 flex w-60 flex-col gap-0.5 rounded-lg border border-white/[0.08] bg-surface p-2 shadow-lg shadow-black/50"
         >
           <div className="px-2 pb-1.5 pt-1 text-[0.6875rem] font-semibold text-fg-muted">{t('a11y_title')}</div>
           <button
