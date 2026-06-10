@@ -81,10 +81,17 @@ export function MapDashboard() {
       {!(alerting || warning) && (
         <a
           href="/"
-          className="absolute top-3 end-3 z-10 flex items-center gap-2 rounded-lg border border-white/[0.08] bg-surface/90 px-2.5 py-1.5 shadow-lg shadow-black/30"
+          className="absolute top-3 end-3 z-10 flex max-w-[19rem] items-center gap-2.5 rounded-lg border border-white/[0.08] bg-surface/90 px-3 py-2 shadow-lg shadow-black/30"
         >
-          <img src="/favicon.svg" alt="" className="h-6 w-6" />
-          <span className="text-[0.875rem] font-semibold leading-none text-fg">אזעקה</span>
+          <img src="/favicon.svg" alt="" className="h-7 w-7 shrink-0" />
+          <span className="flex min-w-0 flex-col gap-0.5">
+            <span className="text-[0.8125rem] font-semibold leading-tight text-fg">
+              אזעקה — ממסר עצמאי להתרעות פיקוד העורף
+            </span>
+            <span className="text-[0.625rem] leading-tight text-fg-faint">
+              ללא זיקה לפיקוד העורף · מציגים את ההתרעות הרשמיות בלבד
+            </span>
+          </span>
         </a>
       )}
 
