@@ -125,14 +125,17 @@ export function AlertMap({
       // Default view FITS the whole country (Eilat to Metula) on any viewport — a fixed
       // center+zoom cannot do that across screen sizes.
       bounds: ISRAEL_BOUNDS,
-      fitBoundsOptions: { padding: 130 },
-      // Israel-only POV: pan/zoom stays within the country + a margin (hull/labels near the
-      // borders still render); zooming out past the country view is clamped by the bounds.
+      fitBoundsOptions: { padding: 100 },
+      // Regional lock: keeps the camera around Israel WITHOUT clamping the country-fit zoom.
+      // CAUTION: a tight box here silently overrides fitBounds/zoom-out on wide viewports —
+      // maxBounds clamps the zoom so the view never exceeds the box, and a wide screen showing
+      // tall-narrow Israel inevitably shows neighbors horizontally. Keep this box several
+      // degrees wider than the country or "zoom out" stops working.
       maxBounds: [
-        [32.6, 28.9],
-        [37.6, 33.9],
+        [29.5, 26.5],
+        [40.5, 36.5],
       ],
-      minZoom: 5.4,
+      minZoom: 5.5,
       attributionControl: { compact: true },
     })
     mapRef.current = m
@@ -279,7 +282,7 @@ export function AlertMap({
       src.setData(EMPTY)
       if (hadSnapshotRef.current) {
         // left a history snapshot: zoom back out to the default country view
-        m.fitBounds(ISRAEL_BOUNDS, { padding: 130, duration: 900 })
+        m.fitBounds(ISRAEL_BOUNDS, { padding: 100, duration: 900 })
         hadSnapshotRef.current = false
       }
       return
