@@ -38,7 +38,7 @@ const fmtDateTime = (ts: number) =>
 export function CityPage({ name }: { name: string }) {
   const { t, lang, tThreat, tAgo } = useLang()
   const localizeArea = useAreaName()
-  const [, setMyArea] = useMyArea()
+  const [, addArea] = useMyArea()
   const [load, setLoad] = useState<Load>({ s: 'loading' })
   const [rec, setRec] = useState<CityRec | null>(null)
 
@@ -70,7 +70,7 @@ export function CityPage({ name }: { name: string }) {
   const setAsMyArea = () => {
     if (!rec) return
     const area: MyArea = { name, en: rec.en, countdown: rec.countdown ?? null, lat: rec.lat, lng: rec.lng }
-    setMyArea(area)
+    addArea(area)
     navigate('/')
   }
 

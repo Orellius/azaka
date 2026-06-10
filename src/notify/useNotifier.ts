@@ -68,8 +68,8 @@ function playAlarm(ctx: AudioContext, kind: AlertKind) {
   }
 }
 
-function showNotification(a: LiveAlert, myArea: string | null | undefined, t: T) {
-  const mine = !!myArea && a.cities.includes(myArea)
+function showNotification(a: LiveAlert, myAreas: string[] | undefined, t: T) {
+  const mine = !!myAreas && myAreas.some((name) => a.cities.includes(name))
   const heading = mine ? t('notif_in_area') : a.kind === 'early' ? t('notif_early_head') : t('notif_active_head')
   const shown = a.cities.slice(0, 6).join(', ')
   const more = a.cities.length > 6 ? ` ${t('notif_more', { n: a.cities.length - 6 })}` : ''
@@ -92,20 +92,20 @@ function showNotification(a: LiveAlert, myArea: string | null | undefined, t: T)
   }
 }
 
-export function useNotifier(lastLiveAlert: LiveAlert | null, myAreaName?: string | null) {
+export function useNotifier(lastLiveAlert: LiveAlert | null, myAreaNames?: string[]) {
   const { t } = useLang()
   const [enabled, setEnabled] = useState(loadEnabled)
   const [perm, setPerm] = useState<Perm>(currentPerm)
   const ctxRef = useRef<AudioContext | null>(null)
   const enabledRef = useRef(enabled)
-  const myAreaRef = useRef(myAreaName)
+  const myAreasRef = useRef(myAreaNames)
   const tRef = useRef<T>(t)
 
-  // mirror the latest enabled/myArea/t into refs so the live-alert effect can read them without
+  // mirror the latest enabled/myAreas/t into refs so the live-alert effect can read them without
   // re-subscribing (a ref write during render is disallowed; this syncs after each commit instead)
   useEffect(() => {
     enabledRef.current = enabled
-    myAreaRef.current = myAreaName
+    myAreasRef.current = myAreaNames
     tRef.current = t
   })
 
@@ -177,7 +177,7 @@ export function useNotifier(lastLiveAlert: LiveAlert | null, myAreaName?: string
       }
     }
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      showNotification(lastLiveAlert, myAreaRef.current, tRef.current)
+      showNotification(lastLiveAlert, myAreasRef.current, tRef.current)
     }
   }, [lastLiveAlert, ensureCtx])
 

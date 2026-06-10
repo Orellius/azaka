@@ -4,8 +4,10 @@ import { useAlertFeed, type FeedEvent, type FeedStatus } from './alerts/useAlert
 import { AlertIcon } from './alerts/AlertIcon'
 import { useNotifier } from './notify/useNotifier'
 import { AlertToggle } from './notify/AlertToggle'
+import { useVoice } from './notify/useVoice'
+import { VoiceToggle } from './notify/VoiceToggle'
 import { useMyArea } from './myarea/useMyArea'
-import { usePersonalAlert } from './myarea/usePersonalAlert'
+import { areaTier, usePersonalAlert } from './myarea/usePersonalAlert'
 import { PersonalAlertBanner } from './myarea/PersonalAlertBanner'
 import { MyAreaControl } from './myarea/MyAreaControl'
 import { WhereToShelter } from './shelter/WhereToShelter'
@@ -62,9 +64,11 @@ export function MapDashboard() {
   usePageMeta(t('home_meta_title'), t('home_meta_desc')) // per-locale title + canonical/hreflang for / and /en /ar /ru
   const regionsOf = useRegions()
   const { activeAreas, earlyAreas, clearedAreas, status, lastAt, instruction, events, lastLiveAlert } = useAlertFeed()
-  const [myArea, setMyArea] = useMyArea()
-  const notifier = useNotifier(lastLiveAlert, myArea?.name ?? null)
-  const personal = usePersonalAlert(myArea?.name ?? null, activeAreas, earlyAreas, clearedAreas, lastLiveAlert)
+  const [myAreas, addArea, removeArea] = useMyArea()
+  const myAreaNames = myAreas.map((a) => a.name)
+  const notifier = useNotifier(lastLiveAlert, myAreaNames)
+  const voice = useVoice(lastLiveAlert, myAreaNames)
+  const personal = usePersonalAlert(myAreas, activeAreas, earlyAreas, clearedAreas, lastLiveAlert)
   const [snapshot, setSnapshot] = useState<FeedEvent | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false) // mobile: feed dropdown collapsed by default (tap the hamburger); desktop ignores it
   // desktop drawer: open by default, edge handle toggles it; the choice persists across visits
@@ -94,7 +98,7 @@ export function MapDashboard() {
   }, [alerting, warning])
   const activeRegions = regionsOf([...activeAreas, ...earlyAreas])
   const headDot = alerting ? 'bg-rose-500' : warning ? 'bg-amber-500' : clearedAreas.size > 0 ? 'bg-emerald-500' : 'bg-fg-faint'
-  const lowered = !!(myArea && personal) // the personal banner owns the very top; push top-anchored chrome below it
+  const lowered = !!personal // the personal banner owns the very top; push top-anchored chrome below it
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
@@ -124,7 +128,7 @@ export function MapDashboard() {
         </a>
       )}
 
-      {myArea && personal && <PersonalAlertBanner area={myArea} personal={personal} />}
+      {personal && <PersonalAlertBanner personal={personal} />}
 
       <div className="pointer-events-none absolute inset-0 p-4">
         {snapshot && <SnapshotBanner event={snapshot} onClose={() => setSnapshot(null)} lowered={lowered} />}
@@ -255,6 +259,7 @@ export function MapDashboard() {
             <div className="ms-auto flex items-center gap-2">
               <LiveClock />
               <AlertToggle enabled={notifier.enabled} onToggle={notifier.toggle} />
+              {voice.supported && <VoiceToggle enabled={voice.enabled} onToggle={voice.toggle} />}
               <button
                 type="button"
                 onClick={() => setSheetOpen((v) => !v)}
@@ -289,7 +294,12 @@ export function MapDashboard() {
             </div>
           )}
 
-          <MyAreaControl myArea={myArea} onChange={setMyArea} tier={personal?.tier ?? null} />
+          <MyAreaControl
+            areas={myAreas}
+            onAdd={addArea}
+            onRemove={removeArea}
+            tierOf={(name) => areaTier(name, activeAreas, earlyAreas, clearedAreas)}
+          />
 
           {events.length === 0 ? (
             <div className="rounded-md border border-white/[0.08] bg-card px-3 py-3 text-center text-sm text-fg-muted">

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import type { MyArea } from './useMyArea'
 import type { PersonalAlert, PersonalTier } from './usePersonalAlert'
 import { useLang } from '../i18n/useLang'
 import { useAreaName } from '../i18n/areaNames'
 
 // Full-width PERSONAL alert banner: the single biggest jump from "national map" to "warns ME".
-// Shows when the user's chosen area is under alert, with a live ticking shelter countdown.
+// Shows when a saved area is under alert, with a live ticking shelter countdown for the most urgent
+// one (smallest official countdown); a "+N" pill marks other saved areas simultaneously alerted.
 // HONESTY (non-negotiable): the countdown is the official time-to-REACH-shelter (migun seconds), NOT
 // a time-to-impact and NOT a "safe now" timer. When it reaches 0 we say "you should be inside, wait
 // for instructions"; we never say it is safe to leave. If the alert was restored on page load (start
@@ -39,8 +39,10 @@ function fmt(sec: number): string {
   return `${sec}`
 }
 
-export function PersonalAlertBanner({ area, personal }: { area: MyArea; personal: PersonalAlert }) {
+export function PersonalAlertBanner({ personal }: { personal: PersonalAlert }) {
   const { t } = useLang()
+  const area = personal.area
+  const others = personal.alertedCount - 1
   const localizeArea = useAreaName()
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
@@ -71,7 +73,18 @@ export function PersonalAlertBanner({ area, personal }: { area: MyArea; personal
         <div className="flex items-baseline gap-2">
           <span className="text-[0.6875rem] font-semibold uppercase tracking-wide text-white/80">{t(LABEL_KEY[personal.tier])}</span>
         </div>
-        <div className="truncate text-xl font-extrabold leading-tight text-white">{localizeArea(area.name)}</div>
+        <div className="flex items-center gap-2">
+          <span className="truncate text-xl font-extrabold leading-tight text-white">{localizeArea(area.name)}</span>
+          {others > 0 && (
+            <span
+              title={t('pb_more_areas', { n: others })}
+              aria-label={t('pb_more_areas', { n: others })}
+              className={`shrink-0 rounded-full px-2 py-0.5 text-[0.75rem] font-bold tabular-nums ${skin.pill}`}
+            >
+              +{others}
+            </span>
+          )}
+        </div>
         {personal.tier === 'cleared' ? (
           <div className={`mt-0.5 text-[0.75rem] ${skin.accent}`}>{t('pb_cleared_msg')}</div>
         ) : left == null ? (

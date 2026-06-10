@@ -56,6 +56,8 @@ export const STRINGS = {
   myarea_mine_no_alert: { he: 'האזור שלי · אין התרעה כעת', en: 'My area · no alert now', ar: 'منطقتي · لا يوجد إنذار الآن', ru: 'Мой район · сейчас нет тревоги' },
   myarea_change: { he: 'שינוי', en: 'Change', ar: 'تغيير', ru: 'Изменить' },
   myarea_remove: { he: 'הסרת האזור שלי', en: 'Remove my area', ar: 'إزالة منطقتي', ru: 'Удалить мой район' },
+  myarea_add: { he: 'הוספת אזור', en: 'Add area', ar: 'إضافة منطقة', ru: 'Добавить район' },
+  myarea_max: { he: 'עד 5 אזורים שמורים', en: 'Up to 5 saved areas', ar: 'حتى 5 مناطق محفوظة', ru: 'До 5 сохранённых районов' },
 
   // status labels (shared by map popup, my-area chip)
   status_active: { he: 'בהתרעה פעילה', en: 'Active alert', ar: 'إنذار نشط', ru: 'Активная тревога' },
@@ -127,6 +129,12 @@ export const STRINGS = {
     en: 'Time to reach shelter · not time to impact',
     ar: 'وقت الوصول إلى الملجأ · ليس وقت الإصابة',
     ru: 'Время добраться до укрытия · не время до удара',
+  },
+  pb_more_areas: {
+    he: 'ועוד {n} אזורים שמורים בהתרעה',
+    en: '{n} more saved areas under alert',
+    ar: '{n} مناطق محفوظة أخرى تحت الإنذار',
+    ru: 'ещё {n} сохранённых районов под тревогой',
   },
   unit_min: { he: 'דקות', en: 'min', ar: 'دقائق', ru: 'мин' },
   unit_sec: { he: 'שניות', en: 'sec', ar: 'ثوانٍ', ru: 'сек' },
@@ -386,6 +394,12 @@ export const STRINGS = {
   notif_mute: { he: 'השתקת התרעות קוליות', en: 'Mute audible alerts', ar: 'كتم التنبيهات الصوتية', ru: 'Отключить звуковые оповещения' },
   notif_unmute: { he: 'הפעלת התרעות קוליות', en: 'Enable audible alerts', ar: 'تفعيل التنبيهات الصوتية', ru: 'Включить звуковые оповещения' },
 
+  // Voice readout (opt-in speechSynthesis of live alerts; src/notify/useVoice)
+  voice_on: { he: 'הקראה קולית פעילה', en: 'Voice readout on', ar: 'القراءة الصوتية مفعّلة', ru: 'Озвучивание включено' },
+  voice_off: { he: 'הקראה קולית כבויה', en: 'Voice readout off', ar: 'القراءة الصوتية متوقفة', ru: 'Озвучивание выключено' },
+  voice_mute: { he: 'כיבוי הקראה קולית של התרעות', en: 'Turn off voice readout of alerts', ar: 'إيقاف القراءة الصوتية للتنبيهات', ru: 'Выключить озвучивание тревог' },
+  voice_unmute: { he: 'הפעלת הקראה קולית של התרעות', en: 'Turn on voice readout of alerts', ar: 'تفعيل القراءة الصوتية للتنبيهات', ru: 'Включить озвучивание тревог' },
+
   // Cookie consent
   cookie_bold: { he: 'אנו משתמשים בעוגיות.', en: 'We use cookies.', ar: 'نستخدم ملفات تعريف الارتباط.', ru: 'Мы используем cookie.' },
   cookie_text: {
@@ -427,6 +441,14 @@ export const STRINGS = {
     en: 'Source: Home Front Command (oref.org.il) · log saved and auto-updated · archived by year',
     ar: 'المصدر: قيادة الجبهة الداخلية (oref.org.il) · يُحفظ السجل ويُحدَّث تلقائيًا · أرشيف سنوي',
     ru: 'Источник: Командование тыла (oref.org.il) · журнал сохраняется и обновляется · архив по годам',
+  },
+
+  // Share-preview disclaimer (api/alert-og.ts injects it into og:description for /alert/:id links)
+  og_disclaimer: {
+    he: 'כלי אזרחי לא רשמי — פעלו תמיד לפי הנחיות פיקוד העורף',
+    en: 'Unofficial citizen tool — always follow official Home Front Command guidance',
+    ar: 'أداة مدنية غير رسمية — اتبعوا دائمًا تعليمات قيادة الجبهة الداخلية',
+    ru: 'Неофициальный гражданский инструмент — всегда следуйте указаниям Командования тыла',
   },
 
   // Info pages chrome

@@ -1,5 +1,11 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/alert/:id", "destination": "/api/alert-og?id=:id" },
+    { "source": "/en/alert/:id", "destination": "/api/alert-og?id=:id&lang=en" },
+    { "source": "/ar/alert/:id", "destination": "/api/alert-og?id=:id&lang=ar" },
+    { "source": "/ru/alert/:id", "destination": "/api/alert-og?id=:id&lang=ru" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
