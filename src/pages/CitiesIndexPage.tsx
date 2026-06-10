@@ -48,9 +48,9 @@ export function CitiesIndexPage() {
   return (
     <ArchiveShell>
       <h1 className="text-2xl font-bold tracking-tight text-white">{t('cities_title')}</h1>
-      <p className="mt-2 text-[0.875rem] leading-relaxed text-slate-300">{t('cities_sub')}</p>
+      <p className="mt-2 text-[0.875rem] leading-relaxed text-fg-muted">{t('cities_sub')}</p>
 
-      {load.s === 'loading' && <p className="mt-7 text-[0.8125rem] text-slate-400">{t('hist_loading')}</p>}
+      {load.s === 'loading' && <p className="mt-7 text-[0.8125rem] text-fg-muted">{t('hist_loading')}</p>}
       {load.s === 'error' && <p className="mt-7 text-[0.8125rem] text-rose-300">{t('picker_failed')}</p>}
 
       {load.s === 'ok' && (
@@ -63,7 +63,7 @@ export function CitiesIndexPage() {
                   <SpaLink
                     key={name}
                     href={`/city/${encodeURIComponent(name)}`}
-                    className="rounded-md border border-white/[0.08] bg-card px-2 py-1 text-[0.75rem] text-slate-300 transition hover:bg-card-hover hover:text-white"
+                    className="rounded-md border border-white/[0.08] bg-card px-2 py-1 text-[0.75rem] text-fg-muted transition hover:bg-card-hover hover:text-white"
                   >
                     {localizeArea(name)}
                   </SpaLink>

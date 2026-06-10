@@ -11,9 +11,9 @@ export function NotFoundPage() {
   usePageMeta(`404 — ${t('notfound_title')} | ${t('brand')}`, t('notfound_text'), { noindex: true })
   return (
     <ArchiveShell>
-      <p className="text-[0.8125rem] font-semibold tracking-widest text-slate-500">404</p>
+      <p className="text-[0.8125rem] font-semibold tracking-widest text-fg-faint">404</p>
       <h1 className="mt-1 text-2xl font-bold tracking-tight text-white">{t('notfound_title')}</h1>
-      <p className="mt-2 text-[0.875rem] leading-relaxed text-slate-400">{t('notfound_text')}</p>
+      <p className="mt-2 text-[0.875rem] leading-relaxed text-fg-muted">{t('notfound_text')}</p>
       <SpaLink
         href="/"
         className="mt-6 inline-block rounded-md border border-sky-500/40 bg-sky-500/10 px-4 py-2 text-[0.8125rem] font-medium text-sky-300 transition hover:bg-sky-500/20"

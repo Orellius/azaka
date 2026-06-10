@@ -68,12 +68,12 @@ export function AlertEventPage({ id }: { id: string }) {
 
   return (
     <ArchiveShell>
-      {load.s === 'loading' && <p className="text-[0.8125rem] text-slate-400">{t('hist_loading')}</p>}
+      {load.s === 'loading' && <p className="text-[0.8125rem] text-fg-muted">{t('hist_loading')}</p>}
       {load.s === 'error' && <p className="text-[0.8125rem] text-rose-300">{t('hist_relay_error')}</p>}
       {load.s === 'notfound' && (
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white">{t('alert_event_title')}</h1>
-          <p className="mt-3 text-[0.8125rem] text-slate-400">{t('alert_not_found')}</p>
+          <p className="mt-3 text-[0.8125rem] text-fg-muted">{t('alert_not_found')}</p>
         </div>
       )}
 
@@ -83,9 +83,9 @@ export function AlertEventPage({ id }: { id: string }) {
           <h1 className="mt-3 text-2xl font-bold leading-snug tracking-tight text-white">
             {ev.title || t('alert_generic')}
           </h1>
-          {lang !== 'he' && tThreat(ev.key) && <p className="mt-1 text-[0.9375rem] text-slate-400">{tThreat(ev.key)}</p>}
-          {ev.desc && <p className="mt-3 text-[0.9375rem] leading-relaxed text-slate-300">{ev.desc}</p>}
-          {ev.ts != null && <p className="mt-3 text-[0.8125rem] tabular-nums text-slate-400">{fmtDateTime(ev.ts)}</p>}
+          {lang !== 'he' && tThreat(ev.key) && <p className="mt-1 text-[0.9375rem] text-fg-muted">{tThreat(ev.key)}</p>}
+          {ev.desc && <p className="mt-3 text-[0.9375rem] leading-relaxed text-fg-muted">{ev.desc}</p>}
+          {ev.ts != null && <p className="mt-3 text-[0.8125rem] tabular-nums text-fg-muted">{fmtDateTime(ev.ts)}</p>}
 
           <div className="mt-5">
             <SpaLink
@@ -104,7 +104,7 @@ export function AlertEventPage({ id }: { id: string }) {
                   <SpaLink
                     key={c}
                     href={`/city/${encodeURIComponent(c)}`}
-                    className="rounded-md border border-white/[0.08] bg-card px-2 py-1 text-[0.75rem] text-slate-300 transition hover:bg-card-hover hover:text-white"
+                    className="rounded-md border border-white/[0.08] bg-card px-2 py-1 text-[0.75rem] text-fg-muted transition hover:bg-card-hover hover:text-white"
                   >
                     {localizeArea(c)}
                   </SpaLink>

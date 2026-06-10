@@ -2,6 +2,7 @@ import { navigate } from '../router'
 import { openCookieSettings } from '../consent/consentStore'
 import { useLang } from '../i18n/useLang'
 import { usePageMeta } from '../seo/usePageMeta'
+import { useInOverlay } from '../overlayContext'
 import type { Lang } from '../i18n/strings'
 
 // Static content pages (About / Privacy / Terms / Contact) reachable from the sidebar footer. One shell
@@ -238,26 +239,30 @@ const PAGES: Record<Lang, Record<InfoSlug, Page>> = {
 export function InfoPage({ slug }: { slug: InfoSlug }) {
   const { t, lang } = useLang()
   const page = PAGES[lang][slug]
+  // inside the RouteOverlay sheet: size to the sheet, drop the redundant back-to-map button
+  const inOverlay = useInOverlay()
   usePageMeta(`${page.title} | ${t('brand')}`, page.intro)
   return (
-    <div className="feed-scroll min-h-screen w-screen overflow-y-auto bg-slate-950 text-slate-200">
+    <div className={`feed-scroll overflow-y-auto bg-surface text-fg ${inOverlay ? 'h-full w-full' : 'min-h-screen w-screen'}`}>
       <div className="mx-auto w-full max-w-2xl px-5 py-10">
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="mb-6 text-[0.8125rem] font-medium text-sky-400 transition hover:text-sky-300"
-        >
-          {t('info_back')}
-        </button>
+        {!inOverlay && (
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="mb-6 text-[0.8125rem] font-medium text-sky-400 transition hover:text-sky-300"
+          >
+            {t('info_back')}
+          </button>
+        )}
         <h1 className="text-2xl font-bold tracking-tight text-white">{page.title}</h1>
-        <p className="mt-2 text-[0.875rem] leading-relaxed text-slate-300">{page.intro}</p>
+        <p className="mt-2 text-[0.875rem] leading-relaxed text-fg-muted">{page.intro}</p>
 
         <div className="mt-7 flex flex-col gap-6">
           {page.sections.map((s) => (
             <section key={s.h}>
               <h2 className="text-[0.9375rem] font-semibold text-white">{s.h}</h2>
               {s.p.map((para, i) => (
-                <p key={i} className="mt-1.5 text-[0.8125rem] leading-relaxed text-slate-400">
+                <p key={i} className="mt-1.5 text-[0.8125rem] leading-relaxed text-fg-muted">
                   {para}
                 </p>
               ))}
@@ -274,46 +279,46 @@ export function InfoPage({ slug }: { slug: InfoSlug }) {
           )}
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/10 pt-5 text-[0.6875rem] text-slate-500">
-          <button type="button" onClick={() => navigate('/cities')} className="transition hover:text-slate-300">
+        <div className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/[0.08] pt-5 text-[0.6875rem] text-fg-faint">
+          <button type="button" onClick={() => navigate('/cities')} className="transition hover:text-fg">
             {t('nav_cities')}
           </button>
           <span>·</span>
-          <button type="button" onClick={() => navigate('/api')} className="transition hover:text-slate-300">
+          <button type="button" onClick={() => navigate('/api')} className="transition hover:text-fg">
             {t('nav_api')}
           </button>
           <span>·</span>
-          <button type="button" onClick={() => navigate('/platforms')} className="transition hover:text-slate-300">
+          <button type="button" onClick={() => navigate('/platforms')} className="transition hover:text-fg">
             {t('nav_platforms')}
           </button>
           <span>·</span>
-          <button type="button" onClick={() => navigate('/about')} className="transition hover:text-slate-300">
+          <button type="button" onClick={() => navigate('/about')} className="transition hover:text-fg">
             {t('nav_about')}
           </button>
           <span>·</span>
-          <button type="button" onClick={() => navigate('/privacy')} className="transition hover:text-slate-300">
+          <button type="button" onClick={() => navigate('/privacy')} className="transition hover:text-fg">
             {t('nav_privacy')}
           </button>
           <span>·</span>
-          <button type="button" onClick={() => navigate('/terms')} className="transition hover:text-slate-300">
+          <button type="button" onClick={() => navigate('/terms')} className="transition hover:text-fg">
             {t('nav_terms')}
           </button>
           <span>·</span>
-          <button type="button" onClick={() => navigate('/contact')} className="transition hover:text-slate-300">
+          <button type="button" onClick={() => navigate('/contact')} className="transition hover:text-fg">
             {t('nav_contact')}
           </button>
           <span>·</span>
-          <button type="button" onClick={() => navigate('/accessibility')} className="transition hover:text-slate-300">
+          <button type="button" onClick={() => navigate('/accessibility')} className="transition hover:text-fg">
             {t('nav_accessibility')}
           </button>
           <span>·</span>
-          <button type="button" onClick={openCookieSettings} className="transition hover:text-slate-300">
+          <button type="button" onClick={openCookieSettings} className="transition hover:text-fg">
             {t('nav_cookies')}
           </button>
         </div>
-        <div className="mt-3 text-[0.6875rem] text-slate-600">
+        <div className="mt-3 text-[0.6875rem] text-fg-faint">
           {t('info_updated')} · {t('rights')} ·{' '}
-          <a href="https://orellius.ai" target="_blank" rel="noopener" className="transition hover:text-slate-400">
+          <a href="https://orellius.ai" target="_blank" rel="noopener" className="transition hover:text-fg-muted">
             Orel Ohayon{/* allow-personal: public footer credit explicitly requested by Orel */}
           </a>
         </div>

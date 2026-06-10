@@ -28,19 +28,19 @@ const ICONS = {
 
 function Card({ icon, name, desc, children }: { icon: ReactNode; name: string; desc: string; children?: ReactNode }) {
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+    <div className="flex flex-col gap-2 rounded-lg border border-white/[0.08] bg-card p-4">
       <div className="flex items-center gap-2.5 text-sky-300">
         {icon}
         <h2 className="text-[0.9375rem] font-semibold text-white">{name}</h2>
       </div>
-      <p className="text-[0.8125rem] leading-relaxed text-slate-400">{desc}</p>
+      <p className="text-[0.8125rem] leading-relaxed text-fg-muted">{desc}</p>
       <div className="mt-auto pt-1">{children}</div>
     </div>
   )
 }
 
 const linkCls =
-  'inline-block rounded-md border border-white/10 bg-white/[0.06] px-3 py-1.5 text-[0.75rem] font-semibold text-sky-300 transition hover:bg-white/[0.1] hover:text-sky-200'
+  'inline-block rounded-md border border-white/[0.08] bg-card px-3 py-1.5 text-[0.75rem] font-semibold text-sky-300 transition hover:bg-card-hover hover:text-sky-200'
 
 function CopySnippet() {
   const { t } = useLang()
@@ -56,13 +56,13 @@ function CopySnippet() {
   }
   return (
     <div dir="ltr" className="relative">
-      <pre className="overflow-x-auto rounded-md border border-white/10 bg-white/[0.04] p-3 pe-20 text-left text-[0.6875rem] leading-relaxed text-slate-300">
+      <pre className="overflow-x-auto rounded-md border border-white/[0.08] bg-card p-3 pe-20 text-left text-[0.6875rem] leading-relaxed text-fg-muted">
         <code>{EMBED_SNIPPET}</code>
       </pre>
       <button
         type="button"
         onClick={copy}
-        className="absolute end-2 top-2 rounded-md border border-white/10 bg-white/[0.08] px-2.5 py-1 text-[0.6875rem] font-semibold text-slate-200 transition hover:bg-white/[0.14]"
+        className="absolute end-2 top-2 rounded-md border border-white/[0.08] bg-card-hover px-2.5 py-1 text-[0.6875rem] font-semibold text-fg transition hover:bg-white/[0.14]"
       >
         {copied ? t('embed_copied') : t('embed_copy')}
       </button>
@@ -83,7 +83,7 @@ export function PlatformsPage() {
   return (
     <ArchiveShell>
       <h1 className="text-xl font-bold text-white">{t('platforms_title')}</h1>
-      <p className="mt-2 text-[0.8125rem] leading-relaxed text-slate-300">{t('platforms_sub')}</p>
+      <p className="mt-2 text-[0.8125rem] leading-relaxed text-fg-muted">{t('platforms_sub')}</p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Card icon={ICONS.site} name={t('plat_site_name')} desc={t('plat_site_desc')}>
@@ -102,22 +102,22 @@ export function PlatformsPage() {
         </Card>
 
         <Card icon={ICONS.push} name={t('plat_push_name')} desc={t('plat_push_desc')}>
-          <span className="inline-block rounded-md border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[0.75rem] font-semibold text-slate-500">
+          <span className="inline-block rounded-md border border-white/[0.08] bg-card px-3 py-1.5 text-[0.75rem] font-semibold text-fg-faint">
             {t('plat_push_soon')}
           </span>
         </Card>
       </div>
 
       {/* the embed card spans full width: snippet + live preview need the room */}
-      <div className="mt-4 flex flex-col gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+      <div className="mt-4 flex flex-col gap-3 rounded-lg border border-white/[0.08] bg-card p-4">
         <div className="flex items-center gap-2.5 text-sky-300">
           {ICONS.embed}
           <h2 className="text-[0.9375rem] font-semibold text-white">{t('plat_embed_name')}</h2>
         </div>
-        <p className="text-[0.8125rem] leading-relaxed text-slate-400">{t('plat_embed_desc')}</p>
+        <p className="text-[0.8125rem] leading-relaxed text-fg-muted">{t('plat_embed_desc')}</p>
         <CopySnippet />
-        <div className="text-[0.6875rem] font-medium text-slate-500">{t('embed_preview')}</div>
-        <iframe src="/embed" height={420} className="w-full rounded-md border border-white/10" title="אזעקה — התרעות בזמן אמת" />
+        <div className="text-[0.6875rem] font-medium text-fg-faint">{t('embed_preview')}</div>
+        <iframe src="/embed" height={420} className="w-full rounded-md border border-white/[0.08]" title="אזעקה — התרעות בזמן אמת" />
       </div>
     </ArchiveShell>
   )

@@ -9,7 +9,8 @@ import { withLocale } from './i18n/locale'
 export function navigate(path: string) {
   const target = withLocale(path, getLang())
   if (target === window.location.pathname) return
-  window.history.pushState({}, '', target)
+  // inApp marks entries pushed by this router, so RouteOverlay knows history.back() stays in-session
+  window.history.pushState({ inApp: true }, '', target)
   window.dispatchEvent(new PopStateEvent('popstate'))
 }
 

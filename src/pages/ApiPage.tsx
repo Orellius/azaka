@@ -12,7 +12,7 @@ const BASE = 'https://azaka-relay.orellius.ai'
 
 function Code({ children }: { children: string }) {
   return (
-    <pre className="mt-2 overflow-x-auto rounded-md border border-white/10 bg-white/[0.04] p-3 text-[0.71875rem] leading-relaxed text-slate-300">
+    <pre className="mt-2 overflow-x-auto rounded-md border border-white/[0.08] bg-card p-3 text-[0.71875rem] leading-relaxed text-fg-muted">
       <code>{children}</code>
     </pre>
   )
@@ -22,7 +22,7 @@ function Fields({ rows }: { rows: Array<[string, string, string]> }) {
   return (
     <table className="mt-2 w-full border-collapse text-[0.71875rem]">
       <thead>
-        <tr className="border-b border-white/10 text-left text-slate-500">
+        <tr className="border-b border-white/[0.08] text-left text-fg-faint">
           <th className="py-1 pe-3 font-medium">field</th>
           <th className="py-1 pe-3 font-medium">type</th>
           <th className="py-1 font-medium">meaning</th>
@@ -30,10 +30,10 @@ function Fields({ rows }: { rows: Array<[string, string, string]> }) {
       </thead>
       <tbody>
         {rows.map(([name, type, meaning]) => (
-          <tr key={name} className="border-b border-white/5 align-top">
+          <tr key={name} className="border-b border-white/[0.08] align-top">
             <td className="py-1.5 pe-3 font-mono text-sky-300">{name}</td>
-            <td className="py-1.5 pe-3 font-mono text-slate-400">{type}</td>
-            <td className="py-1.5 text-slate-400">{meaning}</td>
+            <td className="py-1.5 pe-3 font-mono text-fg-muted">{type}</td>
+            <td className="py-1.5 text-fg-muted">{meaning}</td>
           </tr>
         ))}
       </tbody>
@@ -53,8 +53,8 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 function Endpoint({ method, path, children }: { method: string; path: string; children: ReactNode }) {
   return (
     <div className="mt-5">
-      <h3 className="font-mono text-[0.8125rem] font-semibold text-slate-200">
-        <span className="me-2 rounded bg-white/10 px-1.5 py-0.5 text-[0.6875rem] text-emerald-300">{method}</span>
+      <h3 className="font-mono text-[0.8125rem] font-semibold text-fg">
+        <span className="me-2 rounded bg-card-hover px-1.5 py-0.5 text-[0.6875rem] text-emerald-300">{method}</span>
         {path}
       </h3>
       {children}
@@ -63,7 +63,7 @@ function Endpoint({ method, path, children }: { method: string; path: string; ch
 }
 
 const P = ({ children }: { children: ReactNode }) => (
-  <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-slate-400">{children}</p>
+  <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-fg-muted">{children}</p>
 )
 
 export function ApiPage() {
@@ -76,7 +76,7 @@ export function ApiPage() {
       <h1 className="text-xl font-bold text-white">Azaka Alert API</h1>
 
       {/* Hebrew intro for the local audience; the docs themselves are English for developers */}
-      <p dir="rtl" className="mt-3 text-[0.8125rem] leading-relaxed text-slate-300">
+      <p dir="rtl" className="mt-3 text-[0.8125rem] leading-relaxed text-fg-muted">
         ה־API הציבורי של אזעקה: פיד התרעות פיקוד העורף בזמן אמת (WebSocket) והיסטוריית התרעות מלאה
         (REST) — חינם, בלי מפתח ובלי הרשמה. הנתונים הם הפיד הרשמי של פיקוד העורף, מועברים כלשונם
         (verbatim) דרך הממסר שלנו. התיעוד עצמו באנגלית, לקהל המפתחים.
@@ -84,14 +84,14 @@ export function ApiPage() {
 
       <div dir="ltr" className="text-left">
         <Section title="Terms (read first)">
-          <ul className="mt-1.5 list-disc space-y-1 ps-5 text-[0.8125rem] leading-relaxed text-slate-400">
+          <ul className="mt-1.5 list-disc space-y-1 ps-5 text-[0.8125rem] leading-relaxed text-fg-muted">
             <li>Free, no API key, no signup.</li>
             <li>
-              <b className="text-slate-300">No SLA.</b> This mirrors a public Pikud HaOref feed and can be wrong,
+              <b className="text-fg-muted">No SLA.</b> This mirrors a public Pikud HaOref feed and can be wrong,
               late, or offline. Do not build life-safety systems on it alone.
             </li>
             <li>
-              <b className="text-slate-300">Attribution required:</b>{' '}
+              <b className="text-fg-muted">Attribution required:</b>{' '}
               <span className="font-mono text-[0.75rem]">«נתונים: אזעקה azaka.orellius.ai»</span> or{' '}
               <span className="font-mono text-[0.75rem]">"Data: Azaka — azaka.orellius.ai"</span>, visible wherever
               the data is shown.
@@ -113,14 +113,14 @@ export function ApiPage() {
               Connect to <code className="font-mono">wss://azaka-relay.orellius.ai/ws</code>. The socket is
               receive-only (messages you send are ignored). Three message types, all JSON:
             </P>
-            <h4 className="mt-4 font-mono text-[0.75rem] font-semibold text-slate-300">type: "hello" — on connect</h4>
+            <h4 className="mt-4 font-mono text-[0.75rem] font-semibold text-fg-muted">type: "hello" — on connect</h4>
             <Code>{`{ "type": "hello", "activeAreas": ["קריית שמונה", "מטולה"] }`}</Code>
             <Fields
               rows={[
                 ['activeAreas', 'string[]', 'Area names currently under alert (seen in the last 15 min, no explicit all-clear yet). Lets you restore state after a reconnect.'],
               ]}
             />
-            <h4 className="mt-4 font-mono text-[0.75rem] font-semibold text-slate-300">type: "alert" — a new alert</h4>
+            <h4 className="mt-4 font-mono text-[0.75rem] font-semibold text-fg-muted">type: "alert" — a new alert</h4>
             <Code>{`{
   "type": "alert",
   "kind": "active",            // "active" | "early" | "special"
@@ -142,13 +142,13 @@ export function ApiPage() {
                 ['cities', 'string[]', 'Verbatim Hebrew oref area names. Per-area official shelter-entry seconds live in /data/cities.json on the main site (countdown field).'],
               ]}
             />
-            <h4 className="mt-4 font-mono text-[0.75rem] font-semibold text-slate-300">type: "clear" — official all-clear</h4>
+            <h4 className="mt-4 font-mono text-[0.75rem] font-semibold text-fg-muted">type: "clear" — official all-clear</h4>
             <Code>{`{ "type": "clear", "id": "1342551208…", "cat": "10", "cities": ["חולון", "בת ים"], "ts": 1781038493039 }`}</Code>
             <P>
               Emitted only when oref publishes an explicit "האירוע הסתיים" for those areas. Absence of a clear
               message does NOT mean an area is safe.
             </P>
-            <h4 className="mt-4 font-mono text-[0.75rem] font-semibold text-slate-300">Minimal client</h4>
+            <h4 className="mt-4 font-mono text-[0.75rem] font-semibold text-fg-muted">Minimal client</h4>
             <Code>{`const ws = new WebSocket('wss://azaka-relay.orellius.ai/ws')
 ws.onmessage = (e) => {
   const msg = JSON.parse(e.data)
@@ -215,7 +215,7 @@ ws.onmessage = (e) => {
         </Section>
 
         <Section title="Honesty notes">
-          <ul className="mt-1.5 list-disc space-y-1 ps-5 text-[0.8125rem] leading-relaxed text-slate-400">
+          <ul className="mt-1.5 list-disc space-y-1 ps-5 text-[0.8125rem] leading-relaxed text-fg-muted">
             <li>No predicted impact points, no "safe now" signals — the API only carries what oref published.</li>
             <li>History starts when this relay started recording (2026). It is not a complete national archive.</li>
             <li>Area polygons + per-area shelter seconds: <code className="font-mono">azaka.orellius.ai/data/areas.geojson</code> and <code className="font-mono">/data/cities.json</code> (same attribution applies).</li>

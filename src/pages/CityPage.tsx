@@ -77,10 +77,10 @@ export function CityPage({ name }: { name: string }) {
   return (
     <ArchiveShell>
       <h1 className="text-2xl font-bold tracking-tight text-white">{name}</h1>
-      {lang !== 'he' && localized !== name && <p className="mt-1 text-[0.9375rem] text-slate-400">{localized}</p>}
+      {lang !== 'he' && localized !== name && <p className="mt-1 text-[0.9375rem] text-fg-muted">{localized}</p>}
 
       {rec?.countdown != null && (
-        <p className="mt-2 text-[0.8125rem] text-slate-300">
+        <p className="mt-2 text-[0.8125rem] text-fg-muted">
           {t('map_shelter_time')}:{' '}
           <span className="font-semibold text-white">
             {rec.countdown === 0 ? t('immediate') : t('shelter_secs', { n: rec.countdown })}
@@ -106,9 +106,9 @@ export function CityPage({ name }: { name: string }) {
         )}
       </div>
 
-      {load.s === 'loading' && <p className="mt-7 text-[0.8125rem] text-slate-400">{t('hist_loading')}</p>}
+      {load.s === 'loading' && <p className="mt-7 text-[0.8125rem] text-fg-muted">{t('hist_loading')}</p>}
       {load.s === 'error' && <p className="mt-7 text-[0.8125rem] text-rose-300">{t('hist_relay_error')}</p>}
-      {load.s === 'notfound' && <p className="mt-7 text-[0.8125rem] text-slate-400">{t('city_not_found')}</p>}
+      {load.s === 'notfound' && <p className="mt-7 text-[0.8125rem] text-fg-muted">{t('city_not_found')}</p>}
 
       {load.s === 'ok' && (
         <div className="mt-7 flex flex-col gap-6">
@@ -125,7 +125,7 @@ export function CityPage({ name }: { name: string }) {
             </div>
           </div>
 
-          {load.data.total === 0 && <p className="text-[0.8125rem] text-slate-400">{t('city_none')}</p>}
+          {load.data.total === 0 && <p className="text-[0.8125rem] text-fg-muted">{t('city_none')}</p>}
 
           {Object.keys(load.data.byMonth).length > 0 && (
             <section>
@@ -144,8 +144,8 @@ export function CityPage({ name }: { name: string }) {
                   .sort((a, b) => b[1] - a[1])
                   .map(([key, count]) => (
                     <div key={key} className="flex items-center justify-between gap-3 text-[0.8125rem]">
-                      <span className="text-slate-300">{tThreat(key) || key}</span>
-                      <span className="tabular-nums text-slate-400">{count}</span>
+                      <span className="text-fg-muted">{tThreat(key) || key}</span>
+                      <span className="tabular-nums text-fg-muted">{count}</span>
                     </div>
                   ))}
               </div>
