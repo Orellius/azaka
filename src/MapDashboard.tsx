@@ -439,7 +439,7 @@ const FOOTER_LINKS: Array<{ key: StringKey; path: string }> = [
 function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: FeedStatus }) {
   const { t } = useLang()
   return (
-    <footer className="flex flex-col gap-2.5 border-t border-white/10 pt-3">
+    <footer className="flex flex-col gap-2 border-t border-white/10 pt-2.5">
       <a
         href="/historical"
         onClick={(e) => {
@@ -451,19 +451,17 @@ function SidebarFooter({ lastAt, status }: { lastAt: number | null; status: Feed
         {t('hist_stats')}
       </a>
 
-      <div className="rounded-md border border-white/[0.08] bg-card p-2.5">
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-          {LEGEND.map((l) => (
-            <div key={l.key} className="flex items-center gap-2">
-              <span className={`h-2 w-2 shrink-0 rounded-full ${l.color}`} />
-              <span className="text-[0.625rem] text-fg-muted">{t(l.key)}</span>
-            </div>
-          ))}
-        </div>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        {LEGEND.map((l) => (
+          <div key={l.key} className="flex items-center gap-1.5">
+            <span className={`h-2 w-2 shrink-0 rounded-full ${l.color}`} />
+            <span className="text-[0.625rem] text-fg-muted">{t(l.key)}</span>
+          </div>
+        ))}
       </div>
 
       {/* life-safety disclaimer: stays amber + high-salience by design, only the radius follows the system */}
-      <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2.5 py-2 text-[0.625rem] leading-relaxed text-amber-100/90">
+      <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2.5 py-1.5 text-[0.625rem] leading-snug text-amber-100/90">
         <span className="font-bold text-amber-200">{t('disclaimer_bold')}</span> {t('disclaimer_text')}
         <span className="mt-1 block text-amber-100/60">{t('disclaimer_source')}</span>
       </div>

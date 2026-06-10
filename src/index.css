@@ -16,11 +16,12 @@
 }
 
 /* Responsive root font-size: the whole UI is rem-based, so scaling this scales every panel, text, and
-   spacing together. 16px floor on phones/laptops, then a real ramp on large displays (~20px at 1080p,
-   ~22px at 1440p, 24px cap at 4K) so big screens stay readable. The MapLibre canvas is sized in
-   viewport units, not rem, so the map keeps its native resolution. Tune the slope/cap here. */
+   spacing together. 16px floor on phones/laptops, moderate ramp on large displays (~17.8px at 1080p,
+   ~16.3px at 1440x900 laptops, 21px cap at 4K). 0.4vw was tried and read as oversized/cluttered;
+   0.25vw as too small — this is the calibrated middle. The MapLibre canvas is sized in viewport
+   units, not rem, so the map keeps its native resolution. Tune the slope/cap here. */
 html {
-  font-size: clamp(16px, 0.4vw + 12px, 24px);
+  font-size: clamp(16px, 0.3vw + 12px, 21px);
 }
 
 html,
