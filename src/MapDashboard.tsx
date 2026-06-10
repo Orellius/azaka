@@ -223,7 +223,7 @@ export function MapDashboard() {
           </button>
         )}
         <div
-          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 sm:static sm:relative sm:me-auto sm:w-80 sm:max-w-[88vw] sm:h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] sm:rounded-lg sm:border xl:w-96 ${lowered ? 'top-24' : 'top-0'} sm:top-auto ${panelOpen ? '' : 'sm:hidden'}`}
+          className={`pointer-events-auto fixed inset-x-0 z-20 flex flex-col rounded-b-lg border-b border-white/[0.08] bg-surface shadow-lg shadow-black/50 sm:relative sm:me-auto sm:w-80 sm:max-w-[88vw] sm:h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] sm:rounded-lg sm:border xl:w-96 ${lowered ? 'top-24' : 'top-0'} sm:top-auto ${panelOpen ? '' : 'sm:hidden'}`}
         >
           <button
             type="button"
