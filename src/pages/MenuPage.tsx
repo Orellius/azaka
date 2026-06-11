@@ -21,7 +21,6 @@ const GROUPS: Array<{ h: StringKey; items: Array<{ key: StringKey; path: string 
     h: 'menu_platforms',
     items: [
       { key: 'nav_platforms', path: '/platforms' },
-      { key: 'nav_api', path: '/api' },
     ],
   },
   {

@@ -5,9 +5,9 @@ import type { StringKey } from '../i18n/strings'
 import { ArchiveShell, SpaLink } from './ArchiveShell'
 
 // /platforms — every way to get Azaka alerts (tzevaadom.co.il/systems-style grid): website, Telegram
-// channel + bot, free API, embeddable widget (iframe snippet + copy button + live preview), and an
+// channel + bot, embeddable widget (iframe snippet + copy button + live preview), and an
 // honest "web push in development" card. Reuses ArchiveShell for chrome/disclaimer/nav. NOT
-// responsible for: the widget itself (src/pages/EmbedWidget.tsx) or API docs (/api). Test strategy:
+// responsible for: the widget itself (src/pages/EmbedWidget.tsx). Test strategy:
 // build/lint + exercising the copy button and preview iframe in a browser.
 
 const EMBED_SNIPPET = `<iframe src="https://azaka.orellius.ai/embed" width="100%" height="420" style="border:0" title="אזעקה — התרעות בזמן אמת"></iframe>`
@@ -21,7 +21,6 @@ const ICONS = {
   site: icon(<><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></>),
   channel: icon(<path d="M3 11l18-7-4 16-6.5-4.5L8 18l-.5-5z" />),
   bot: icon(<><rect x="5" y="8" width="14" height="11" rx="2" /><path d="M12 8V4M8 4h8" /><circle cx="9.5" cy="13" r="0.5" /><circle cx="14.5" cy="13" r="0.5" /></>),
-  api: icon(<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13 5l-2 14" />),
   embed: icon(<><rect x="3" y="4" width="18" height="14" rx="2" /><path d="M3 8h18M9 12l-2 2 2 2M15 12l2 2-2 2" /></>),
   push: icon(<path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6M10 18a2 2 0 0 0 4 0" />),
 }
@@ -94,12 +93,6 @@ export function PlatformsPage() {
 
         {tg('plat_tg_channel_name', 'plat_tg_channel_desc', '@azaka_alerts', 'https://t.me/azaka_alerts', ICONS.channel)}
         {tg('plat_tg_bot_name', 'plat_tg_bot_desc', '@azakaalertsbot', 'https://t.me/azakaalertsbot', ICONS.bot)}
-
-        <Card icon={ICONS.api} name={t('plat_api_name')} desc={t('plat_api_desc')}>
-          <SpaLink href="/api" className={linkCls}>
-            {t('nav_api')}
-          </SpaLink>
-        </Card>
 
         <Card icon={ICONS.push} name={t('plat_push_name')} desc={t('plat_push_desc')}>
           <span className="inline-block rounded-md border border-white/[0.08] bg-card px-3 py-1.5 text-[0.75rem] font-semibold text-fg-faint">

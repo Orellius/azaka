@@ -3,7 +3,6 @@ import { InfoPage, type InfoSlug } from './pages/InfoPage'
 import { CityPage } from './pages/CityPage'
 import { AlertEventPage } from './pages/AlertEventPage'
 import { CitiesIndexPage } from './pages/CitiesIndexPage'
-import { ApiPage } from './pages/ApiPage'
 import { PlatformsPage } from './pages/PlatformsPage'
 import { MenuPage } from './pages/MenuPage'
 import { EmbedWidget } from './pages/EmbedWidget'
@@ -66,7 +65,6 @@ function routePage(path: string, info: InfoSlug | undefined, cityName: string | 
       </Suspense>
     )
   if (path === '/cities') return <CitiesIndexPage />
-  if (path === '/api') return <ApiPage />
   if (path === '/platforms') return <PlatformsPage />
   if (path === '/menu') return <MenuPage />
   if (cityName) return <CityPage key={cityName} name={cityName} />

@@ -457,7 +457,6 @@ const LEGEND: Array<{ color: string; key: StringKey }> = [
 
 const FOOTER_LINKS: Array<{ key: StringKey; path: string }> = [
   { key: 'nav_cities', path: '/cities' },
-  { key: 'nav_api', path: '/api' },
   { key: 'nav_platforms', path: '/platforms' },
   { key: 'nav_about', path: '/about' },
   { key: 'nav_privacy', path: '/privacy' },
