@@ -20,8 +20,8 @@
 ## What it is
 
 Azaka renders Israel's official Pikud HaOref rocket and missile alerts on a live map, the moment
-they fire — on the web, on Telegram, and through a free public API. It exists to be sharper than the
-typical Red Alert clone: the same official data, but read more carefully and shown more usefully.
+they fire — on the web and on Telegram. It exists to be sharper than the typical Red Alert clone:
+the same official data, but read more carefully and shown more usefully.
 
 It is built around one honest constraint: **you cannot predict where a missile will land from open
 data.** So Azaka never fakes a "where it lands" dot, never invents a "safe now" timer, and never
@@ -36,7 +36,6 @@ time-to-reach-shelter.
 | Web app | https://azaka.orellius.ai |
 | Telegram channel (all alerts, country-wide) | https://t.me/azaka_alerts |
 | Telegram bot (per-city personal DMs) | https://t.me/azakaalertsbot (`/add שם עיר`) |
-| Free public API (WS + REST, no key) | https://azaka.orellius.ai/api |
 | Embeddable widget for news/community sites | https://azaka.orellius.ai/platforms |
 
 ## Features
@@ -75,7 +74,7 @@ time-to-reach-shelter.
   breakdowns, recent events — plus `/alert/<id>` permalinks with **per-alert OG share previews**
   (a Vercel edge function injects the event's verbatim title + timestamp into link unfurls).
 - `/cities` index · `/historical` stats · `/platforms` (all distribution channels + embed snippet) ·
-  `/api` docs · `/menu` site index · about/privacy/terms/contact/accessibility.
+  `/menu` site index · about/privacy/terms/contact/accessibility.
 - **`/embed`** — a chrome-less live-alert iframe for third-party sites: no cookies, no analytics,
   one line of HTML.
 - **4 locales at real URLs** (`/` Hebrew, `/en` `/ar` `/ru`) with bidirectional hreflang (in-page +
@@ -192,8 +191,8 @@ src/
   analytics/track.ts       consent-gated first-party pageview beacon
   consent/                 cookie banner + store (yields to live alerts)
   historical/              /historical stats (server-aggregated)
-  pages/                   city pages, alert permalinks, cities index, platforms, API docs,
-                           menu, embed widget, snapshot render target, info pages, 404
+  pages/                   city pages, alert permalinks, cities index, platforms, menu,
+                           embed widget, snapshot render target, info pages, 404
   threat-zone/             convexHull + computeThreatZone (no deps)
 relay/
   server.ts                poll, classify, fan out, HTTP API (+5s micro-cache), static opt-in
@@ -205,10 +204,10 @@ relay/
 scripts/                   build-areas (geojson + slim) · build-sitemap (5,800+ URLs, hreflang)
 ```
 
-## Public API
+## Relay API (internal)
 
-Free, no key, no SLA. Attribution required ("Data: Azaka — azaka.orellius.ai"); don't poll faster
-than 1/s. Full docs with message shapes: **https://azaka.orellius.ai/api**
+The public `/api` docs page was taken down on 2026-06-11 — no advertising a public API served off
+the home relay. The endpoints themselves remain; the site, embeds, and the Telegram bot consume them.
 
 - `wss://azaka-relay.orellius.ai/ws` — live push (`hello` / `alert` / `clear`, verbatim oref text)
 - `GET /history` · `/history/years` · `/history/stats` · `/history/city?name=` · `/history/event?id=`
