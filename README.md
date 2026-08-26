@@ -239,4 +239,12 @@ full-event-extent historical snapshots.
 
 ## License
 
-Private. Not for redistribution.
+AGPL-3.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
+If you run a modified Azaka as a public service, the AGPL requires you to offer that
+modified source to the people using it. That is deliberate: an alert map people trust
+with their safety should be one they can read.
+
+Azaka is an independent citizen project. It is not affiliated with, endorsed by, or
+operated by Pikud HaOref, the IDF, or any Israeli government body. The alert text, area
+names and time-to-shelter values originate with Pikud HaOref and remain theirs.

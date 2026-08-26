@@ -1,0 +1,36 @@
+Azaka
+Copyright (c) 2026 Orel Ohayon
+
+This product is licensed under the GNU Affero General Public License v3.0.
+See LICENSE for the full text.
+
+--------------------------------------------------------------------------------
+Not affiliated with the Israeli Home Front Command
+--------------------------------------------------------------------------------
+
+Azaka is an independent citizen project. It is not affiliated with, endorsed by,
+or operated by Pikud HaOref (the Israeli Home Front Command), the Israel Defense
+Forces, or any Israeli government body.
+
+Azaka reads a public alert feed published by Pikud HaOref. The alert text, the
+area names and the per-area time-to-shelter values originate with Pikud HaOref
+and remain theirs. Azaka reformats and renders them; it does not author them.
+
+Azaka carries no service-level guarantee. It can be wrong, late or offline.
+It is not a substitute for the physical siren, the official Pikud HaOref
+application, or Home Front Command instructions.
+
+--------------------------------------------------------------------------------
+Third-party feeds
+--------------------------------------------------------------------------------
+
+Azaka can enrich an alert with secondary, unofficial community feeds. Those feeds
+are operated by third parties, carry no SLA, and are named in the README. They are
+consumed over the public network and are not redistributed as part of this source.
+
+--------------------------------------------------------------------------------
+Map data
+--------------------------------------------------------------------------------
+
+Base map tiles and geometry are served by third-party providers under their own
+terms. See the attribution rendered in the map control on the running site.

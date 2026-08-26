@@ -29,3 +29,8 @@ relay/data/telegram-subs.json
 *.sln
 *.sw?
 .vercel
+
+# agent config
+CLAUDE.md
+AGENTS.md
+.claude/
